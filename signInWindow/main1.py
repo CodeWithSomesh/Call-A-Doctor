@@ -3,6 +3,7 @@ from pathlib import Path
 # from tkinter import *
 # Explicit imports to satisfy Flake8
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+import customtkinter as ctk
 
 
 OUTPUT_PATH = Path(__file__).parent
@@ -12,9 +13,9 @@ ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Softwa
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-
+# Must be TK, giving issues if its CTK
 window = Tk()
-
+window.title("CaD - Doctor Appointment Booking System (Login Window)")
 window.geometry("1350x800")
 window.configure(bg = "#000000")
 
@@ -32,21 +33,21 @@ canvas = Canvas(
 canvas.place(x = 0, y = 0)
 
 
-image_image_1 = PhotoImage(
+bgImagePath = PhotoImage(
     file=relative_to_assets("image_1.png"))
-image_1 = canvas.create_image(
+bgImage = canvas.create_image(
     326.0,
     401.0,
-    image=image_image_1
+    image=bgImagePath
 )
 
-canvas.create_rectangle(
-    589.0,
-    0.0,
-    1350.0,
-    800.0,
-    fill="#FFFCFC",
-    outline="")
+whiteBgPath = PhotoImage(
+    file=relative_to_assets("image_2.png"))
+whiteBg = canvas.create_image(
+    969.0,
+    400.0,
+    image=whiteBgPath
+)
 
 canvas.create_text(
     670.0,
@@ -55,6 +56,43 @@ canvas.create_text(
     text="Create Account",
     fill="#000000",
     font=("Inter", 48 * -1, "bold", "underline")
+)
+
+canvas.create_text(
+    670.0,
+    154.0,
+    anchor="nw",
+    text="First Name",
+    fill="#000000",
+    font=("Inter", 16 * -1, "bold")
+)
+
+
+canvas.create_text(
+    994.0,
+    154.0,
+    anchor="nw",
+    text="Last Name",
+    fill="#000000",
+    font=("Inter", 16 * -1, "bold")
+)
+
+canvas.create_text(
+    670.0,
+    260.0,
+    anchor="nw",
+    text="Address",
+    fill="#000000",
+    font=("Inter", 16 * -1, "bold")
+)
+
+canvas.create_text(
+    670.0,
+    406.0,
+    anchor="nw",
+    text="Email",
+    fill="#000000",
+    font=("Inter", 16 * -1, "bold")
 )
 
 canvas.create_text(
@@ -75,52 +113,10 @@ canvas.create_text(
     font=("Inter", 16 * -1, "bold")
 )
 
-canvas.create_text(
-    670.0,
-    260.0,
-    anchor="nw",
-    text="Address",
-    fill="#000000",
-    font=("Inter", 16 * -1, "bold")
-)
 
-canvas.create_text(
-    670.0,
-    154.0,
-    anchor="nw",
-    text="First Name",
-    fill="#000000",
-    font=("Inter", 16 * -1, "bold")
-)
 
-entry_image_1 = PhotoImage(
-    file=relative_to_assets("entry_1.png"))
-entry_bg_1 = canvas.create_image(
-    817.5,
-    210.0,
-    image=entry_image_1
-)
-entry_1 = Entry(
-    bd=0,
-    bg="#FFFFFF",
-    fg="#000716",
-    highlightthickness=0
-)
-entry_1.place(
-    x=678.0,
-    y=186.0,
-    width=279.0,
-    height=46.0
-)
 
-canvas.create_text(
-    670.0,
-    406.0,
-    anchor="nw",
-    text="Email",
-    fill="#000000",
-    font=("Inter", 16 * -1, "bold")
-)
+
 
 entry_image_2 = PhotoImage(
     file=relative_to_assets("entry_2.png"))
@@ -218,14 +214,7 @@ entry_5.place(
     height=46.0
 )
 
-canvas.create_text(
-    994.0,
-    154.0,
-    anchor="nw",
-    text="Last Name",
-    fill="#000000",
-    font=("Inter", 16 * -1, "bold")
-)
+
 
 entry_image_6 = PhotoImage(
     file=relative_to_assets("entry_6.png"))
