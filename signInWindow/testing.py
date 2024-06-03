@@ -39,7 +39,8 @@ textbox = ctk.CTkTextbox(
 )
 textbox.pack()
 
-
+label = ctk.CTkLabel(window, text="Create Account", font=("Inter", 48), text_color="#000000")
+label.place(x=81.0, y=53.0)
 
 window.resizable(False, False)
 window.mainloop()

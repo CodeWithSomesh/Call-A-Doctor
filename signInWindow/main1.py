@@ -13,11 +13,11 @@ ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Softwa
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-# Must be TK, giving issues if its CTK
+# Must be TK, giving issues if its CTK while in laptop screen
 window = Tk()
 window.title("CaD - Doctor Appointment Booking System (Login Window)")
 window.geometry("1350x800")
-window.configure(bg = "#000000")
+window.configure(bg = "#ffffff")
 
 
 canvas = Canvas(
@@ -49,6 +49,7 @@ whiteBg = canvas.create_image(
     image=whiteBgPath
 )
 
+
 canvas.create_text(
     670.0,
     53.0,
@@ -57,6 +58,17 @@ canvas.create_text(
     fill="#000000",
     font=("Inter", 48 * -1, "bold", "underline")
 )
+
+# formsFrame = ctk.CTkFrame(window, width=680, height=646, fg_color='transparent')
+# formsFrame.place(
+#     x=639.0,
+#     y=135.0
+# )
+
+# label = ctk.CTkLabel(formsFrame, text="First Name", font=("Inter", 16, "bold"), text_color="#000000")
+# label.pack(fill='both', expand=True)
+# label = ctk.CTkLabel(formsFrame, text="Last Name", font=("Inter", 16, "bold"), text_color="#000000")
+# label.pack(fill='both', expand=True)
 
 canvas.create_text(
     670.0,
@@ -67,6 +79,15 @@ canvas.create_text(
     font=("Inter", 16 * -1, "bold")
 )
 
+firstNameTextBox = ctk.CTkTextbox(
+    window, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+    border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
+    scrollbar_button_color="#1AFF75", border_width=1
+)
+firstNameTextBox.place(
+    x=670.0,
+    y=186.0
+)
 
 canvas.create_text(
     994.0,
@@ -75,6 +96,16 @@ canvas.create_text(
     text="Last Name",
     fill="#000000",
     font=("Inter", 16 * -1, "bold")
+)
+
+lastNameTextBox = ctk.CTkTextbox(
+    window, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+    border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
+    scrollbar_button_color="#1AFF75", border_width=1
+)
+lastNameTextBox.place(
+    x=994.0,
+    y=186.0
 )
 
 canvas.create_text(
@@ -86,6 +117,16 @@ canvas.create_text(
     font=("Inter", 16 * -1, "bold")
 )
 
+addressTextBox = ctk.CTkTextbox(
+    window, fg_color="#ffffff", text_color="#000000", width=619, height=88, 
+    border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
+    scrollbar_button_color="#1AFF75", border_width=1
+)
+addressTextBox.place(
+    x=670.0,
+    y=292.0
+)
+
 canvas.create_text(
     670.0,
     406.0,
@@ -93,6 +134,16 @@ canvas.create_text(
     text="Email",
     fill="#000000",
     font=("Inter", 16 * -1, "bold")
+)
+
+emailTextBox = ctk.CTkTextbox(
+    window, fg_color="#ffffff", text_color="#000000", width=619, height=48, 
+    border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
+    scrollbar_button_color="#1AFF75", border_width=1
+)
+emailTextBox.place(
+    x=670.0,
+    y=438.0
 )
 
 canvas.create_text(
@@ -104,6 +155,16 @@ canvas.create_text(
     font=("Inter", 16 * -1, "bold")
 )
 
+passwordTextBox = ctk.CTkTextbox(
+    window, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+    border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
+    scrollbar_button_color="#1AFF75", border_width=1
+)
+passwordTextBox.place(
+    x=670.0,
+    y=544.0
+)
+
 canvas.create_text(
     994.0,
     512.0,
@@ -113,50 +174,28 @@ canvas.create_text(
     font=("Inter", 16 * -1, "bold")
 )
 
-
-
-
-
-
-entry_image_2 = PhotoImage(
-    file=relative_to_assets("entry_2.png"))
-entry_bg_2 = canvas.create_image(
-    979.5,
-    462.0,
-    image=entry_image_2
+roleTextBox = ctk.CTkTextbox(
+    window, fg_color="#ffffff", text_color="#000000", width=299, height=48, 
+    border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
+    scrollbar_button_color="#1AFF75", border_width=1
 )
-entry_2 = Entry(
-    bd=0,
-    bg="#FFFFFF",
-    fg="#000716",
-    highlightthickness=0
-)
-entry_2.place(
-    x=678.0,
-    y=438.0,
-    width=603.0,
-    height=46.0
+roleTextBox.place(
+    x=994.0,
+    y=544.0
 )
 
-entry_image_3 = PhotoImage(
-    file=relative_to_assets("entry_3.png"))
-entry_bg_3 = canvas.create_image(
-    979.5,
-    336.0,
-    image=entry_image_3
+roleTextBox = ctk.CTkOptionMenu(
+    window, fg_color="#ffffff", text_color="#000000", width=293, height=46, 
+    font=("Inter", 20), button_color='#1AFF75', button_hover_color='#33383F',
+    values=['Patient', 'Doctor', 'Clinic Admin'],
+    dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+    dropdown_text_color='#000', dropdown_hover_color='#1AFF75'
 )
-entry_3 = Entry(
-    bd=0,
-    bg="#FFFFFF",
-    fg="#000716",
-    highlightthickness=0
+roleTextBox.place(
+    x=1000.0,
+    y=545.0
 )
-entry_3.place(
-    x=678.0,
-    y=292.0,
-    width=603.0,
-    height=86.0
-)
+
 
 button_image_1 = PhotoImage(
     file=relative_to_assets("button_1.png"))
@@ -174,75 +213,25 @@ button_1.place(
     height=64.0
 )
 
-entry_image_4 = PhotoImage(
-    file=relative_to_assets("entry_4.png"))
-entry_bg_4 = canvas.create_image(
-    817.5,
-    568.0,
-    image=entry_image_4
-)
-entry_4 = Entry(
-    bd=0,
-    bg="#FFFFFF",
-    fg="#000716",
-    highlightthickness=0
-)
-entry_4.place(
-    x=678.0,
-    y=544.0,
-    width=279.0,
-    height=46.0
-)
-
-entry_image_5 = PhotoImage(
-    file=relative_to_assets("entry_5.png"))
-entry_bg_5 = canvas.create_image(
-    1141.5,
-    568.0,
-    image=entry_image_5
-)
-entry_5 = Entry(
-    bd=0,
-    bg="#FFFFFF",
-    fg="#000716",
-    highlightthickness=0
-)
-entry_5.place(
-    x=1002.0,
-    y=544.0,
-    width=279.0,
-    height=46.0
-)
-
-
-
-entry_image_6 = PhotoImage(
-    file=relative_to_assets("entry_6.png"))
-entry_bg_6 = canvas.create_image(
-    1141.5,
-    210.0,
-    image=entry_image_6
-)
-entry_6 = Entry(
-    bd=0,
-    bg="#FFFFFF",
-    fg="#000716",
-    highlightthickness=0
-)
-entry_6.place(
-    x=1002.0,
-    y=186.0,
-    width=279.0,
-    height=46.0
-)
 
 canvas.create_text(
     865.0,
     718.0,
     anchor="nw",
-    text="Already have an account? Login",
+    text="Already have an account?",
     fill="#000000",
     font=("Inter", 15 * -1, "bold")
 )
+
+canvas.create_text(
+    1050.0,
+    718.0,
+    anchor="nw",
+    text="Login",
+    fill="#1AFF75",
+    font=("Inter", 15 * -1, "bold")
+)
+
+
 window.resizable(False, False)
 window.mainloop()
