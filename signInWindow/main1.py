@@ -50,18 +50,18 @@ whiteBg = canvas.create_image(
 
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-scrollable_frame = ctk.CTkScrollableFrame(window, width=683, height=850, fg_color="#FFFDFD", scrollbar_fg_color="#000", scrollbar_button_color="#000", border_width=2)
+scrollable_frame = ctk.CTkScrollableFrame(window, width=683, height=850, fg_color="#FFFDFD", scrollbar_fg_color="#000", scrollbar_button_color="#000", )
 scrollable_frame.place(x=645, y=0)
 
 createAccountLabel = ctk.CTkLabel(scrollable_frame, text="Create Account", font=("Inter", 48, "bold", "underline"), text_color="#000000")
-createAccountLabel.pack(side='top', fill='both', expand=False, pady=(50,25))
+createAccountLabel.pack(side='top', fill='both', expand=False, pady=(50,45))
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<< PARENT FRAME INSIDE SCROLLABLE FRAME STORES LEFT & RIGHT FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-parentFrame = ctk.CTkFrame(scrollable_frame, width=620, height=500, fg_color="#FFFDFD", border_width=2, border_color="blue")
+parentFrame = ctk.CTkFrame(scrollable_frame, width=620, height=500, fg_color="#FFFDFD", )
 parentFrame.pack(side='top', fill='x', expand=False, )
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< LEFT FRAME INSIDE SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-leftFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD", border_width=2)
+leftFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD", )
 leftFrame.pack(side='left', fill='both', expand=False,)
 
 
@@ -122,9 +122,18 @@ passwordTextBox.pack(side='top', fill='x', expand=False,)
 
 def displayBasedOnRole(role):
     print(role)
+    buttonFrame.pack_forget()
+    submitButton.pack_forget()
 
     if role == 'Clinic Admin':
         patientBottomFrame.pack_forget()
+        doctorSpecializationLabel.pack_forget()
+        yearsOfExpLabel.pack_forget()
+        doctorSpecializationTextBox.pack_forget()
+        yearsOfExpTextBox.pack_forget()
+        doctorBottomFrame.pack_forget()
+        doctorClinicNameLabel.pack_forget()
+        doctorClinicNameDropdown.pack_forget()
 
         clinicNameLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
         clinicContactLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
@@ -132,7 +141,7 @@ def displayBasedOnRole(role):
         clinicContactTextBox.pack(side='top', fill='x', expand=False,)
         clinicBottomFrame.pack(side='top', fill='x', expand=False, pady=(30, 0))
         clinicAddressLabel.pack(side='top', fill='x', expand=False, )
-        clinicAddressTextBox.pack(side='top', fill='none', expand=False, pady=(0, 30), anchor="w")
+        clinicAddressTextBox.pack(side='top', fill='none', expand=False, pady=(0, 40), anchor="w")
 
 
     elif role == 'Patient':
@@ -143,10 +152,17 @@ def displayBasedOnRole(role):
         clinicBottomFrame.pack_forget()
         clinicAddressLabel.pack_forget()
         clinicAddressTextBox.pack_forget()
+        doctorSpecializationLabel.pack_forget()
+        yearsOfExpLabel.pack_forget()
+        doctorSpecializationTextBox.pack_forget()
+        yearsOfExpTextBox.pack_forget()
+        doctorBottomFrame.pack_forget()
+        doctorClinicNameLabel.pack_forget()
+        doctorClinicNameDropdown.pack_forget()
 
         patientBottomFrame.pack(side='top', fill='x', expand=False, pady=(30, 0),)
         addressLabel.pack(side='top', fill='x', expand=False,)
-        addressTextBox.pack(side='top', fill='none', expand=False, pady=(0, 30), anchor="w")
+        addressTextBox.pack(side='top', fill='none', expand=False, pady=(0, 40), anchor="w")
         
     elif role == 'Doctor':
         clinicNameLabel.pack_forget()
@@ -158,6 +174,15 @@ def displayBasedOnRole(role):
         clinicAddressTextBox.pack_forget()
         patientBottomFrame.pack_forget()
 
+        doctorSpecializationLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
+        yearsOfExpLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
+        doctorSpecializationTextBox.pack(side='top', fill='x', expand=False,)
+        yearsOfExpTextBox.pack(side='top', fill='x', expand=False,)
+        doctorBottomFrame.pack(side='top', fill='x', expand=False, pady=(30, 0))
+        doctorClinicNameLabel.pack(side='top', fill='x', expand=False, )
+        doctorClinicNameDropdown.pack(side='top', fill='none', expand=False, pady=(0, 40), anchor="w")
+
+
     else:
         clinicNameLabel.pack_forget()
         clinicNameTextBox.pack_forget()
@@ -167,7 +192,22 @@ def displayBasedOnRole(role):
         clinicAddressLabel.pack_forget()
         clinicAddressTextBox.pack_forget()
         patientBottomFrame.pack_forget()
+        doctorSpecializationLabel.pack_forget()
+        yearsOfExpLabel.pack_forget()
+        doctorSpecializationTextBox.pack_forget()
+        yearsOfExpTextBox.pack_forget()
+        doctorBottomFrame.pack_forget()
+        doctorClinicNameLabel.pack_forget()
+        doctorClinicNameDropdown.pack_forget()
 
+        buttonFrame.pack(side='top', fill='x', expand=False, pady=(40, 40),)
+        submitButton.pack(side='top', fill='none', expand=False, anchor="w")
+        return
+
+
+    
+    buttonFrame.pack(side='top', fill='x', expand=False, pady=(0, 100),)
+    submitButton.pack(side='top', fill='none', expand=False, anchor="w")
 
 
 roleLabel = ctk.CTkLabel(rightFrame, text="Sign In As", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
@@ -191,8 +231,6 @@ clinicNameTextBox = ctk.CTkTextbox(
     scrollbar_button_color="#1AFF75", border_width=1
 )
 
-
-
 clinicContactLabel = ctk.CTkLabel(rightFrame, text="Clinic Contact Number", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
 clinicContactTextBox = ctk.CTkTextbox(
     rightFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
@@ -201,10 +239,7 @@ clinicContactTextBox = ctk.CTkTextbox(
 )
 
 
-
-clinicBottomFrame = ctk.CTkFrame(scrollable_frame, width=341, height=500, fg_color="#FFFDFD", border_color='yellow', border_width=5)
-
-
+clinicBottomFrame = ctk.CTkFrame(scrollable_frame, width=341, height=500, fg_color="#FFFDFD",)
 
 clinicAddressLabel = ctk.CTkLabel(clinicBottomFrame, text="Clinic Address", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
 clinicAddressTextBox = ctk.CTkTextbox(
@@ -214,13 +249,48 @@ clinicAddressTextBox = ctk.CTkTextbox(
 )
 
 
-patientBottomFrame = ctk.CTkFrame(scrollable_frame, width=341, height=500, fg_color="#FFFDFD", border_color='yellow', border_width=5)
+patientBottomFrame = ctk.CTkFrame(scrollable_frame, width=341, height=500, fg_color="#FFFDFD",)
 addressLabel = ctk.CTkLabel(patientBottomFrame, text="Address", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
 addressTextBox = ctk.CTkTextbox(
     patientBottomFrame, fg_color="#ffffff", text_color="#000000", width=620, height=88, 
     border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
     scrollbar_button_color="#1AFF75", border_width=1
 )
+
+
+
+doctorSpecializationLabel = ctk.CTkLabel(rightFrame, text="Specialization", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+doctorSpecializationTextBox = ctk.CTkTextbox(
+    rightFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+    border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
+    scrollbar_button_color="#1AFF75", border_width=1
+)
+
+yearsOfExpLabel = ctk.CTkLabel(leftFrame, text="Year Of Experience", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+yearsOfExpTextBox = ctk.CTkTextbox(
+    leftFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+    border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
+    scrollbar_button_color="#1AFF75", border_width=1
+)
+
+
+doctorBottomFrame = ctk.CTkFrame(scrollable_frame, width=341, height=500, fg_color="#FFFDFD",)
+
+
+doctorClinicNameLabel = ctk.CTkLabel(doctorBottomFrame, text="Clinic Name", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+doctorClinicNameDropdown = ctk.CTkComboBox(
+    doctorBottomFrame, fg_color="#ffffff", text_color="#000000", width=620, height=48, 
+    font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+    values=['Clinic Panmedic', 'Clinic Sungai Nibong', 'Clinic Medicare', 'Clinic HealthSync'], border_color="#b5b3b3", border_width=1,
+    dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+    dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+)
+
+
+buttonFrame = ctk.CTkFrame(scrollable_frame, width=341, height=500, fg_color="#FFFDFD",)
+submitButton = ctk.CTkButton(buttonFrame, text="Submit", width=620, height=64, font=("Inter", 24, "bold",), fg_color="#000", hover_color="#1BCC62", )
+buttonFrame.pack(side='top', fill='x', expand=False, pady=(40, 40),)
+submitButton.pack(side='top', fill='none', expand=False, anchor="w")
 
 
 
