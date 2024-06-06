@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from PIL import Image
 
 # Add the parent directory to the system path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -27,180 +28,111 @@ def loginWindow():
 
     window = Tk()
     window.geometry("1350x800")
-    window.configure(bg = "#000000")
+    window.configure(bg = "#fff")
 
     canvas = Canvas(
         window,
-        bg = "#000000",
+        bg = "#fff",
         height = 800,
         width = 1350,
         bd = 0,
         highlightthickness = 0,
         relief = "ridge"
     )
-
     canvas.place(x = 0, y = 0)
-    image_image_1 = PhotoImage(
+
+    bgImagePath = PhotoImage(
         file=relative_to_assets("image_1.png"))
-    image_1 = canvas.create_image(
+    bgImage = canvas.create_image(
         401.0,
         400.0,
-        image=image_image_1
+        image=bgImagePath
     )
 
-    canvas.create_rectangle(
-        719.0,
-        0.0,
-        1350.0,
-        800.0,
-        fill="#FFFCFC",
-        outline="")
-
-    canvas.create_text(
-        858.0,
-        123.0,
-        anchor="nw",
-        text="Your Health, Our Priority",
-        fill="#000000",
-        font=("Inter", 32 * -1, "bold")
-    )
-
-    canvas.create_text(
-        778.0,
-        163.0,
-        anchor="nw",
-        text="– Book Appointments in Seconds",
-        fill="#000000",
-        font=("Inter", 32 * -1, "bold")
-    )
-
-    canvas.create_text(
-        761.060302734375,
-        396.0,
-        anchor="nw",
-        text="Password",
-        fill="#000000",
-        font=("Inter", 16 * -1)
-    )
-
-    canvas.create_text(
-        1048.060302734375,
-        396.0,
-        anchor="nw",
-        text="Sign In As",
-        fill="#000000",
-        font=("Inter", 16 * -1)
-    )
-
-    canvas.create_text(
-        761.060302734375,
-        290.0,
-        anchor="nw",
-        text="Email",
-        fill="#000000",
-        font=("Inter", 16 * -1)
-    )
-
-    entry_image_1 = PhotoImage(
-        file=relative_to_assets("entry_1.png"))
-    entry_bg_1 = canvas.create_image(
-        1035.060302734375,
-        346.0,
-        image=entry_image_1
-    )
-    entry_1 = Entry(
-        bd=0,
-        bg="#FFFFFF",
-        fg="#000716",
-        highlightthickness=0
-    )
-    entry_1.place(
-        x=769.060302734375,
-        y=322.0,
-        width=532.0,
-        height=46.0
-    )
-
-    button_image_1 = PhotoImage(
-        file=relative_to_assets("button_1.png"))
-    button_1 = Button(
-        image=button_image_1,
-        borderwidth=0,
-        highlightthickness=0,
-        command=redirectToSignInWindow,
-        relief="flat"
-    )
-    button_1.place(
-        x=761.0,
-        y=525.0,
-        width=547.8106689453125,
-        height=64.0
-    )
-
-    entry_image_2 = PhotoImage(
-        file=relative_to_assets("entry_2.png"))
-    entry_bg_2 = canvas.create_image(
-        891.560302734375,
-        452.0,
-        image=entry_image_2
-    )
-    entry_2 = Entry(
-        bd=0,
-        bg="#FFFFFF",
-        fg="#000716",
-        highlightthickness=0
-    )
-    entry_2.place(
-        x=769.060302734375,
-        y=428.0,
-        width=245.0,
-        height=46.0
-    )
-
-    entry_image_3 = PhotoImage(
-        file=relative_to_assets("entry_3.png"))
-    entry_bg_3 = canvas.create_image(
-        1178.560302734375,
-        452.0,
-        image=entry_image_3
-    )
-    entry_3 = Entry(
-        bd=0,
-        bg="#FFFFFF",
-        fg="#000716",
-        highlightthickness=0
-    )
-    entry_3.place(
-        x=1056.060302734375,
-        y=428.0,
-        width=245.0,
-        height=46.0
-    )
-
-    canvas.create_text(
-        934.060302734375,
-        614.0,
-        anchor="nw",
-        text="Don’t have an account? Sign Up",
-        fill="#000000",
-        font=("Inter", 15 * -1)
-    )
-
-    image_image_2 = PhotoImage(
-        file=relative_to_assets("image_2.png"))
-    image_2 = canvas.create_image(
-        1254.0,
-        705.0,
-        image=image_image_2
-    )
-
-    image_image_3 = PhotoImage(
+    logoImagePath = PhotoImage(
         file=relative_to_assets("image_3.png"))
-    image_3 = canvas.create_image(
+    logoImage = canvas.create_image(
         380.0,
         368.0,
-        image=image_image_3
+        image=logoImagePath
     )
+
+    # canvas.create_rectangle(
+    #     719.0,
+    #     0.0,
+    #     1350.0,
+    #     800.0,
+    #     fill="#FFFCFC",
+    #     outline="")
+    
+    formFrame = ctk.CTkFrame(window, width=653, height=800, fg_color="#FFFDFD", border_color="#000", )
+    formFrame.place(x=719, y=0)
+
+    headerLabel1 = ctk.CTkLabel(window, text="Your Health, Our Priority", font=("Inter", 32, "bold",), text_color="#000000")
+    headerLabel1.place(x=858, y=163)
+    headerLabel2 = ctk.CTkLabel(window, text="– Book Appointments in Seconds", font=("Inter", 32, "bold",), text_color="#000000")
+    headerLabel2.place(x=778, y=203)
+
+
+    emailLabel = ctk.CTkLabel(window, text="Email", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+    emailLabel.place(x=761.06, y=290.0,)
+    emailTextBox = ctk.CTkTextbox(
+        window, fg_color="#ffffff", text_color="#000000", width=548, height=48, 
+        border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
+        scrollbar_button_color="#1AFF75", border_width=1
+    )
+    emailTextBox.place(x=761.060302734375, y=322.0)
+
+
+    passwordLabel = ctk.CTkLabel(window, text="Password", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+    passwordLabel.place(x=761.06, y=396.0,)
+    passwordTextBox = ctk.CTkTextbox(
+        window, fg_color="#ffffff", text_color="#000000", width=261, height=48, 
+        border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
+        scrollbar_button_color="#1AFF75", border_width=1
+    )
+    passwordTextBox.place(x=761.06, y=428.0)
+
+
+    roleLabel = ctk.CTkLabel(window, text="Sign In As", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+    roleLabel.place(x=1048.06, y=396,)
+    roleDropdown = ctk.CTkComboBox(
+        window, fg_color="#ffffff", text_color="#000000", width=261, height=48, 
+        font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+        values=['Role', 'Patient', 'Doctor', 'Clinic Admin'], border_color="#b5b3b3", border_width=1,
+        dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+        dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+    )
+    roleDropdown.place(x=1048, y=428,)
+
+
+    submitButton = ctk.CTkButton(
+        window, text="Submit", width=548, height=64, 
+        font=("Inter", 24, "bold",), fg_color="#000", hover_color="#1BCC62", 
+        command=redirectToSignInWindow
+    )
+    submitButton.place(x=761, y=525)
+
+
+    logInLabel1 = ctk.CTkLabel(window, text="Don't Have An Account?", font=("Inter", 15, "bold") , text_color="#000000",)
+    logInLabel1.place(x=910, y=597)
+    logInLabel2 = ctk.CTkButton(
+        window, text="Sign In", font=("Inter", 16, "bold") , 
+        text_color="#1AFF75", command=redirectToSignInWindow, width=0,
+        fg_color='transparent', hover=False)
+    logInLabel2.place(x=1080, y=598)
+
+    extraImagePath = relative_to_assets("image_2.png")
+    extraImage = ctk.CTkImage(light_image=Image.open(extraImagePath), size=(191,206))
+    extraImageLabel = ctk.CTkLabel(window, image=extraImage,)
+    extraImageLabel.place(x=1160, y=593)
+    # image_2 = canvas.create_image(
+    #     1254.0,
+    #     705.0,
+    #     image=extraImagePath
+    # )
+
+    
 
 
     window.resizable(False, False)
