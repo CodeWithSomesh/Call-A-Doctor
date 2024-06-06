@@ -1,13 +1,30 @@
+import sys
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Button, PhotoImage
+
+# Add the parent directory to the system path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+from tkinter import Tk, Canvas, PhotoImage, Entry, Button
+import customtkinter as ctk
+
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\logInWindow\assets\frame0")
 
-def relative_to_assets(path: str) -> Path:
-    return ASSETS_PATH / Path(path)
 
-def open_login_window():
+
+def loginWindow():
+
+    def relative_to_assets(path: str) -> Path:
+        return ASSETS_PATH / Path(path)
+
+    # Function to redirect to the login window
+    def redirectToSignInWindow():
+        window.destroy()
+        from signInWindow.main import signInWindow
+        signInWindow()
+
+
     window = Tk()
     window.geometry("1350x800")
     window.configure(bg = "#000000")
@@ -110,7 +127,7 @@ def open_login_window():
         image=button_image_1,
         borderwidth=0,
         highlightthickness=0,
-        command=lambda: print("button_1 clicked"),
+        command=redirectToSignInWindow,
         relief="flat"
     )
     button_1.place(
@@ -184,9 +201,12 @@ def open_login_window():
         368.0,
         image=image_image_3
     )
+
+
     window.resizable(False, False)
     window.mainloop()
 
 # Only execute the login window if this script is run directly
 if __name__ == "__main__":
-    open_login_window()
+    loginWindow()
+
