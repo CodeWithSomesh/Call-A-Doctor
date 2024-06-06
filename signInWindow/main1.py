@@ -1,25 +1,129 @@
+import sys
 from pathlib import Path
 
-# from tkinter import *
-# Explicit imports to satisfy Flake8
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Scrollbar, LEFT
+# Add the parent directory to the system path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+from tkinter import Tk, Canvas, PhotoImage
 import customtkinter as ctk
+#from logInWindow.main import open_login_window
 
 
+# Paths to assets and output directories
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\signInWindow\assets\frame0")
 
-
+# Helper function to get the full path of assets
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-# Must be TK, giving issues if its CTK while in laptop screen
+# Function to redirect to the login window
+def redirect_to_login():
+    window.destroy()
+    open_login_window()
+
+# Function to update the display based on selected role
+def displayBasedOnRole(role):
+    print(role)
+    buttonFrame.pack_forget()
+    submitButton.pack_forget()
+
+    if role == 'Clinic Admin':
+        # Hide patient and doctor specific fields
+        patientBottomFrame.pack_forget()
+        doctorSpecializationLabel.pack_forget()
+        yearsOfExpLabel.pack_forget()
+        doctorSpecializationTextBox.pack_forget()
+        yearsOfExpTextBox.pack_forget()
+        doctorBottomFrame.pack_forget()
+        doctorClinicNameLabel.pack_forget()
+        doctorClinicNameDropdown.pack_forget()
+
+        # Show clinic admin specific fields
+        clinicNameLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
+        clinicContactLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
+        clinicNameTextBox.pack(side='top', fill='x', expand=False,)
+        clinicContactTextBox.pack(side='top', fill='x', expand=False,)
+        clinicBottomFrame.pack(side='top', fill='x', expand=False, pady=(30, 0))
+        clinicAddressLabel.pack(side='top', fill='x', expand=False, )
+        clinicAddressTextBox.pack(side='top', fill='none', expand=False, pady=(0, 40), anchor="w")
+
+    elif role == 'Patient':
+        # Hide clinic admin and doctor specific fields
+        clinicNameLabel.pack_forget()
+        clinicNameTextBox.pack_forget()
+        clinicContactLabel.pack_forget()
+        clinicContactTextBox.pack_forget()
+        clinicBottomFrame.pack_forget()
+        clinicAddressLabel.pack_forget()
+        clinicAddressTextBox.pack_forget()
+        doctorSpecializationLabel.pack_forget()
+        yearsOfExpLabel.pack_forget()
+        doctorSpecializationTextBox.pack_forget()
+        yearsOfExpTextBox.pack_forget()
+        doctorBottomFrame.pack_forget()
+        doctorClinicNameLabel.pack_forget()
+        doctorClinicNameDropdown.pack_forget()
+
+        # Show patient specific fields
+        patientBottomFrame.pack(side='top', fill='x', expand=False, pady=(30, 0),)
+        addressLabel.pack(side='top', fill='x', expand=False,)
+        addressTextBox.pack(side='top', fill='none', expand=False, pady=(0, 40), anchor="w")
+        
+    elif role == 'Doctor':
+        # Hide clinic admin and patient specific fields
+        clinicNameLabel.pack_forget()
+        clinicNameTextBox.pack_forget()
+        clinicContactLabel.pack_forget()
+        clinicContactTextBox.pack_forget()
+        clinicBottomFrame.pack_forget()
+        clinicAddressLabel.pack_forget()
+        clinicAddressTextBox.pack_forget()
+        patientBottomFrame.pack_forget()
+
+        # Show doctor specific fields
+        doctorSpecializationLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
+        yearsOfExpLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
+        doctorSpecializationTextBox.pack(side='top', fill='x', expand=False,)
+        yearsOfExpTextBox.pack(side='top', fill='x', expand=False,)
+        doctorBottomFrame.pack(side='top', fill='x', expand=False, pady=(30, 0))
+        doctorClinicNameLabel.pack(side='top', fill='x', expand=False, )
+        doctorClinicNameDropdown.pack(side='top', fill='none', expand=False, pady=(0, 40), anchor="w")
+
+    else:
+        # Hide all fields and reset to initial state
+        clinicNameLabel.pack_forget()
+        clinicNameTextBox.pack_forget()
+        clinicContactLabel.pack_forget()
+        clinicContactTextBox.pack_forget()
+        clinicBottomFrame.pack_forget()
+        clinicAddressLabel.pack_forget()
+        clinicAddressTextBox.pack_forget()
+        patientBottomFrame.pack_forget()
+        doctorSpecializationLabel.pack_forget()
+        yearsOfExpLabel.pack_forget()
+        doctorSpecializationTextBox.pack_forget()
+        yearsOfExpTextBox.pack_forget()
+        doctorBottomFrame.pack_forget()
+        doctorClinicNameLabel.pack_forget()
+        doctorClinicNameDropdown.pack_forget()
+
+        # Show submit button
+        buttonFrame.pack(side='top', fill='x', expand=False, pady=(40, 40),)
+        submitButton.pack(side='top', fill='none', expand=False, anchor="w")
+        return
+    
+    # Show submit button below the dynamically added input fields
+    buttonFrame.pack(side='top', fill='x', expand=False, pady=(0, 100),)
+    submitButton.pack(side='top', fill='none', expand=False, anchor="w")
+
+# Create main window
 window = Tk()
 window.title("CaD - Doctor Appointment Booking System (Login Window)")
 window.geometry("1350x800")
 window.configure(bg = "#ffffff")
 
-
+# Create canvas for background and layout
 canvas = Canvas(
     window,
     bg = "#fff",
@@ -31,7 +135,7 @@ canvas = Canvas(
 )
 canvas.place(x = 0, y = 0)
 
-
+# Background image
 bgImagePath = PhotoImage(
     file=relative_to_assets("image_1.png"))
 bgImage = canvas.create_image(
@@ -40,6 +144,7 @@ bgImage = canvas.create_image(
     image=bgImagePath
 )
 
+# White background for form
 whiteBgPath = PhotoImage(
     file=relative_to_assets("image_2.png"))
 whiteBg = canvas.create_image(
@@ -53,6 +158,7 @@ whiteBg = canvas.create_image(
 scrollable_frame = ctk.CTkScrollableFrame(window, width=683, height=850, fg_color="#FFFDFD", scrollbar_fg_color="#000", scrollbar_button_color="#000", )
 scrollable_frame.place(x=645, y=0)
 
+# Label for Create Account
 createAccountLabel = ctk.CTkLabel(scrollable_frame, text="Create Account", font=("Inter", 48, "bold", "underline"), text_color="#000000")
 createAccountLabel.pack(side='top', fill='both', expand=False, pady=(50,45))
 
@@ -64,7 +170,7 @@ parentFrame.pack(side='top', fill='x', expand=False, )
 leftFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD", )
 leftFrame.pack(side='left', fill='both', expand=False,)
 
-
+# First name field
 firstNameLabel = ctk.CTkLabel(leftFrame, text="First Name", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
 firstNameLabel.pack(side='top', fill='x', expand=False)
 firstNameTextBox = ctk.CTkTextbox(
@@ -74,7 +180,7 @@ firstNameTextBox = ctk.CTkTextbox(
 )
 firstNameTextBox.pack(side='top', fill='x', expand=False,)
 
-
+# Email field
 emailLabel = ctk.CTkLabel(leftFrame, text="Email", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
 emailLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
 emailTextBox = ctk.CTkTextbox(
@@ -84,7 +190,7 @@ emailTextBox = ctk.CTkTextbox(
 )
 emailTextBox.pack(side='top', fill='x', expand=False,)
 
-
+# NRIC field
 nricLabel = ctk.CTkLabel(leftFrame, text="NRIC", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
 nricLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
 nricTextBox = ctk.CTkTextbox(
@@ -99,6 +205,7 @@ nricTextBox.pack(side='top', fill='x', expand=False,)
 rightFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD",)
 rightFrame.pack(side='left', fill='both', expand=False, padx=(30,0))
 
+# Last name field
 lastNameLabel = ctk.CTkLabel(rightFrame, text="Last Name", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
 lastNameLabel.pack(side='top', fill='x', expand=False)
 lastNameTextBox = ctk.CTkTextbox(
@@ -108,7 +215,7 @@ lastNameTextBox = ctk.CTkTextbox(
 )
 lastNameTextBox.pack(side='top', fill='x', expand=False,)
 
-
+# Password field
 passwordLabel = ctk.CTkLabel(rightFrame, text="Password", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
 passwordLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
 passwordTextBox = ctk.CTkTextbox(
@@ -119,97 +226,7 @@ passwordTextBox = ctk.CTkTextbox(
 passwordTextBox.pack(side='top', fill='x', expand=False,)
 
 
-
-def displayBasedOnRole(role):
-    print(role)
-    buttonFrame.pack_forget()
-    submitButton.pack_forget()
-
-    if role == 'Clinic Admin':
-        patientBottomFrame.pack_forget()
-        doctorSpecializationLabel.pack_forget()
-        yearsOfExpLabel.pack_forget()
-        doctorSpecializationTextBox.pack_forget()
-        yearsOfExpTextBox.pack_forget()
-        doctorBottomFrame.pack_forget()
-        doctorClinicNameLabel.pack_forget()
-        doctorClinicNameDropdown.pack_forget()
-
-        clinicNameLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
-        clinicContactLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
-        clinicNameTextBox.pack(side='top', fill='x', expand=False,)
-        clinicContactTextBox.pack(side='top', fill='x', expand=False,)
-        clinicBottomFrame.pack(side='top', fill='x', expand=False, pady=(30, 0))
-        clinicAddressLabel.pack(side='top', fill='x', expand=False, )
-        clinicAddressTextBox.pack(side='top', fill='none', expand=False, pady=(0, 40), anchor="w")
-
-
-    elif role == 'Patient':
-        clinicNameLabel.pack_forget()
-        clinicNameTextBox.pack_forget()
-        clinicContactLabel.pack_forget()
-        clinicContactTextBox.pack_forget()
-        clinicBottomFrame.pack_forget()
-        clinicAddressLabel.pack_forget()
-        clinicAddressTextBox.pack_forget()
-        doctorSpecializationLabel.pack_forget()
-        yearsOfExpLabel.pack_forget()
-        doctorSpecializationTextBox.pack_forget()
-        yearsOfExpTextBox.pack_forget()
-        doctorBottomFrame.pack_forget()
-        doctorClinicNameLabel.pack_forget()
-        doctorClinicNameDropdown.pack_forget()
-
-        patientBottomFrame.pack(side='top', fill='x', expand=False, pady=(30, 0),)
-        addressLabel.pack(side='top', fill='x', expand=False,)
-        addressTextBox.pack(side='top', fill='none', expand=False, pady=(0, 40), anchor="w")
-        
-    elif role == 'Doctor':
-        clinicNameLabel.pack_forget()
-        clinicNameTextBox.pack_forget()
-        clinicContactLabel.pack_forget()
-        clinicContactTextBox.pack_forget()
-        clinicBottomFrame.pack_forget()
-        clinicAddressLabel.pack_forget()
-        clinicAddressTextBox.pack_forget()
-        patientBottomFrame.pack_forget()
-
-        doctorSpecializationLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
-        yearsOfExpLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
-        doctorSpecializationTextBox.pack(side='top', fill='x', expand=False,)
-        yearsOfExpTextBox.pack(side='top', fill='x', expand=False,)
-        doctorBottomFrame.pack(side='top', fill='x', expand=False, pady=(30, 0))
-        doctorClinicNameLabel.pack(side='top', fill='x', expand=False, )
-        doctorClinicNameDropdown.pack(side='top', fill='none', expand=False, pady=(0, 40), anchor="w")
-
-
-    else:
-        clinicNameLabel.pack_forget()
-        clinicNameTextBox.pack_forget()
-        clinicContactLabel.pack_forget()
-        clinicContactTextBox.pack_forget()
-        clinicBottomFrame.pack_forget()
-        clinicAddressLabel.pack_forget()
-        clinicAddressTextBox.pack_forget()
-        patientBottomFrame.pack_forget()
-        doctorSpecializationLabel.pack_forget()
-        yearsOfExpLabel.pack_forget()
-        doctorSpecializationTextBox.pack_forget()
-        yearsOfExpTextBox.pack_forget()
-        doctorBottomFrame.pack_forget()
-        doctorClinicNameLabel.pack_forget()
-        doctorClinicNameDropdown.pack_forget()
-
-        buttonFrame.pack(side='top', fill='x', expand=False, pady=(40, 40),)
-        submitButton.pack(side='top', fill='none', expand=False, anchor="w")
-        return
-
-
-    
-    buttonFrame.pack(side='top', fill='x', expand=False, pady=(0, 100),)
-    submitButton.pack(side='top', fill='none', expand=False, anchor="w")
-
-
+# Role dropdown field
 roleLabel = ctk.CTkLabel(rightFrame, text="Sign In As", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
 roleLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
 roleDropdown = ctk.CTkComboBox(
@@ -223,7 +240,7 @@ roleDropdown = ctk.CTkComboBox(
 roleDropdown.pack(side='top', fill='x', expand=False,)
 
 
-
+# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Clinic-specific fields for Clinic Admin role >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 clinicNameLabel = ctk.CTkLabel(leftFrame, text="Clinic Name", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
 clinicNameTextBox = ctk.CTkTextbox(
     leftFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
@@ -249,6 +266,7 @@ clinicAddressTextBox = ctk.CTkTextbox(
 )
 
 
+# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Patient-specific fields for Clinic Admin role >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 patientBottomFrame = ctk.CTkFrame(scrollable_frame, width=341, height=500, fg_color="#FFFDFD",)
 addressLabel = ctk.CTkLabel(patientBottomFrame, text="Address", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
 addressTextBox = ctk.CTkTextbox(
@@ -258,7 +276,7 @@ addressTextBox = ctk.CTkTextbox(
 )
 
 
-
+# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Doctor-specific fields for Clinic Admin role >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 doctorSpecializationLabel = ctk.CTkLabel(rightFrame, text="Specialization", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
 doctorSpecializationTextBox = ctk.CTkTextbox(
     rightFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
@@ -286,11 +304,27 @@ doctorClinicNameDropdown = ctk.CTkComboBox(
     dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
 )
 
-
+# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Submit Button >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 buttonFrame = ctk.CTkFrame(scrollable_frame, width=341, height=500, fg_color="#FFFDFD",)
-submitButton = ctk.CTkButton(buttonFrame, text="Submit", width=620, height=64, font=("Inter", 24, "bold",), fg_color="#000", hover_color="#1BCC62", )
-buttonFrame.pack(side='top', fill='x', expand=False, pady=(40, 40),)
+submitButton = ctk.CTkButton(
+    buttonFrame, text="Submit", width=620, height=64, 
+    font=("Inter", 24, "bold",), fg_color="#000", hover_color="#1BCC62", 
+    command=redirect_to_login
+)
+
+buttonFrame.pack(side='top', fill='x', expand=False, pady=(40, 0),)
 submitButton.pack(side='top', fill='none', expand=False, anchor="w")
+
+# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Redirection Button >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+loginTextFrame = ctk.CTkFrame(scrollable_frame, width=341, height=500, fg_color="#FFFDFD",)
+logInLabel1 = ctk.CTkLabel(loginTextFrame, text="Already Have An Account?", font=("Inter", 15, "bold") , text_color="#000000",)
+logInLabel2 = ctk.CTkButton(
+    loginTextFrame, text="Login", font=("Inter", 16, "bold") , 
+    text_color="#1AFF75", command=redirect_to_login, width=0,
+    fg_color='transparent', hover=False)
+loginTextFrame.pack(side='top', fill='x', expand=False, pady=(0, 40),)
+logInLabel1.pack(side='left', fill='x', expand=False, padx=(190, 3), pady=(10, 40))
+logInLabel2.pack(side='left', fill='x', expand=False, padx=(0, 0), pady=(10, 40))
 
 
 
