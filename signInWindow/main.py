@@ -26,7 +26,8 @@ def redirect_to_login():
 def displayBasedOnRole(role):
     print(role)
     buttonFrame.pack_forget()
-    submitButton.pack_forget()
+    loginTextFrame.pack_forget()
+    #submitButton.pack_forget()
 
     if role == 'Clinic Admin':
         # Hide patient and doctor specific fields
@@ -109,13 +110,19 @@ def displayBasedOnRole(role):
         doctorClinicNameDropdown.pack_forget()
 
         # Show submit button
-        buttonFrame.pack(side='top', fill='x', expand=False, pady=(40, 40),)
+        buttonFrame.pack(side='top', fill='x', expand=False, pady=(40, 0),)
         submitButton.pack(side='top', fill='none', expand=False, anchor="w")
+        loginTextFrame.pack(side='top', fill='x', expand=False, pady=(0, 40),)
+        logInLabel1.pack(side='left', fill='x', expand=False, padx=(190, 3), pady=(10, 40))
+        logInLabel2.pack(side='left', fill='x', expand=False, padx=(0, 0), pady=(10, 40))
         return
     
     # Show submit button below the dynamically added input fields
-    buttonFrame.pack(side='top', fill='x', expand=False, pady=(0, 100),)
+    buttonFrame.pack(side='top', fill='x', expand=False, pady=(0, 0),)
     submitButton.pack(side='top', fill='none', expand=False, anchor="w")
+    loginTextFrame.pack(side='top', fill='x', expand=False, pady=(0, 40),)
+    logInLabel1.pack(side='left', fill='x', expand=False, padx=(190, 3), pady=(10, 40))
+    logInLabel2.pack(side='left', fill='x', expand=False, padx=(0, 0), pady=(10, 40))
 
 # Create main window
 window = Tk()
