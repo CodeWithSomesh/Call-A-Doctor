@@ -132,7 +132,7 @@ def signInWindow():
 
     # Create main window
     window = Tk()
-    window.title("CaD - Doctor Appointment Booking System (Login Window)")
+    window.title("CaD - Doctor Appointment Booking System (Sign In Window)")
     window.geometry("1350x800")
     window.configure(bg = "#ffffff")
     window.resizable(False, False)

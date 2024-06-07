@@ -27,6 +27,7 @@ def loginWindow():
 
     # Create main window
     window = Tk()
+    window.title("CaD - Doctor Appointment Booking System (Login Window)")
     window.geometry("1350x800")
     window.configure(bg = "#fff")
 
@@ -119,6 +120,7 @@ def loginWindow():
         fg_color='transparent', hover=False)
     logInLabel2.place(x=1080, y=598)
 
+    # 3D Image
     extraImagePath = relative_to_assets("image_2.png")
     extraImage = ctk.CTkImage(light_image=Image.open(extraImagePath), size=(191,206))
     extraImageLabel = ctk.CTkLabel(window, image=extraImage,)
