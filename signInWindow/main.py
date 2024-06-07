@@ -20,7 +20,7 @@ def signInWindow():
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
 
-    # Function to redirect to the login window
+    # Function to redirect to the Sign In Window
     def redirectToLoginWindow():
         window.destroy()
         from logInWindow.main import loginWindow

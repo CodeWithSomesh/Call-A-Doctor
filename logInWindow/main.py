@@ -15,21 +15,22 @@ ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Softwa
 
 
 def loginWindow():
-
+    # Helper function to get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
 
-    # Function to redirect to the login window
+    # Function to redirect to the Sign In Window
     def redirectToSignInWindow():
         window.destroy()
         from signInWindow.main import signInWindow
         signInWindow()
 
-
+    # Create main window
     window = Tk()
     window.geometry("1350x800")
     window.configure(bg = "#fff")
 
+    # Create canvas for background and layout
     canvas = Canvas(
         window,
         bg = "#fff",
@@ -41,6 +42,7 @@ def loginWindow():
     )
     canvas.place(x = 0, y = 0)
 
+    # Background image
     bgImagePath = PhotoImage(
         file=relative_to_assets("image_1.png"))
     bgImage = canvas.create_image(
@@ -49,6 +51,7 @@ def loginWindow():
         image=bgImagePath
     )
 
+    # Logo image
     logoImagePath = PhotoImage(
         file=relative_to_assets("image_3.png"))
     logoImage = canvas.create_image(
@@ -57,23 +60,17 @@ def loginWindow():
         image=logoImagePath
     )
 
-    # canvas.create_rectangle(
-    #     719.0,
-    #     0.0,
-    #     1350.0,
-    #     800.0,
-    #     fill="#FFFCFC",
-    #     outline="")
-    
+    # <<<<<<<<<<<<<<<<<<<< FORM FRAME >>>>>>>>>>>>>>>>>>>>>
     formFrame = ctk.CTkFrame(window, width=653, height=800, fg_color="#FFFDFD", border_color="#000", )
     formFrame.place(x=719, y=0)
 
+    # Label with Marketing Text 
     headerLabel1 = ctk.CTkLabel(window, text="Your Health, Our Priority", font=("Inter", 32, "bold",), text_color="#000000")
     headerLabel1.place(x=858, y=163)
     headerLabel2 = ctk.CTkLabel(window, text="– Book Appointments in Seconds", font=("Inter", 32, "bold",), text_color="#000000")
     headerLabel2.place(x=778, y=203)
 
-
+    # Email field 
     emailLabel = ctk.CTkLabel(window, text="Email", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
     emailLabel.place(x=761.06, y=290.0,)
     emailTextBox = ctk.CTkTextbox(
@@ -83,7 +80,7 @@ def loginWindow():
     )
     emailTextBox.place(x=761.060302734375, y=322.0)
 
-
+    # Password field 
     passwordLabel = ctk.CTkLabel(window, text="Password", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
     passwordLabel.place(x=761.06, y=396.0,)
     passwordTextBox = ctk.CTkTextbox(
@@ -93,7 +90,7 @@ def loginWindow():
     )
     passwordTextBox.place(x=761.06, y=428.0)
 
-
+    # Role Dropdown Menu  
     roleLabel = ctk.CTkLabel(window, text="Sign In As", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
     roleLabel.place(x=1048.06, y=396,)
     roleDropdown = ctk.CTkComboBox(
@@ -105,7 +102,7 @@ def loginWindow():
     )
     roleDropdown.place(x=1048, y=428,)
 
-
+    # Submit Button
     submitButton = ctk.CTkButton(
         window, text="Submit", width=548, height=64, 
         font=("Inter", 24, "bold",), fg_color="#000", hover_color="#1BCC62", 
@@ -113,7 +110,7 @@ def loginWindow():
     )
     submitButton.place(x=761, y=525)
 
-
+    # Redirection Button
     logInLabel1 = ctk.CTkLabel(window, text="Don't Have An Account?", font=("Inter", 15, "bold") , text_color="#000000",)
     logInLabel1.place(x=910, y=597)
     logInLabel2 = ctk.CTkButton(
@@ -126,14 +123,7 @@ def loginWindow():
     extraImage = ctk.CTkImage(light_image=Image.open(extraImagePath), size=(191,206))
     extraImageLabel = ctk.CTkLabel(window, image=extraImage,)
     extraImageLabel.place(x=1160, y=593)
-    # image_2 = canvas.create_image(
-    #     1254.0,
-    #     705.0,
-    #     image=extraImagePath
-    # )
-
     
-
 
     window.resizable(False, False)
     window.mainloop()
