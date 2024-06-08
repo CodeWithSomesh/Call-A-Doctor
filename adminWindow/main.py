@@ -18,11 +18,11 @@ def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 
-window = Tk()
+window = ctk.CTk()
 
 window.geometry("1350x800")
 window.title("CaD - Doctor Appointment Booking System (Admin Window)")
-window.configure(bg = "#000")
+window.configure(fg_color="black")
 
 
 # canvas = Canvas(
@@ -100,20 +100,51 @@ logoutButton.pack(side="bottom", fill='y', expand=True, padx=(35, 0), pady=(395,
 
 
 # <<<<<<<<<<<<<<<<<<<< WHITE FRAME >>>>>>>>>>>>>>>>>>>>>
-whiteFrame = ctk.CTkFrame(window, width=1040, height=800, fg_color="#fff", )
+whiteFrame = ctk.CTkFrame(window, width=1040, height=800, fg_color="#fff", bg_color='#fff' )
 whiteFrame.place(x=310, y=0)
 
 
+# Label with Role Text 
+adminLabel = ctk.CTkLabel(whiteFrame, text="Admin", font=("Inter", 64, "bold",), text_color="#000000")
+adminLabel.place(x=434, y=28)
 
 
-# canvas.create_text(
-#     721.0,
-#     28.0,
-#     anchor="nw",
-#     text="Admin",
-#     fill="#000000",
-#     font=("Inter ExtraBold", 64 * -1)
-# )
+lineFrame2 = ctk.CTkFrame(window, width=1040, height=3, fg_color="#37D8B7", border_color="#37D8B7", bg_color='#37D8B7' )
+lineFrame2.place(x=310, y=130)
+
+
+h1Label = ctk.CTkLabel(whiteFrame, text="Manage Clinics", font=("Inter", 40, "bold", 'underline'), text_color="#000000")
+h1Label.place(x=31, y=155)
+
+descLabel = ctk.CTkLabel(
+        whiteFrame, font=("Inter", 22,), text_color="#000000",
+        text="Manage the clinic registrations after verifying with Malaysian Registered Doctor System", 
+    )
+descLabel.place(x=31, y=220)
+
+def searchbarFocus(event):
+    print(event)
+    searchInputTextBox.delete('0.0', "end")
+    searchInputTextBox.configure(text_color='black')
+        
+
+def searchbarOutFocus(event):
+    print(event)
+    searchInputTextBox.insert(0, "Search Clinics by Name or Address")
+    searchInputTextBox.configure(text_color='gray')
+
+
+
+searchInputTextBox = ctk.CTkTextbox(
+        whiteFrame, fg_color="#ffffff", text_color="gray", width=973, height=60, 
+        border_color="#000", font=("Inter", 25), border_spacing=15,
+        scrollbar_button_color="#1AFF75", border_width=2,
+    )
+searchInputTextBox.insert('insert', "Search Clinics by Name or Address")
+searchInputTextBox.place(x=31, y=270)
+searchInputTextBox.bind("<FocusIn>", searchbarFocus)
+searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
+
 
 # canvas.create_text(
 #     338.0,
