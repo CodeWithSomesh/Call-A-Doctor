@@ -25,11 +25,15 @@ def loginWindow():
         from signInWindow.main import signInWindow
         signInWindow()
 
-    # Create main window
+    # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
     window = Tk()
     window.title("CaD - Doctor Appointment Booking System (Login Window)")
-    window.geometry("1350x800")
     window.configure(bg = "#fff")
+    window.geometry("1350x800+115+5")
+    window.update_idletasks()
+    window.resizable(False, False)
+    window.focus_set()
+    window.lift()
 
     # Create canvas for background and layout
     canvas = Canvas(
@@ -127,7 +131,6 @@ def loginWindow():
     extraImageLabel.place(x=1160, y=593)
     
 
-    window.resizable(False, False)
     window.mainloop()
 
 # Only execute the login window if this script is run directly

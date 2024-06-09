@@ -20,7 +20,7 @@ def signInWindow():
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
 
-    # Function to redirect to the Sign In Window
+    # Function to redirect to the Log In Window
     def redirectToLoginWindow():
         window.destroy()
         from logInWindow.main import loginWindow
@@ -130,12 +130,16 @@ def signInWindow():
 
 
 
-    # Create main window
+    # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
     window = Tk()
     window.title("CaD - Doctor Appointment Booking System (Sign In Window)")
-    window.geometry("1350x800")
     window.configure(bg = "#ffffff")
+    window.geometry("1350x800+115+5")
+    window.update_idletasks()
     window.resizable(False, False)
+    window.focus_set()
+    window.lift()
+    
 
     # Create canvas for background and layout
     canvas = Canvas(
@@ -339,6 +343,7 @@ def signInWindow():
     loginTextFrame.pack(side='top', fill='x', expand=False, pady=(0, 40),)
     logInLabel1.pack(side='left', fill='x', expand=False, padx=(190, 3), pady=(10, 40))
     logInLabel2.pack(side='left', fill='x', expand=False, padx=(0, 0), pady=(10, 40))
+
 
     window.mainloop()
 
