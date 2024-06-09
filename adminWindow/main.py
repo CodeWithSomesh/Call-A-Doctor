@@ -105,10 +105,12 @@ def adminWindow():
 
 
     # Label with Greeting Message & User's First Name 
-    greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, Someshwar Rao (Admin)", font=("Inter", 36, "bold",), text_color="#000000")
+    greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, Someshwar Rao", font=("Inter", 36, "bold",), text_color="#000000")
     greetingLabel1.place(x=25, y=25)
-    greetingLabel2 = ctk.CTkLabel(whiteFrame, text="Good Morning!", font=("Inter", 22,), text_color="#000000")
+    greetingLabel2 = ctk.CTkLabel(whiteFrame, text="Good Morning!  (January 26, 2024)", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
+    roleLabel = ctk.CTkLabel(whiteFrame, text="(Admin)", font=("Inter", 36, "bold",), text_color="#000000")
+    roleLabel.place(x=880, y=25)
 
     # Line that seperates Greeting Message from others
     lineFrame2 = ctk.CTkFrame(window, width=1040, height=3, fg_color="#37D8B7", border_color="#37D8B7", bg_color='#37D8B7' )

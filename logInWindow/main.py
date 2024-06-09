@@ -25,6 +25,17 @@ def loginWindow():
         from signInWindow.main import signInWindow
         signInWindow()
 
+    def redirectBasedOnRole():
+        role = roleDropdown.get()
+        print(role)
+
+        if role == 'Clinic Admin':
+            window.destroy()
+            from adminWindow.main import adminWindow
+            adminWindow()
+
+        
+
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
     window = ctk.CTk()
     window.title("CaD - Doctor Appointment Booking System (Login Window)")
@@ -98,7 +109,7 @@ def loginWindow():
     submitButton = ctk.CTkButton(
         window, text="Submit", width=548, height=64, 
         font=("Inter", 24, "bold",), fg_color="#000", hover_color="#1BCC62", 
-        command=redirectToSignInWindow
+        command=redirectBasedOnRole
     )
     submitButton.place(x=761, y=525)
 
