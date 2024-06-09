@@ -106,23 +106,26 @@ whiteFrame = ctk.CTkFrame(window, width=1040, height=800, fg_color="#fff", bg_co
 whiteFrame.place(x=310, y=0)
 
 
-# Label with Role Text 
-adminLabel = ctk.CTkLabel(whiteFrame, text="Admin", font=("Inter", 64, "bold",), text_color="#000000")
-adminLabel.place(x=434, y=28)
+# Label with Greeting Message & User's First Name 
+greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, Someshwar Rao (Admin)", font=("Inter", 36, "bold",), text_color="#000000")
+greetingLabel1.place(x=25, y=25)
+greetingLabel2 = ctk.CTkLabel(whiteFrame, text="Good Morning!", font=("Inter", 22,), text_color="#000000")
+greetingLabel2.place(x=25, y=72)
+
 
 
 lineFrame2 = ctk.CTkFrame(window, width=1040, height=3, fg_color="#37D8B7", border_color="#37D8B7", bg_color='#37D8B7' )
-lineFrame2.place(x=310, y=130)
+lineFrame2.place(x=310, y=115)
 
 
-h1Label = ctk.CTkLabel(whiteFrame, text="Manage Clinics", font=("Inter", 40, "bold", 'underline'), text_color="#000000")
-h1Label.place(x=31, y=155)
+h1Label = ctk.CTkLabel(whiteFrame, text="Manage Clinics", font=("Inter", 30, "bold", 'underline'), text_color="#000000")
+h1Label.place(x=25, y=135)
 
 descLabel = ctk.CTkLabel(
         whiteFrame, font=("Inter", 22,), text_color="#000000",
         text="Manage the clinic registrations after verifying with Malaysian Registered Doctor System", 
     )
-descLabel.place(x=31, y=220)
+descLabel.place(x=25, y=182)
 
 def searchbarFocus(event):
     print(event)
@@ -132,42 +135,55 @@ def searchbarFocus(event):
 
 def searchbarOutFocus(event):
     print(event)
+    searchInputTextBox.delete('0.0', "end")
     searchInputTextBox.insert('0.0', "Search Clinics by Name or Address")
     searchInputTextBox.configure(text_color='gray')
 
 
 
 searchInputTextBox = ctk.CTkTextbox(
-        whiteFrame, fg_color="#ffffff", text_color="gray", width=973, height=60, 
-        border_color="#000", font=("Inter", 25), border_spacing=15,
+        whiteFrame, fg_color="#ffffff", text_color="gray", width=660, height=50, 
+        border_color="#000", font=("Inter", 21), border_spacing=8,
         scrollbar_button_color="#1AFF75", border_width=2,
     )
 searchInputTextBox.insert('insert', "Search Clinics by Name or Address")
-searchInputTextBox.place(x=31, y=260)
+searchInputTextBox.place(x=25, y=225)
 searchInputTextBox.bind("<FocusIn>", searchbarFocus)
 searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
 
 
-
-tableFrame = ctk.CTkFrame(whiteFrame, width=930, height=430, fg_color="transparent", border_color='black', border_width=2 )
-tableFrame.place(x=31, y=340)
-
-
-
-style = ttk.Style(tableFrame)
-style.theme_use('clam')
-style.configure(
-    'Treeview.Heading', font=('Inter', 16, 'bold'), 
-    foreground='#fff', background='#000',
+# Approve Button with Icon
+approveIconPath = relative_to_assets("approve-icon.png")
+approveIcon = ctk.CTkImage(light_image=Image.open(approveIconPath), size=(33,33),)
+approveButton = ctk.CTkButton(
+    whiteFrame, text=" Approve ", width=140, height=50, 
+    font=("Inter", 22, "bold",), fg_color="#00C16A", hover_color="#009B2B", image=approveIcon,
+    # anchor=ctk.W 
 )
-style.configure('Treeview', font=('Inter', 16, 'bold'), rowheight=50)
-style.map('Treeview', background=[('selected', '#00BE97')])
+approveButton.place(x=700, y=225)
+
+# Reject Button with Icon
+rejectIconPath = relative_to_assets("reject-icon.png")
+rejectIcon = ctk.CTkImage(light_image=Image.open(rejectIconPath), size=(33,33),)
+rejectButton = ctk.CTkButton(
+    whiteFrame, text=" Reject  ", width=140, height=50, 
+    font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=rejectIcon,
+    # anchor=ctk.W 
+)
+rejectButton.place(x=870, y=225)
+
+
+
+
+tableFrame = ctk.CTkFrame(whiteFrame, fg_color="transparent",)
+tableFrame.place(x=25, y=295)
+
 
 tableScrollbar1 = Scrollbar(tableFrame, orient=VERTICAL)
 # tableScrollbar2 = Scrollbar(tableFrame, orient="horizontal")
 
 
-table = ttk.Treeview(tableFrame, yscrollcommand=tableScrollbar1.set,)
+table = ttk.Treeview(tableFrame, yscrollcommand=tableScrollbar1.set,height=12)
 table.pack(side='left', fill='both')
 table['columns'] = (
     'No', 'Clinic ID', 'Clinic Name', 'Clinic Contact',
@@ -181,6 +197,14 @@ tableScrollbar1.config(command=table.yview)
 # tableScrollbar2.config(command=table.xview)
 
 
+style = ttk.Style(tableFrame)
+style.theme_use('clam')
+style.configure(
+    'Treeview.Heading', font=('Inter', 16, 'bold'), 
+    foreground='#fff', background='#000', hover=False,
+)
+style.configure('Treeview', font=('Inter', 16), rowheight=47, fieldbackground="#DAFFF7")
+style.map('Treeview', background=[('selected', '#00BE97')])
 
 table.heading('No', text='No')
 table.heading('Clinic ID', text='Clinic ID',)
@@ -190,12 +214,12 @@ table.heading('Clinic Admin', text='Clinic Admin')
 table.heading('Admin Email', text='Admin Email')
 
 table.column("#0", width=0, stretch=ctk.NO)
-table.column("No", width=37, anchor=ctk.CENTER)
+table.column("No", width=43, anchor=ctk.CENTER)
 table.column("Clinic ID", anchor=ctk.CENTER)
-table.column("Clinic Name", width=210, anchor=ctk.CENTER)
+table.column("Clinic Name", width=220, anchor=ctk.CENTER)
 table.column("Clinic Contact", anchor=ctk.CENTER)
 table.column("Clinic Admin", width=250, anchor=ctk.CENTER)
-table.column("Admin Email", width=305, anchor=ctk.CENTER,)
+table.column("Admin Email", width=315, anchor=ctk.CENTER,)
 
 table.tag_configure("oddrow", background="#F2F5F8")
 table.tag_configure("evenrow", background="#B4EFF7")
@@ -217,14 +241,14 @@ adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 
 
 
 
-for i in range(100):
+for i in range(5):
     num = (i+1)
     clinicID = ''.join(random.choices('0123456789', k=12))
     clinicName = choice(clinicNames)
     clinicContact = ''.join(random.choices('0123456789', k=8))
     clinicContact = f'+01{clinicContact}'
     adminName = choice(adminNames)
-    adminEmail = f'{adminName.replace(" ", "")}@email.com'
+    adminEmail = f'{(adminName.replace(" ", "")).lower()}@email.com'
 
     data = (num, clinicID, clinicName, clinicContact, adminName, adminEmail)
     if count % 2 == 0:
