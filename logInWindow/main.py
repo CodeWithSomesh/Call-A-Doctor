@@ -26,48 +26,35 @@ def loginWindow():
         signInWindow()
 
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
-    window = Tk()
+    window = ctk.CTk()
     window.title("CaD - Doctor Appointment Booking System (Login Window)")
-    window.configure(bg = "#fff")
+    window.configure(fg_color = "#fff")
     window.geometry("1350x800+115+5")
     window.update_idletasks()
     window.resizable(False, False)
     window.focus_set()
     window.lift()
 
-    # Create canvas for background and layout
-    canvas = Canvas(
-        window,
-        bg = "#fff",
-        height = 800,
-        width = 1350,
-        bd = 0,
-        highlightthickness = 0,
-        relief = "ridge"
-    )
-    canvas.place(x = 0, y = 0)
+    # <<<<<<<<<<<<<<<<<<<< LOGO IMAGE FRAME >>>>>>>>>>>>>>>>>>>>>
+    logoImgFrame = ctk.CTkFrame(window, width=802, height=800, fg_color="transparent",)
+    logoImgFrame.place(x=0, y=0)
 
-    # Background image
-    bgImagePath = PhotoImage(
-        file=relative_to_assets("image_1.png"))
-    bgImage = canvas.create_image(
-        401.0,
-        400.0,
-        image=bgImagePath
-    )
+    # Logo Background image
+    logoBgImgPath = relative_to_assets("bgImg.png")
+    logoBgImg = ctk.CTkImage(light_image=Image.open(logoBgImgPath), size=(802,800))
+    logoBgImgLabel = ctk.CTkLabel(logoImgFrame, image=logoBgImg, text_color='#000',text='', anchor=ctk.W,)
+    logoBgImgLabel.place(x=0, y=0)
 
-    # Logo image
-    logoImagePath = PhotoImage(
-        file=relative_to_assets("image_3.png"))
-    logoImage = canvas.create_image(
-        380.0,
-        368.0,
-        image=logoImagePath
-    )
 
     # <<<<<<<<<<<<<<<<<<<< FORM FRAME >>>>>>>>>>>>>>>>>>>>>
     formFrame = ctk.CTkFrame(window, width=653, height=800, fg_color="#FFFDFD", border_color="#000", )
     formFrame.place(x=719, y=0)
+
+    # White Cornered Background image
+    whiteBgImgPath = relative_to_assets("white-frame.png")
+    whiteBgImg = ctk.CTkImage(light_image=Image.open(whiteBgImgPath), size=(631,800))
+    whiteBgImgLabel = ctk.CTkLabel(formFrame, image=whiteBgImg, text_color='#000',text='', anchor=ctk.W,)
+    whiteBgImgLabel.place(x=0, y=0)
 
     # Label with Marketing Text 
     headerLabel1 = ctk.CTkLabel(window, text="Your Health, Our Priority", font=("Inter", 32, "bold",), text_color="#000000")
@@ -125,7 +112,7 @@ def loginWindow():
     logInLabel2.place(x=1080, y=598)
 
     # 3D Image
-    extraImagePath = relative_to_assets("image_2.png")
+    extraImagePath = relative_to_assets("3d-doctor.png")
     extraImage = ctk.CTkImage(light_image=Image.open(extraImagePath), size=(191,206))
     extraImageLabel = ctk.CTkLabel(window, image=extraImage,)
     extraImageLabel.place(x=1160, y=593)
