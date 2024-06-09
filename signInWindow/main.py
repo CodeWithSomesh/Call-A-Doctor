@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from PIL import Image
 
 # Add the parent directory to the system path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -20,7 +21,7 @@ def signInWindow():
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
 
-    # Function to redirect to the Sign In Window
+    # Function to redirect to the Log In Window
     def redirectToLoginWindow():
         window.destroy()
         from logInWindow.main import loginWindow
@@ -130,47 +131,72 @@ def signInWindow():
 
 
 
-    # Create main window
-    window = Tk()
-    window.title("CaD - Doctor Appointment Booking System (Login Window)")
-    window.geometry("1350x800")
-    window.configure(bg = "#ffffff")
+    # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
+    window = ctk.CTk()
+    window.title("CaD - Doctor Appointment Booking System (Sign In Window)")
+    window.configure(fg_color = "#CFEBFF")
+    window.geometry("1350x800+115+5")
+    window.update_idletasks()
     window.resizable(False, False)
+    window.focus_set()
+    window.lift()
+    
 
     # Create canvas for background and layout
-    canvas = Canvas(
-        window,
-        bg = "#fff",
-        height = 800,
-        width = 1350,
-        bd = 0,
-        highlightthickness = 0,
-        relief = "ridge", 
-    )
-    canvas.place(x = 0, y = 0)
+    # canvas = Canvas(
+    #     window,
+    #     bg = "#fff",
+    #     height = 800,
+    #     width = 1350,
+    #     bd = 0,
+    #     highlightthickness = 0,
+    #     relief = "ridge", 
+    # )
+    # canvas.place(x = 0, y = 0)
 
-    # Background image
-    bgImagePath = PhotoImage(
-        file=relative_to_assets("image_1.png"))
-    bgImage = canvas.create_image(
-        326.0,
-        401.0,
-        image=bgImagePath
-    )
+    # # Background image
+    # bgImagePath = PhotoImage(
+    #     file=relative_to_assets("image_1.png"))
+    # bgImage = canvas.create_image(
+    #     326.0,
+    #     401.0,
+    #     image=bgImagePath
+    # )
 
-    # White background for form
-    whiteBgPath = PhotoImage(
-        file=relative_to_assets("image_2.png"))
-    whiteBg = canvas.create_image(
-        969.0,
-        400.0,
-        image=whiteBgPath
-    )
+    # # White background for form
+    # whiteBgPath = PhotoImage(
+    #     file=relative_to_assets("image_2.png"))
+    # whiteBg = canvas.create_image(
+    #     969.0,
+    #     400.0,
+    #     image=whiteBgPath
+    # )
+
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< LEFT IMAGE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    leftImgFrame = ctk.CTkFrame(window, width=652, height=800, fg_color="transparent",)
+    leftImgFrame.place(x=0, y=0)
+
+    # Left Background image
+    leftBgImgPath = relative_to_assets("image_1.png")
+    leftBgImg = ctk.CTkImage(light_image=Image.open(leftBgImgPath), size=(652,800))
+    leftBgImgLabel = ctk.CTkLabel(leftImgFrame, image=leftBgImg, text_color='#000',text='', anchor=ctk.W,)
+    leftBgImgLabel.place(x=0, y=0)
 
 
-    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    scrollable_frame = ctk.CTkScrollableFrame(window, width=683, height=850, fg_color="#FFFDFD", scrollbar_fg_color="#000", scrollbar_button_color="#000", )
-    scrollable_frame.place(x=645, y=0)
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< WHITE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    whiteImgFrame = ctk.CTkFrame(window, width=761, height=800, fg_color="transparent",)
+    whiteImgFrame.place(x=589, y=0)
+
+    # White Background image
+    whiteBgImgPath = relative_to_assets("image_2.png")
+    whiteBgImg = ctk.CTkImage(light_image=Image.open(whiteBgImgPath), size=(761,800))
+    whiteBgImgLabel = ctk.CTkLabel(whiteImgFrame, image=whiteBgImg, text_color='#000',text='', anchor=ctk.W,)
+    whiteBgImgLabel.place(x=0, y=0)
+
+
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SCROLLABLE FRAME INSIDE WHITE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    scrollable_frame = ctk.CTkScrollableFrame(whiteImgFrame, width=683, height=850, fg_color="#FFFDFD", scrollbar_fg_color="#000", scrollbar_button_color="#000", )
+    scrollable_frame.place(x=56, y=0)
 
     # Label for Create Account
     createAccountLabel = ctk.CTkLabel(scrollable_frame, text="Create Account", font=("Inter", 48, "bold", "underline"), text_color="#000000")
@@ -339,6 +365,7 @@ def signInWindow():
     loginTextFrame.pack(side='top', fill='x', expand=False, pady=(0, 40),)
     logInLabel1.pack(side='left', fill='x', expand=False, padx=(190, 3), pady=(10, 40))
     logInLabel2.pack(side='left', fill='x', expand=False, padx=(0, 0), pady=(10, 40))
+
 
     window.mainloop()
 
