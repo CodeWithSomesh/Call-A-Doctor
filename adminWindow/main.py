@@ -22,7 +22,7 @@ def relative_to_assets(path: str) -> Path:
 
 window = ctk.CTk()
 
-window.geometry("1350x800")
+window.geometry("1350x800+115+5")
 window.title("CaD - Doctor Appointment Booking System (Admin Window)")
 window.configure(fg_color="black")
 
