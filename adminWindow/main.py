@@ -1,11 +1,13 @@
 import sys
 from pathlib import Path
 from PIL import Image
+import random
+from random import choice
 
 # Add the parent directory to the system path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from tkinter import Tk, Canvas, PhotoImage, Entry, Button
+from tkinter import ttk, Scrollbar, VERTICAL
 import customtkinter as ctk
 
 
@@ -130,7 +132,7 @@ def searchbarFocus(event):
 
 def searchbarOutFocus(event):
     print(event)
-    searchInputTextBox.insert(0, "Search Clinics by Name or Address")
+    searchInputTextBox.insert('0.0', "Search Clinics by Name or Address")
     searchInputTextBox.configure(text_color='gray')
 
 
@@ -141,9 +143,124 @@ searchInputTextBox = ctk.CTkTextbox(
         scrollbar_button_color="#1AFF75", border_width=2,
     )
 searchInputTextBox.insert('insert', "Search Clinics by Name or Address")
-searchInputTextBox.place(x=31, y=270)
+searchInputTextBox.place(x=31, y=260)
 searchInputTextBox.bind("<FocusIn>", searchbarFocus)
 searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
+
+
+
+tableFrame = ctk.CTkFrame(whiteFrame, width=930, height=430, fg_color="transparent", border_color='black', border_width=2 )
+tableFrame.place(x=31, y=340)
+
+
+
+style = ttk.Style(tableFrame)
+style.theme_use('clam')
+style.configure(
+    'Treeview.Heading', font=('Inter', 16, 'bold'), 
+    foreground='#fff', background='#000',
+)
+style.configure('Treeview', font=('Inter', 16, 'bold'), rowheight=50)
+style.map('Treeview', background=[('selected', '#00BE97')])
+
+tableScrollbar1 = Scrollbar(tableFrame, orient=VERTICAL)
+# tableScrollbar2 = Scrollbar(tableFrame, orient="horizontal")
+
+
+table = ttk.Treeview(tableFrame, yscrollcommand=tableScrollbar1.set,)
+table.pack(side='left', fill='both')
+table['columns'] = (
+    'No', 'Clinic ID', 'Clinic Name', 'Clinic Contact',
+    "Clinic Admin", "Admin Email"
+)
+
+
+tableScrollbar1.pack(side='left', fill='y')
+tableScrollbar1.config(command=table.yview)
+# tableScrollbar2.pack(side='bottom', fill='x')
+# tableScrollbar2.config(command=table.xview)
+
+
+
+table.heading('No', text='No')
+table.heading('Clinic ID', text='Clinic ID',)
+table.heading('Clinic Name', text='Clinic Name')
+table.heading('Clinic Contact', text='Clinic Contact')
+table.heading('Clinic Admin', text='Clinic Admin')
+table.heading('Admin Email', text='Admin Email')
+
+table.column("#0", width=0, stretch=ctk.NO)
+table.column("No", width=37, anchor=ctk.CENTER)
+table.column("Clinic ID", anchor=ctk.CENTER)
+table.column("Clinic Name", width=210, anchor=ctk.CENTER)
+table.column("Clinic Contact", anchor=ctk.CENTER)
+table.column("Clinic Admin", width=250, anchor=ctk.CENTER)
+table.column("Admin Email", width=305, anchor=ctk.CENTER,)
+
+table.tag_configure("oddrow", background="#F2F5F8")
+table.tag_configure("evenrow", background="#B4EFF7")
+
+global count
+count = 0
+#     if count % 2 == 0:
+#         table.insert(parent='', index=0, values=data, tags=("evenrow",))
+#     else:
+#         table.insert(parent='', index=0, values=data, tags=("oddrow",))
+
+
+
+
+# <<<<<<<<<<<<<<<<<<<< AUTOMATED TESTING >>>>>>>>>>>>>>>>>>>>>
+
+clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
+adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
+
+
+
+for i in range(100):
+    num = (i+1)
+    clinicID = ''.join(random.choices('0123456789', k=12))
+    clinicName = choice(clinicNames)
+    clinicContact = ''.join(random.choices('0123456789', k=8))
+    clinicContact = f'+01{clinicContact}'
+    adminName = choice(adminNames)
+    adminEmail = f'{adminName.replace(" ", "")}@email.com'
+
+    data = (num, clinicID, clinicName, clinicContact, adminName, adminEmail)
+    if count % 2 == 0:
+        table.insert(parent='', index='end', values=data, tags=("evenrow",))
+    else:
+        table.insert(parent='', index='end', values=data, tags=("oddrow",))
+
+    count += 1
+
+# Test the insertion in table
+def testTableInsertion():
+    clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
+    clinicAddress = ["Kuala Lumpur", "George Town", "Ipoh", "Johor Bahru", "Kota Kinabalu", "Shah Alam", "Malacca City", "Alor Setar", "Kuantan", "Kuching"]
+    adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
+
+    for name in adminNames:
+        email = name.replace(" ", "")
+
+    for i in range(10):
+        num = i
+        clinicID = ''.join(random.choices('0123456789', k=12))
+        clinicName = choice(clinicNames)
+        clinicContact = ''.join(random.choices('0123456789', k=8))
+        clinicAddress = choice(clinicAddress)
+        adminName = choice(adminNames)
+        adminEmail = f'{email}@email.com'
+
+        data = (num, clinicID, clinicName, clinicContact, clinicAddress, adminName, adminEmail)
+        if count % 2 == 0:
+            table.insert(parent='', index=0, values=data, tags=("evenrow",))
+        else:
+            table.insert(parent='', index=0, values=data, tags=("oddrow",))
+
+        count += 1
+
+
 
 
 # canvas.create_text(
