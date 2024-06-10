@@ -12,9 +12,9 @@ import customtkinter as ctk
 
 
 OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\adminWindow\assets\frame0")
+ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\clinicAdmin\assets\frame0")
 
-def adminWindow():
+def clinicAdminDashboard():
     # Helper function to get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
@@ -39,13 +39,13 @@ def adminWindow():
     def searchbarOutFocus(event):
         print(event)
         searchInputTextBox.delete('0.0', "end")
-        searchInputTextBox.insert('0.0', "Search Clinics by Name or Address")
+        searchInputTextBox.insert('0.0', "Search by Patient Name or Doctor Name ")
         searchInputTextBox.configure(text_color='gray')
 
 
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
     window = ctk.CTk()
-    window.title("CaD - Doctor Appointment Booking System (Admin Window)")
+    window.title("CaD - Doctor Appointment Booking System (Clinic Admin Window)")
     window.configure(fg_color="black")
     window.geometry("1350x800+115+5")
     window.update_idletasks()
@@ -109,29 +109,29 @@ def adminWindow():
     greetingLabel1.place(x=25, y=25)
     greetingLabel2 = ctk.CTkLabel(whiteFrame, text="Good Morning!  (January 26, 2024)", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
-    roleLabel = ctk.CTkLabel(whiteFrame, text="(Admin)", font=("Inter", 36, "bold",), text_color="#000000")
-    roleLabel.place(x=880, y=25)
+    roleLabel = ctk.CTkLabel(whiteFrame, text="(Clinic Admin)", font=("Inter", 36, "bold",), text_color="#000000")
+    roleLabel.place(x=775, y=25)
 
     # Line that seperates Greeting Message from others
     lineFrame2 = ctk.CTkFrame(window, width=1040, height=3, fg_color="#37D8B7", border_color="#37D8B7", bg_color='#37D8B7' )
     lineFrame2.place(x=310, y=115)
 
     # Manage Clinic Header & Description
-    h1Label = ctk.CTkLabel(whiteFrame, text="Manage Clinics", font=("Inter", 30, "bold", 'underline'), text_color="#000000")
+    h1Label = ctk.CTkLabel(whiteFrame, text="Manage Appointments", font=("Inter", 30, "bold", 'underline'), text_color="#000000")
     h1Label.place(x=25, y=135)
     descLabel = ctk.CTkLabel(
             whiteFrame, font=("Inter", 22,), text_color="#000000",
-            text="Manage the clinic registrations after verifying with Malaysian Registered Doctor System", 
+            text="Manage the patient appointments after verifying with the doctor availability  ", 
         )
     descLabel.place(x=25, y=182)
 
     # Search Box field 
     searchInputTextBox = ctk.CTkTextbox(
-            whiteFrame, fg_color="#ffffff", text_color="gray", width=660, height=50, 
+            whiteFrame, fg_color="#ffffff", text_color="gray", width=485, height=50, 
             border_color="#000", font=("Inter", 21), border_spacing=8,
             scrollbar_button_color="#1AFF75", border_width=2,
         )
-    searchInputTextBox.insert('insert', "Search Clinics by Name or Address")
+    searchInputTextBox.insert('insert', "Search by Patient Name or Doctor Name ")
     searchInputTextBox.place(x=25, y=225)
     searchInputTextBox.bind("<FocusIn>", searchbarFocus)
     searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
@@ -145,7 +145,7 @@ def adminWindow():
         font=("Inter", 22, "bold",), fg_color="#00C16A", hover_color="#009B2B", image=approveIcon,
         # anchor=ctk.W 
     )
-    approveButton.place(x=700, y=225)
+    approveButton.place(x=525, y=225)
 
     # Reject Button with Icon
     rejectIconPath = relative_to_assets("reject-icon.png")
@@ -155,7 +155,18 @@ def adminWindow():
         font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=rejectIcon,
         # anchor=ctk.W 
     )
-    rejectButton.place(x=870, y=225)
+    rejectButton.place(x=695, y=225)
+
+
+    # Reassign Button with Icon
+    reassignIconPath = relative_to_assets("reassign-icon.png")
+    reassignIcon = ctk.CTkImage(light_image=Image.open(reassignIconPath), size=(33,33),)
+    reassignButton = ctk.CTkButton(
+        whiteFrame, text=" Reassign  ", width=140, height=50, 
+        font=("Inter", 22, "bold",), fg_color="#1BC5DC", hover_color="#1695A7", image=reassignIcon,
+        # anchor=ctk.W 
+    )
+    reassignButton.place(x=850, y=225)
 
 
     # <<<<<<<<<<<<<<<<<<<< TABLE FRAME STORING TREEVIEW >>>>>>>>>>>>>>>>>>>>> 
@@ -275,4 +286,4 @@ def adminWindow():
 
 # Only execute the Admin Window if this script is run directly
 if __name__ == "__main__":
-    adminWindow()
+    clinicAdminDashboard()
