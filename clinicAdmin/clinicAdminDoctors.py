@@ -14,23 +14,24 @@ import customtkinter as ctk
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\clinicAdmin\assets\frame0")
 
-def clinicAdminDashboardWindow():
+def clinicAdminDoctorWindow():
     # Helper function to get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
 
 
-    # Function to redirect to the Log In Window
+    # Redirect to the Log In Window
     def redirectToLoginWindow():
         window.destroy()
         from logInWindow.main import logInWindow
         logInWindow()
 
-    # Redirect to the Clinic Admin Doctor Window
-    def redirectToClinicAdminDoctorWindow():
+    
+    # Redirect to the Clinic Admin Dashboard Window
+    def redirectToAdminDashboardWindow():
         window.destroy()
-        from clinicAdmin.clinicAdminDoctors import clinicAdminDoctorWindow
-        clinicAdminDoctorWindow()
+        from clinicAdmin.clinicAdminDashboard import clinicAdminDashboardWindow
+        clinicAdminDashboardWindow()
 
 
     # When user is typing remove placeholder
@@ -45,7 +46,7 @@ def clinicAdminDashboardWindow():
     def searchbarOutFocus(event):
         print(event)
         searchInputTextBox.delete('0.0', "end")
-        searchInputTextBox.insert('0.0', "Search by Patient Name or Doctor Name ")
+        searchInputTextBox.insert('0.0', "Search Doctors by their Name or Clinic Name")
         searchInputTextBox.configure(text_color='gray')
 
 
@@ -75,8 +76,8 @@ def clinicAdminDashboardWindow():
     dashboardIcon = ctk.CTkImage(light_image=Image.open(dashboardIconPath), size=(33,33))
     dashboardButton = ctk.CTkButton(
         sidebarFrame, text=" Dashboard", width=240, height=60, 
-        font=("Inter", 26, "bold",), fg_color="#37D8B7", hover_color="#37D8B7", image=dashboardIcon,
-        # anchor=ctk.W
+        font=("Inter", 26, "bold",), fg_color="#000", hover_color="#333333", image=dashboardIcon,
+        command=redirectToAdminDashboardWindow # anchor=ctk.W
     )
     dashboardButton.pack(side="top", fill='none', expand=False, padx=(35, 0), pady=25)
 
@@ -85,8 +86,7 @@ def clinicAdminDashboardWindow():
     doctorIcon = ctk.CTkImage(light_image=Image.open(doctorIconPath), size=(44,44),)
     doctorButton = ctk.CTkButton(
         sidebarFrame, text=" Doctors     ", width=240, height=60, 
-        font=("Inter", 26, "bold",), fg_color="#000", hover_color="#333333", image=doctorIcon,
-        command=redirectToClinicAdminDoctorWindow
+        font=("Inter", 26, "bold",), fg_color="#37D8B7", hover_color="#37D8B7", image=doctorIcon,
         # anchor=ctk.W 
     )
     doctorButton.pack(side="top", fill='none', expand=False, padx=(35, 0), pady=(0, 25))
@@ -134,21 +134,21 @@ def clinicAdminDashboardWindow():
     lineFrame2.place(x=310, y=115)
 
     # Manage Appointment Header & Description
-    h1Label = ctk.CTkLabel(whiteFrame, text="Manage Appointments", font=("Inter", 30, "bold", 'underline'), text_color="#000000")
+    h1Label = ctk.CTkLabel(whiteFrame, text="Manage Doctors", font=("Inter", 30, "bold", 'underline'), text_color="#000000")
     h1Label.place(x=25, y=135)
     descLabel = ctk.CTkLabel(
             whiteFrame, font=("Inter", 22,), text_color="#000000",
-            text="Manage the patient appointments after verifying with the doctor availability  ", 
+            text="Manage the status of registered doctors in the app", 
         )
     descLabel.place(x=25, y=182)
 
     # Search Box field 
     searchInputTextBox = ctk.CTkTextbox(
-            whiteFrame, fg_color="#ffffff", text_color="gray", width=485, height=50, 
+            whiteFrame, fg_color="#ffffff", text_color="gray", width=660, height=50, 
             border_color="#000", font=("Inter", 21), border_spacing=8,
             scrollbar_button_color="#1AFF75", border_width=2,
         )
-    searchInputTextBox.insert('insert', "Search by Patient Name or Doctor Name ")
+    searchInputTextBox.insert('insert', "Search Doctors by their Name or Clinic Name")
     searchInputTextBox.place(x=25, y=225)
     searchInputTextBox.bind("<FocusIn>", searchbarFocus)
     searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
@@ -162,7 +162,7 @@ def clinicAdminDashboardWindow():
         font=("Inter", 22, "bold",), fg_color="#00C16A", hover_color="#009B2B", image=approveIcon,
         # anchor=ctk.W 
     )
-    approveButton.place(x=525, y=225)
+    approveButton.place(x=700, y=225)
 
     # Reject Button with Icon
     rejectIconPath = relative_to_assets("reject-icon.png")
@@ -172,18 +172,7 @@ def clinicAdminDashboardWindow():
         font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=rejectIcon,
         # anchor=ctk.W 
     )
-    rejectButton.place(x=695, y=225)
-
-
-    # Reassign Button with Icon
-    reassignIconPath = relative_to_assets("reassign-icon.png")
-    reassignIcon = ctk.CTkImage(light_image=Image.open(reassignIconPath), size=(33,33),)
-    reassignButton = ctk.CTkButton(
-        whiteFrame, text=" Reassign  ", width=140, height=50, 
-        font=("Inter", 22, "bold",), fg_color="#1BC5DC", hover_color="#1695A7", image=reassignIcon,
-        # anchor=ctk.W 
-    )
-    reassignButton.place(x=850, y=225)
+    rejectButton.place(x=870, y=225)
 
 
     # <<<<<<<<<<<<<<<<<<<< TABLE FRAME STORING TREEVIEW >>>>>>>>>>>>>>>>>>>>> 
@@ -303,4 +292,4 @@ def clinicAdminDashboardWindow():
 
 # Only execute the Admin Window if this script is run directly
 if __name__ == "__main__":
-    clinicAdminDashboardWindow()
+    clinicAdminDoctorWindow()
