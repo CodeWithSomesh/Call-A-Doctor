@@ -116,7 +116,7 @@ def clinicAdminDashboard():
     lineFrame2 = ctk.CTkFrame(window, width=1040, height=3, fg_color="#37D8B7", border_color="#37D8B7", bg_color='#37D8B7' )
     lineFrame2.place(x=310, y=115)
 
-    # Manage Clinic Header & Description
+    # Manage Appointment Header & Description
     h1Label = ctk.CTkLabel(whiteFrame, text="Manage Appointments", font=("Inter", 30, "bold", 'underline'), text_color="#000000")
     h1Label.place(x=25, y=135)
     descLabel = ctk.CTkLabel(
