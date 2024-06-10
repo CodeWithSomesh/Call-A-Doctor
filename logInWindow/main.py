@@ -33,6 +33,10 @@ def loginWindow():
             window.destroy()
             from adminWindow.main import adminWindow
             adminWindow()
+        elif role == 'Doctor':
+            window.destroy()
+            from doctorWindow.main import doctorWindow
+            doctorWindow()
 
         
 
