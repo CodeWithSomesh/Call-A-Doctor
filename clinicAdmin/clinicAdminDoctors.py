@@ -290,6 +290,6 @@ def clinicAdminDoctorWindow():
     window.mainloop()
 
 
-# Only execute the Admin Window if this script is run directly
+# Only execute the Clinic Admin Doctor Window if this script is run directly
 if __name__ == "__main__":
     clinicAdminDoctorWindow()
