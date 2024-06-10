@@ -37,6 +37,11 @@ def loginWindow():
             window.destroy()
             from doctorWindow.main import doctorWindow
             doctorWindow()
+        elif role == 'Patient':
+            window.destroy()
+            from patientWindow.main import patientWindow
+            patientWindow()
+
 
         
 

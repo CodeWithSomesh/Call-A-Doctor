@@ -12,9 +12,9 @@ import customtkinter as ctk
 
 
 OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\doctorWindow\assets\frame0")
+ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\patientWindow\assets\frame0")
 
-def doctorWindow():
+def patientWindow():
     # Helper function to get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
@@ -162,8 +162,8 @@ def doctorWindow():
     consultationDurationDropdown.place(x=400, y=290)
 
     # Book Appointment Button with Icon
-    appointmentIconPath = relative_to_assets("pill-icon.png")
-    appointmentIcon = ctk.CTkImage(light_image=Image.open(appointmentIconPath), size=(33,33),)
+    appointmentIconPath = relative_to_assets("add-icon.png")
+    appointmentIcon = ctk.CTkImage(light_image=Image.open(appointmentIconPath), size=(28,28),)
     bookButton = ctk.CTkButton(
         whiteFrame, text=" Book Appointment", width=280, height=48, 
         font=("Inter", 22, "bold",), fg_color="#17D463", hover_color="#009B2B", image=appointmentIcon,
@@ -238,20 +238,20 @@ def doctorWindow():
     searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
 
     # Update Appointment Details Button with Icon
-    updateIconPath = relative_to_assets("pill-icon.png")
+    updateIconPath = relative_to_assets("update-icon.png")
     updateIcon = ctk.CTkImage(light_image=Image.open(updateIconPath), size=(33,33),)
     updateButton = ctk.CTkButton(
-        whiteFrame, text=" Update   ", height=48, width=172,
+        whiteFrame, text=" Update  ", height=48, width=172,
         font=("Inter", 22, "bold",), fg_color="#1BC5DC", hover_color="#1695A7", image=updateIcon,
         # anchor=ctk.W 
     )
     updateButton.place(x=660, y=726)
 
     # Delete Appointment Button with Icon
-    deleteIconPath = relative_to_assets("pill-icon.png")
-    deleteIcon = ctk.CTkImage(light_image=Image.open(deleteIconPath), size=(33,33),)
+    deleteIconPath = relative_to_assets("delete-icon.png")
+    deleteIcon = ctk.CTkImage(light_image=Image.open(deleteIconPath), size=(26,26),)
     deleteButton = ctk.CTkButton(
-        whiteFrame, text=" Delete   ", height=48, width=172,
+        whiteFrame, text=" Delete ", height=48, width=172,
         font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=deleteIcon,
         # anchor=ctk.W 
     )
@@ -323,4 +323,4 @@ def doctorWindow():
 
 # Only execute the Admin Window if this script is run directly
 if __name__ == "__main__":
-    doctorWindow()
+    patientWindow()
