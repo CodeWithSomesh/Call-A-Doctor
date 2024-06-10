@@ -43,9 +43,9 @@ def patientWindow():
         searchInputTextBox.configure(text_color='gray')
 
 
-    # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     window = ctk.CTk()
-    window.title("CaD - Doctor Appointment Booking System (Admin Window)")
+    window.title("CaD - Doctor Appointment Booking System (Patient Window)")
     window.configure(fg_color="black")
     window.geometry("1350x800+115+5")
     window.update_idletasks()
@@ -54,11 +54,11 @@ def patientWindow():
     window.lift()
     
 
-    # <<<<<<<<<<<<<<<<<<<< SIDEBAR FRAME >>>>>>>>>>>>>>>>>>>>>
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIDEBAR FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     sidebarFrame = ctk.CTkFrame(window, width=310, height=800, fg_color="#000", border_color="#000", )
     sidebarFrame.place(x=0, y=0)
 
-    # 3D Image
+    # Logo Image
     logoImgPath = relative_to_assets("image_1.png")
     logoImg = ctk.CTkImage(light_image=Image.open(logoImgPath), size=(213,74))
     logoImgLabel = ctk.CTkLabel(sidebarFrame, image=logoImg, text_color='#000',text='', anchor=ctk.W,)
@@ -99,12 +99,12 @@ def patientWindow():
     logoutButton.pack(side="bottom", fill='y', expand=True, padx=(35, 0), pady=(395, 0))
 
 
-    # <<<<<<<<<<<<<<<<<<<< WHITE FRAME >>>>>>>>>>>>>>>>>>>>>
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<< WHITE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     whiteFrame = ctk.CTkFrame(window, width=1040, height=800, fg_color="#fff", bg_color='#fff' )
     whiteFrame.place(x=310, y=0)
 
 
-    # Label with Greeting Message & User's First Name 
+    # Label with Greeting Message & User's Full Name 
     greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, Someshwar Rao", font=("Inter", 36, "bold",), text_color="#000000")
     greetingLabel1.place(x=25, y=25)
     greetingLabel2 = ctk.CTkLabel(whiteFrame, text="Good Morning!  (January 26, 2024)", font=("Inter", 22,), text_color="#000000")
@@ -125,6 +125,7 @@ def patientWindow():
         )
     descLabel.place(x=25, y=182)
 
+    # Select Clinic Dropdown Menu
     clinicDropdown = ctk.CTkComboBox(
         whiteFrame, fg_color="#ffffff", text_color="#000000", width=360, height=48, 
         font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
@@ -134,6 +135,7 @@ def patientWindow():
     )
     clinicDropdown.place(x=25, y=225)
 
+    # Select Doctor Dropdown Menu
     doctorDropdown = ctk.CTkComboBox(
         whiteFrame, fg_color="#ffffff", text_color="#000000", width=615, height=48, 
         font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
@@ -143,6 +145,7 @@ def patientWindow():
     )
     doctorDropdown.place(x=400, y=225)
 
+    # Select Consultation Time Dropdown Menu
     consultationTimeDropdown = ctk.CTkComboBox(
         whiteFrame, fg_color="#ffffff", text_color="#000000", width=360, height=48, 
         font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
@@ -151,7 +154,8 @@ def patientWindow():
         dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
     )
     consultationTimeDropdown.place(x=25, y=290)
-
+    
+    # Select Consultation Duration Dropdown Menu
     consultationDurationDropdown = ctk.CTkComboBox(
         whiteFrame, fg_color="#ffffff", text_color="#000000", width=320, height=48, 
         font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
