@@ -24,8 +24,8 @@ def signInWindow():
     # Function to redirect to the Log In Window
     def redirectToLoginWindow():
         window.destroy()
-        from logInWindow.main import loginWindow
-        loginWindow()
+        from logInWindow.main import logInWindow
+        logInWindow()
 
     # Function to update the display based on selected role
     def displayBasedOnRole(role):

@@ -12,9 +12,9 @@ import customtkinter as ctk
 
 
 OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\adminWindow\assets\frame0")
+ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\admin\assets\frame0")
 
-def adminWindow():
+def adminDashboardWindow():
     # Helper function to get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
@@ -23,8 +23,8 @@ def adminWindow():
     # Function to redirect to the Log In Window
     def redirectToLoginWindow():
         window.destroy()
-        from logInWindow.main import loginWindow
-        loginWindow()
+        from logInWindow.main import logInWindow
+        logInWindow()
 
 
     # When user is typing remove placeholder
@@ -275,4 +275,4 @@ def adminWindow():
 
 # Only execute the Admin Window if this script is run directly
 if __name__ == "__main__":
-    adminWindow()
+    adminDashboardWindow()
