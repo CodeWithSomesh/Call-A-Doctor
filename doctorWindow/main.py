@@ -116,7 +116,7 @@ def doctorWindow():
     lineFrame2 = ctk.CTkFrame(window, width=1040, height=3, fg_color="#37D8B7", border_color="#37D8B7", bg_color='#37D8B7' )
     lineFrame2.place(x=310, y=115)
 
-    # Manage Clinic Header & Description
+    # Manage Patient Header & Description
     h1Label = ctk.CTkLabel(whiteFrame, text="Manage Patients", font=("Inter", 30, "bold", 'underline'), text_color="#000000")
     h1Label.place(x=25, y=135)
     descLabel = ctk.CTkLabel(
@@ -137,7 +137,7 @@ def doctorWindow():
     searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
 
 
-    # Approve Button with Icon
+    # Generate Prescriptions Button with Icon
     pillIconPath = relative_to_assets("pill-icon.png")
     pillIcon = ctk.CTkImage(light_image=Image.open(pillIconPath), size=(33,33),)
     generateMedicineButton = ctk.CTkButton(
@@ -146,16 +146,6 @@ def doctorWindow():
         # anchor=ctk.W 
     )
     generateMedicineButton.place(x=700, y=225)
-
-    # Reject Button with Icon
-    # rejectIconPath = relative_to_assets("reject-icon.png")
-    # rejectIcon = ctk.CTkImage(light_image=Image.open(rejectIconPath), size=(33,33),)
-    # rejectButton = ctk.CTkButton(
-    #     whiteFrame, text=" Reject  ", width=140, height=50, 
-    #     font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=rejectIcon,
-    #     # anchor=ctk.W 
-    # )
-    # rejectButton.place(x=870, y=225)
 
 
     # <<<<<<<<<<<<<<<<<<<< TABLE FRAME STORING TREEVIEW >>>>>>>>>>>>>>>>>>>>> 
