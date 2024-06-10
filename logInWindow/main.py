@@ -14,7 +14,7 @@ ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Softwa
 
 
 
-def loginWindow():
+def logInWindow():
     # Helper function to get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
@@ -31,16 +31,16 @@ def loginWindow():
 
         if role == 'Clinic Admin':
             window.destroy()
-            from adminWindow.main import adminWindow
-            adminWindow()
+            from admin.adminDashboard import adminDashboardWindow
+            adminDashboardWindow()
         elif role == 'Doctor':
             window.destroy()
-            from doctorWindow.main import doctorWindow
-            doctorWindow()
+            from doctor.doctorDashboard import doctorDashboardWindow
+            doctorDashboardWindow()
         elif role == 'Patient':
             window.destroy()
-            from patientWindow.main import patientWindow
-            patientWindow()
+            from patient.patientDashboard import patientDashboardWindow
+            patientDashboardWindow()
 
 
         
@@ -142,5 +142,5 @@ def loginWindow():
 
 # Only execute the login window if this script is run directly
 if __name__ == "__main__":
-    loginWindow()
+    logInWindow()
 

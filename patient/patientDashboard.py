@@ -12,9 +12,9 @@ import customtkinter as ctk
 
 
 OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\adminWindow\assets\frame0")
+ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\patient\assets\frame0")
 
-def adminWindow():
+def patientDashboardWindow():
     # Helper function to get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
@@ -23,8 +23,8 @@ def adminWindow():
     # Function to redirect to the Log In Window
     def redirectToLoginWindow():
         window.destroy()
-        from logInWindow.main import loginWindow
-        loginWindow()
+        from logInWindow.main import logInWindow
+        logInWindow()
 
 
     # When user is typing remove placeholder
@@ -39,13 +39,13 @@ def adminWindow():
     def searchbarOutFocus(event):
         print(event)
         searchInputTextBox.delete('0.0', "end")
-        searchInputTextBox.insert('0.0', "Search Clinics by Name or Address")
+        searchInputTextBox.insert('0.0', "Search Appointments by Date, Clinic Name or Doctor Name")
         searchInputTextBox.configure(text_color='gray')
 
 
-    # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     window = ctk.CTk()
-    window.title("CaD - Doctor Appointment Booking System (Admin Window)")
+    window.title("CaD - Doctor Appointment Booking System (Patient Window)")
     window.configure(fg_color="black")
     window.geometry("1350x800+115+5")
     window.update_idletasks()
@@ -54,11 +54,11 @@ def adminWindow():
     window.lift()
     
 
-    # <<<<<<<<<<<<<<<<<<<< SIDEBAR FRAME >>>>>>>>>>>>>>>>>>>>>
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIDEBAR FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     sidebarFrame = ctk.CTkFrame(window, width=310, height=800, fg_color="#000", border_color="#000", )
     sidebarFrame.place(x=0, y=0)
 
-    # 3D Image
+    # Logo Image
     logoImgPath = relative_to_assets("image_1.png")
     logoImg = ctk.CTkImage(light_image=Image.open(logoImgPath), size=(213,74))
     logoImgLabel = ctk.CTkLabel(sidebarFrame, image=logoImg, text_color='#000',text='', anchor=ctk.W,)
@@ -99,75 +99,93 @@ def adminWindow():
     logoutButton.pack(side="bottom", fill='y', expand=True, padx=(35, 0), pady=(395, 0))
 
 
-    # <<<<<<<<<<<<<<<<<<<< WHITE FRAME >>>>>>>>>>>>>>>>>>>>>
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<< WHITE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     whiteFrame = ctk.CTkFrame(window, width=1040, height=800, fg_color="#fff", bg_color='#fff' )
     whiteFrame.place(x=310, y=0)
 
 
-    # Label with Greeting Message & User's First Name 
+    # Label with Greeting Message & User's Full Name 
     greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, Someshwar Rao", font=("Inter", 36, "bold",), text_color="#000000")
     greetingLabel1.place(x=25, y=25)
     greetingLabel2 = ctk.CTkLabel(whiteFrame, text="Good Morning!  (January 26, 2024)", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
-    roleLabel = ctk.CTkLabel(whiteFrame, text="(Admin)", font=("Inter", 36, "bold",), text_color="#000000")
-    roleLabel.place(x=880, y=25)
+    roleLabel = ctk.CTkLabel(whiteFrame, text="(Patient)", font=("Inter", 36, "bold",), text_color="#000000")
+    roleLabel.place(x=872, y=25)
 
     # Line that seperates Greeting Message from others
     lineFrame2 = ctk.CTkFrame(window, width=1040, height=3, fg_color="#37D8B7", border_color="#37D8B7", bg_color='#37D8B7' )
     lineFrame2.place(x=310, y=115)
 
-    # Manage Clinic Header & Description
-    h1Label = ctk.CTkLabel(whiteFrame, text="Manage Clinics", font=("Inter", 30, "bold", 'underline'), text_color="#000000")
+    # Book Appointment Header & Description
+    h1Label = ctk.CTkLabel(whiteFrame, text="Book Appointments", font=("Inter", 30, "bold", 'underline'), text_color="#000000")
     h1Label.place(x=25, y=135)
     descLabel = ctk.CTkLabel(
             whiteFrame, font=("Inter", 22,), text_color="#000000",
-            text="Manage the clinic registrations after verifying with Malaysian Registered Doctor System", 
+            text="Select available doctors from any clinic and make an appointment with a few clicks ", 
         )
     descLabel.place(x=25, y=182)
 
-    # Search Box field 
-    searchInputTextBox = ctk.CTkTextbox(
-            whiteFrame, fg_color="#ffffff", text_color="gray", width=660, height=50, 
-            border_color="#000", font=("Inter", 21), border_spacing=8,
-            scrollbar_button_color="#1AFF75", border_width=2,
-        )
-    searchInputTextBox.insert('insert', "Search Clinics by Name or Address")
-    searchInputTextBox.place(x=25, y=225)
-    searchInputTextBox.bind("<FocusIn>", searchbarFocus)
-    searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
+    # Select Clinic Dropdown Menu
+    clinicDropdown = ctk.CTkComboBox(
+        whiteFrame, fg_color="#ffffff", text_color="#000000", width=360, height=48, 
+        font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+        values=['Select Clinic', 'Panmedic', 'Health Sync', 'Clinic Sungai Ara'], border_color="#b5b3b3", border_width=1,
+        dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+        dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+    )
+    clinicDropdown.place(x=25, y=225)
 
+    # Select Doctor Dropdown Menu
+    doctorDropdown = ctk.CTkComboBox(
+        whiteFrame, fg_color="#ffffff", text_color="#000000", width=615, height=48, 
+        font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+        values=['Select Doctor', 'Maisarah Majdi (Cardiologist)', 'Someshwar Rao (Neurosurgeon)', 'Karen Khor Siew Li (Psychologist)'], border_color="#b5b3b3", border_width=1,
+        dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+        dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+    )
+    doctorDropdown.place(x=400, y=225)
 
-    # Approve Button with Icon
-    approveIconPath = relative_to_assets("approve-icon.png")
-    approveIcon = ctk.CTkImage(light_image=Image.open(approveIconPath), size=(33,33),)
-    approveButton = ctk.CTkButton(
-        whiteFrame, text=" Approve ", width=140, height=50, 
-        font=("Inter", 22, "bold",), fg_color="#00C16A", hover_color="#009B2B", image=approveIcon,
+    # Select Consultation Time Dropdown Menu
+    consultationTimeDropdown = ctk.CTkComboBox(
+        whiteFrame, fg_color="#ffffff", text_color="#000000", width=360, height=48, 
+        font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+        values=['Select Consultation Time', '9am', '10am', '11am'], border_color="#b5b3b3", border_width=1,
+        dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+        dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+    )
+    consultationTimeDropdown.place(x=25, y=290)
+    
+    # Select Consultation Duration Dropdown Menu
+    consultationDurationDropdown = ctk.CTkComboBox(
+        whiteFrame, fg_color="#ffffff", text_color="#000000", width=320, height=48, 
+        font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+        values=['Select Consultation Duration', '30 Minutes', '1 hour', '1 hour 30 Minutes'], border_color="#b5b3b3", border_width=1,
+        dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+        dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+    )
+    consultationDurationDropdown.place(x=400, y=290)
+
+    # Book Appointment Button with Icon
+    appointmentIconPath = relative_to_assets("add-icon.png")
+    appointmentIcon = ctk.CTkImage(light_image=Image.open(appointmentIconPath), size=(28,28),)
+    bookButton = ctk.CTkButton(
+        whiteFrame, text=" Book Appointment", width=280, height=48, 
+        font=("Inter", 22, "bold",), fg_color="#17D463", hover_color="#009B2B", image=appointmentIcon,
         # anchor=ctk.W 
     )
-    approveButton.place(x=700, y=225)
+    bookButton.place(x=735, y=290)
 
-    # Reject Button with Icon
-    rejectIconPath = relative_to_assets("reject-icon.png")
-    rejectIcon = ctk.CTkImage(light_image=Image.open(rejectIconPath), size=(33,33),)
-    rejectButton = ctk.CTkButton(
-        whiteFrame, text=" Reject  ", width=140, height=50, 
-        font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=rejectIcon,
-        # anchor=ctk.W 
-    )
-    rejectButton.place(x=870, y=225)
-
-
+    
     # <<<<<<<<<<<<<<<<<<<< TABLE FRAME STORING TREEVIEW >>>>>>>>>>>>>>>>>>>>> 
-    tableFrame = ctk.CTkFrame(whiteFrame, fg_color="transparent",)
-    tableFrame.place(x=25, y=295)
+    tableFrame = ctk.CTkFrame(whiteFrame, fg_color="transparent",) #width=900
+    tableFrame.place(x=25, y=355)
 
     # Initializing Treeview Scrollbar
     tableScrollbar1 = Scrollbar(tableFrame, orient=VERTICAL)
     # tableScrollbar2 = Scrollbar(tableFrame, orient="horizontal")
 
     # Treeview that stores User Data
-    table = ttk.Treeview(tableFrame, yscrollcommand=tableScrollbar1.set,height=12)
+    table = ttk.Treeview(tableFrame, yscrollcommand=tableScrollbar1.set,height=9)
     table.pack(side='left', fill='both')
     table['columns'] = (
         'No', 'Clinic ID', 'Clinic Name', 'Clinic Contact',
@@ -187,7 +205,7 @@ def adminWindow():
         'Treeview.Heading', font=('Inter', 16, 'bold'), 
         foreground='#fff', background='#000', hover=False,
     )
-    style.configure('Treeview', font=('Inter', 16), rowheight=47, fieldbackground="#DAFFF7")
+    style.configure('Treeview', font=('Inter', 16), rowheight=45, fieldbackground="#DAFFF7")
     style.map('Treeview', background=[('selected', '#00BE97')])
 
     # Treeview Table Headings Details
@@ -210,6 +228,40 @@ def adminWindow():
     # Setting alternating colours for the rows in Treeview
     table.tag_configure("oddrow", background="#F2F5F8")
     table.tag_configure("evenrow", background="#B4EFF7")
+
+
+    # Search Box field 
+    searchInputTextBox = ctk.CTkTextbox(
+            whiteFrame, fg_color="#ffffff", text_color="gray", width=620, height=48, 
+            border_color="#000", font=("Inter", 21), border_spacing=8,
+            scrollbar_button_color="#1AFF75", border_width=2,
+        )
+    searchInputTextBox.insert('insert', "Search Appointments by Date, Clinic Name or Doctor Name")
+    searchInputTextBox.place(x=25, y=726)
+    searchInputTextBox.bind("<FocusIn>", searchbarFocus)
+    searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
+
+    # Update Appointment Details Button with Icon
+    updateIconPath = relative_to_assets("update-icon.png")
+    updateIcon = ctk.CTkImage(light_image=Image.open(updateIconPath), size=(33,33),)
+    updateButton = ctk.CTkButton(
+        whiteFrame, text=" Update  ", height=48, width=172,
+        font=("Inter", 22, "bold",), fg_color="#1BC5DC", hover_color="#1695A7", image=updateIcon,
+        # anchor=ctk.W 
+    )
+    updateButton.place(x=660, y=726)
+
+    # Delete Appointment Button with Icon
+    deleteIconPath = relative_to_assets("delete-icon.png")
+    deleteIcon = ctk.CTkImage(light_image=Image.open(deleteIconPath), size=(26,26),)
+    deleteButton = ctk.CTkButton(
+        whiteFrame, text=" Delete ", height=48, width=172,
+        font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=deleteIcon,
+        # anchor=ctk.W 
+    )
+    deleteButton.place(x=847, y=726)
+
+
 
 
     # <<<<<<<<<<<<<<<<<<<< AUTOMATED TESTING >>>>>>>>>>>>>>>>>>>>>
@@ -275,4 +327,4 @@ def adminWindow():
 
 # Only execute the Admin Window if this script is run directly
 if __name__ == "__main__":
-    adminWindow()
+    patientDashboardWindow()
