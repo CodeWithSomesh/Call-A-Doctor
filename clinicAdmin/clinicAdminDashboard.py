@@ -301,6 +301,6 @@ def clinicAdminDashboardWindow():
     window.mainloop()
 
 
-# Only execute the Admin Window if this script is run directly
+# Only execute the Clinic Admin Dashboard Window if this script is run directly
 if __name__ == "__main__":
     clinicAdminDashboardWindow()

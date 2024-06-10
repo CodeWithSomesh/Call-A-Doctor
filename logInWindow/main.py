@@ -144,7 +144,7 @@ def logInWindow():
 
     window.mainloop()
 
-# Only execute the login window if this script is run directly
+# Only execute the Login Window if this script is run directly
 if __name__ == "__main__":
     logInWindow()
 

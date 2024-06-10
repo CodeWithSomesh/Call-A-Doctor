@@ -263,6 +263,6 @@ def doctorDashboardWindow():
     window.mainloop()
 
 
-# Only execute the Admin Window if this script is run directly
+# Only execute the Doctor Dashboard Window if this script is run directly
 if __name__ == "__main__":
     doctorDashboardWindow()
