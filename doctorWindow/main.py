@@ -110,7 +110,7 @@ def doctorWindow():
     greetingLabel2 = ctk.CTkLabel(whiteFrame, text="Good Morning!  (January 26, 2024)", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
     roleLabel = ctk.CTkLabel(whiteFrame, text="(Doctor)", font=("Inter", 36, "bold",), text_color="#000000")
-    roleLabel.place(x=880, y=25)
+    roleLabel.place(x=875, y=25)
 
     # Line that seperates Greeting Message from others
     lineFrame2 = ctk.CTkFrame(window, width=1040, height=3, fg_color="#37D8B7", border_color="#37D8B7", bg_color='#37D8B7' )
@@ -138,24 +138,24 @@ def doctorWindow():
 
 
     # Approve Button with Icon
-    approveIconPath = relative_to_assets("approve-icon.png")
-    approveIcon = ctk.CTkImage(light_image=Image.open(approveIconPath), size=(33,33),)
-    approveButton = ctk.CTkButton(
-        whiteFrame, text=" Approve ", width=140, height=50, 
-        font=("Inter", 22, "bold",), fg_color="#00C16A", hover_color="#009B2B", image=approveIcon,
+    pillIconPath = relative_to_assets("pill-icon.png")
+    pillIcon = ctk.CTkImage(light_image=Image.open(pillIconPath), size=(33,33),)
+    generateMedicineButton = ctk.CTkButton(
+        whiteFrame, text=" Generate Prescriptions ", width=310, height=50, 
+        font=("Inter", 22, "bold",), fg_color="#00C16A", hover_color="#009B2B", image=pillIcon,
         # anchor=ctk.W 
     )
-    approveButton.place(x=700, y=225)
+    generateMedicineButton.place(x=700, y=225)
 
     # Reject Button with Icon
-    rejectIconPath = relative_to_assets("reject-icon.png")
-    rejectIcon = ctk.CTkImage(light_image=Image.open(rejectIconPath), size=(33,33),)
-    rejectButton = ctk.CTkButton(
-        whiteFrame, text=" Reject  ", width=140, height=50, 
-        font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=rejectIcon,
-        # anchor=ctk.W 
-    )
-    rejectButton.place(x=870, y=225)
+    # rejectIconPath = relative_to_assets("reject-icon.png")
+    # rejectIcon = ctk.CTkImage(light_image=Image.open(rejectIconPath), size=(33,33),)
+    # rejectButton = ctk.CTkButton(
+    #     whiteFrame, text=" Reject  ", width=140, height=50, 
+    #     font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=rejectIcon,
+    #     # anchor=ctk.W 
+    # )
+    # rejectButton.place(x=870, y=225)
 
 
     # <<<<<<<<<<<<<<<<<<<< TABLE FRAME STORING TREEVIEW >>>>>>>>>>>>>>>>>>>>> 
