@@ -29,7 +29,7 @@ def logInWindow():
         role = roleDropdown.get()
         print(role)
 
-        if role == 'Clinic Admin':
+        if role == 'Admin':
             window.destroy()
             from admin.adminDashboard import adminDashboardWindow
             adminDashboardWindow()
@@ -41,6 +41,10 @@ def logInWindow():
             window.destroy()
             from patient.patientDashboard import patientDashboardWindow
             patientDashboardWindow()
+        elif role == 'Clinic Admin':
+            window.destroy()
+            from clinicAdmin.clinicAdminDashboard import clinicAdminDashboardWindow
+            clinicAdminDashboardWindow()
 
 
         
@@ -108,7 +112,7 @@ def logInWindow():
     roleDropdown = ctk.CTkComboBox(
         window, fg_color="#ffffff", text_color="#000000", width=261, height=48, 
         font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-        values=['Role', 'Patient', 'Doctor', 'Clinic Admin'], border_color="#b5b3b3", border_width=1,
+        values=['Role', 'Patient', 'Doctor', 'Clinic Admin', 'Admin'], border_color="#b5b3b3", border_width=1,
         dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
         dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
     )

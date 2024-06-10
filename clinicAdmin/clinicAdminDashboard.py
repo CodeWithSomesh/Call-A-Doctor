@@ -14,7 +14,7 @@ import customtkinter as ctk
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\clinicAdmin\assets\frame0")
 
-def clinicAdminDashboard():
+def clinicAdminDashboardWindow():
     # Helper function to get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
@@ -286,4 +286,4 @@ def clinicAdminDashboard():
 
 # Only execute the Admin Window if this script is run directly
 if __name__ == "__main__":
-    clinicAdminDashboard()
+    clinicAdminDashboardWindow()
