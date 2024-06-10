@@ -62,14 +62,14 @@ def loginWindow():
 
 
     # <<<<<<<<<<<<<<<<<<<< FORM FRAME >>>>>>>>>>>>>>>>>>>>>
-    formFrame = ctk.CTkFrame(window, width=653, height=800, fg_color="#FFFDFD", border_color="#000", )
+    formFrame = ctk.CTkFrame(window, width=683, height=800, fg_color="#fff", border_color="#000", corner_radius=60 )
     formFrame.place(x=719, y=0)
 
     # White Cornered Background image
-    whiteBgImgPath = relative_to_assets("white-frame.png")
-    whiteBgImg = ctk.CTkImage(light_image=Image.open(whiteBgImgPath), size=(631,800))
-    whiteBgImgLabel = ctk.CTkLabel(formFrame, image=whiteBgImg, text_color='#000',text='', anchor=ctk.W,)
-    whiteBgImgLabel.place(x=0, y=0)
+    # whiteBgImgPath = relative_to_assets("white-frame.png")
+    # whiteBgImg = ctk.CTkImage(light_image=Image.open(whiteBgImgPath), size=(631,800))
+    # whiteBgImgLabel = ctk.CTkLabel(window, image=whiteBgImg, text_color='#000',text='', anchor=ctk.W,)
+    # whiteBgImgLabel.place(x=719, y=0)
 
     # Label with Marketing Text 
     headerLabel1 = ctk.CTkLabel(window, text="Your Health, Our Priority", font=("Inter", 32, "bold",), text_color="#000000")
