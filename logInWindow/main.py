@@ -15,11 +15,11 @@ ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Softwa
 
 
 def logInWindow():
-    # Helper function to get the full path of assets
+    # Get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
 
-    # Function to redirect to the Sign In Window
+    # Redirect to the Sign In Window
     def redirectToSignInWindow():
         window.destroy()
         from signInWindow.main import signInWindow
