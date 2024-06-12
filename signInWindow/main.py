@@ -4,7 +4,8 @@ from PIL import Image
 from tkinter import messagebox
 import customtkinter as ctk
 import sqlite3
-import bcrypt
+import bcrypt # Helps in hashing the password for increased security
+import re # Provides support for working with regular expressions
 
 
 # Add the parent directory to the system path
@@ -183,8 +184,35 @@ def signInWindow():
         logInLabel1.pack(side='left', fill='x', expand=False, padx=(190, 3), pady=(10, 40))
         logInLabel2.pack(side='left', fill='x', expand=False, padx=(0, 0), pady=(10, 40))
 
+    # Validating user's email and password for increased security
+    def validateCredentials(email, password):
+        if "@" not in email:
+            messagebox.showerror('Error', 'Enter a valid email address.')
+            return False
+        
+        if ".com" not in email:
+            messagebox.showerror('Error', 'Enter a valid email address.')
+            return False 
+        
+        if len(password) <= 8:
+            messagebox.showerror('Error', 'Password must be more than 8 characters')
+            return False
+        
+        if not re.search(r'[A-Z]', password): # Ensures there is at least one uppercase letter.
+            messagebox.showerror('Error', 'Password must contain at least 1 uppercase letter.')
+            return False
+        
+        if not re.search(r'\d', password): # Check if password contains at least one digit
+            messagebox.showerror('Error', 'Password must contain at least 1 number.')
+            return False
+        
+        if not re.search(r'[\W_]', password):  # \W matches any non-word character, _ is included to catch underscore as a symbol
+            messagebox.showerror('Error', 'Password must contain at least 1 symbol.')
+            return False
+        
+        return True
 
-
+    # Handling Patient Sign Up process (Upon validated, patients will be added in the database) 
     def patientSignUp():
         firstName = firstNameTextBox.get(0.0, 'end').strip()
         # print(firstName)
@@ -199,14 +227,8 @@ def signInWindow():
         if (firstName != '' and lastName != '' and email != '' and password != '' and nric != '' and 
             role != '' and address != ''):
 
-            if "@" not in email:
-                messagebox.showerror('Error', 'Enter a valid email address')
-                return 
-        
-            if ".com" not in email:
-                messagebox.showerror('Error', 'Enter a valid email address')
-                return 
-        
+            if validateCredentials(email, password) is False:
+                return
 
             patientCursor.execute('SELECT Email FROM patients WHERE Email=?', [email])
             if patientCursor.fetchone() is not None:
@@ -223,7 +245,7 @@ def signInWindow():
         else:
             messagebox.showerror('Error',"Please fill up all the fields.")
 
-
+    # Handling Doctor Sign Up process (Upon validated, doctors will be added in the database) 
     def doctorSignUp():
         firstName = firstNameTextBox.get(0.0, 'end').strip()
         lastName = lastNameTextBox.get(0.0, 'end').strip()
@@ -239,15 +261,9 @@ def signInWindow():
         if (firstName != '' and lastName != '' and email != '' and password != '' and nric != '' and 
             role != '' and clinicName != '' and doctorSpecialization != '' and yearsOfExp != '' ):
 
-            if "@" not in email:
-                messagebox.showerror('Error', 'Enter a valid email address')
-                return 
+            if validateCredentials(email, password) is False:
+                return
         
-            if ".com" not in email:
-                messagebox.showerror('Error', 'Enter a valid email address')
-                return 
-        
-
             doctorCursor.execute('SELECT Email FROM doctors WHERE Email=?', [email])
             if doctorCursor.fetchone() is not None:
                 messagebox.showerror('Error', 'Email already exist')
@@ -265,7 +281,7 @@ def signInWindow():
         else:
             messagebox.showerror('Error',"Please fill up all the fields.")
 
-
+    # Handling Clinic Admin Sign Up process (Upon validated, Clinic Admins will be added in the database) 
     def clinicAdminSignUp():
         firstName = firstNameTextBox.get(0.0, 'end').strip()
         lastName = lastNameTextBox.get(0.0, 'end').strip()
@@ -281,13 +297,8 @@ def signInWindow():
         if (firstName != '' and lastName != '' and email != '' and password != '' and nric != '' and 
             role != '' and clinicName != '' and clinicAddress != '' and clinicContact != '' ):
 
-            if "@" not in email:
-                messagebox.showerror('Error', 'Enter a valid email address')
-                return 
-        
-            if ".com" not in email:
-                messagebox.showerror('Error', 'Enter a valid email address')
-                return 
+            if validateCredentials(email, password) is False:
+                return
         
 
             clinicAdminCursor.execute('SELECT Email FROM clinicAdmins WHERE Email=?', [email])
@@ -302,7 +313,7 @@ def signInWindow():
                     [firstName, lastName, email, hashedPassword, nric, role, clinicName, clinicAddress, clinicContact]
                 )
                 clinicAdminConn.commit()
-                messagebox.showinfo('Success', "Clinic Admin Account has been created successfully. \nWaiting for your CAD Admin's approval. \nYou can login after their approval.")
+                messagebox.showinfo('Success', "Clinic Admin Account has been created successfully. \nWaiting for CAD Admin's approval. \nYou can login after their approval.")
         
         else:
             messagebox.showerror('Error',"Please fill up all the fields.")
@@ -323,10 +334,6 @@ def signInWindow():
         else:
             messagebox.showerror('Error',"Please select who you want sign in as.")
 
-
-
-    
-    
 
 
 
