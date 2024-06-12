@@ -254,7 +254,7 @@ def signInWindow():
         
         return True
 
-    # Handling Patient Sign Up process (Upon validated, patients will be added in the database) 
+    # Handling Patient Sign Up process (Validations) 
     def patientSignUp():
         firstName = firstNameTextBox.get(0.0, 'end').strip()
         # print(firstName)
@@ -287,7 +287,7 @@ def signInWindow():
         else:
             messagebox.showerror('Error',"Please fill up all the fields.")
 
-    # Handling Doctor Sign Up process (Upon validated, doctors will be added in the database) 
+    # Handling Doctor Sign Up process (Validations) 
     def doctorSignUp():
         firstName = firstNameTextBox.get(0.0, 'end').strip()
         lastName = lastNameTextBox.get(0.0, 'end').strip()
@@ -323,7 +323,7 @@ def signInWindow():
         else:
             messagebox.showerror('Error',"Please fill up all the fields.")
 
-    # Handling Clinic Admin Sign Up process (Upon validated, Clinic Admins will be added in the database) 
+    # Handling Clinic Admin Sign Up process (Validations) 
     def clinicAdminSignUp():
         firstName = firstNameTextBox.get(0.0, 'end').strip()
         lastName = lastNameTextBox.get(0.0, 'end').strip()
@@ -361,7 +361,7 @@ def signInWindow():
             messagebox.showerror('Error',"Please fill up all the fields.")
 
 
-    # Handling Admin Sign Up process (Upon validated, Admins will be added in the database) 
+    # Handling Admin Sign Up process (Validations) 
     def adminSignUp():
         firstName = firstNameTextBox.get(0.0, 'end').strip()
         lastName = lastNameTextBox.get(0.0, 'end').strip()
@@ -397,6 +397,7 @@ def signInWindow():
         else:
             messagebox.showerror('Error',"Please fill up all the fields.")
 
+    # Function will run after user clicks on Submit button
     def handleSignUp():
         role = roleDropdown.get()
 

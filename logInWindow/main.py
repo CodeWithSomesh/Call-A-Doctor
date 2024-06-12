@@ -81,7 +81,7 @@ def logInWindow():
         
         return True
     
-
+    # Handling Patient Log In process (Validations) 
     def patientLogin():
         email = emailTextBox.get(0.0, 'end').strip()
         password = passwordTextBox.get(0.0, 'end').strip()
@@ -110,7 +110,7 @@ def logInWindow():
             messagebox.showerror('Error',"Please fill up all the fields.")
             return False
 
-
+    # Handling Doctor Log In process (Validations) 
     def doctorLogin():
         email = emailTextBox.get(0.0, 'end').strip()
         password = passwordTextBox.get(0.0, 'end').strip()
@@ -139,7 +139,7 @@ def logInWindow():
             messagebox.showerror('Error',"Please fill up all the fields.")
             return False
 
-
+    # Handling Clinic Admin Log In process (Validations) 
     def clinicAdminLogin():
         email = emailTextBox.get(0.0, 'end').strip()
         password = passwordTextBox.get(0.0, 'end').strip()
@@ -168,7 +168,7 @@ def logInWindow():
             messagebox.showerror('Error',"Please fill up all the fields.")
             return False
 
-
+    # Handling CAD Admin Log In process (Validations) 
     def adminLogin():
         email = emailTextBox.get(0.0, 'end').strip()
         password = passwordTextBox.get(0.0, 'end').strip()
@@ -197,7 +197,7 @@ def logInWindow():
             messagebox.showerror('Error',"Please fill up all the fields.")
             return False
         
-
+    # Function will run after user clicks on Submit button, redirecting the users to their respective windows based on their roles
     def redirectBasedOnRole():
         email = emailTextBox.get(0.0, 'end').strip()
         password = passwordTextBox.get(0.0, 'end').strip()
