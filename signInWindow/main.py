@@ -81,7 +81,7 @@ def signInWindow():
         from logInWindow.main import logInWindow
         logInWindow()
 
-    # Function to update the display based on selected role
+    # Update the display based on selected role
     def displayBasedOnRole(role):
         print(role)
         buttonFrame.pack_forget()
