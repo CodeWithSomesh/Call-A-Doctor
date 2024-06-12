@@ -34,6 +34,10 @@ def logInWindow():
     # Connecting to Clinic Admin DB
     clinicAdminConn = sqlite3.connect('clinicAdmins.db')
     clinicAdminCursor = clinicAdminConn.cursor()
+
+    # Connecting to Clinic Admin DB
+    adminConn = sqlite3.connect('admins.db')
+    adminCursor = adminConn.cursor()
     
 
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ALL FUNCTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -165,6 +169,35 @@ def logInWindow():
             return False
 
 
+    def adminLogin():
+        email = emailTextBox.get(0.0, 'end').strip()
+        password = passwordTextBox.get(0.0, 'end').strip()
+        role = roleDropdown.get()
+
+        if (email != '' and password != '' and role != ''):
+
+            if validateCredentials(email, password) is False:
+                return
+            
+            adminCursor.execute('SELECT Password FROM admins WHERE Email=?', [email])
+            result = adminCursor.fetchone()
+
+            if result:
+                if bcrypt.checkpw(password.encode('utf-8'), result[0]): # Check whether the user entered password matched the password in DB
+                    messagebox.showinfo('Success', 'Logged in successfully as CAD Admin.')
+                    return True
+                else:
+                    messagebox.showerror('Error', 'Password does not match. Please try again.')
+                    return False
+            else:
+                messagebox.showerror('Error', 'Email entered is not registered. Please try again.')
+                return False
+
+        else:
+            messagebox.showerror('Error',"Please fill up all the fields.")
+            return False
+        
+
     def redirectBasedOnRole():
         email = emailTextBox.get(0.0, 'end').strip()
         password = passwordTextBox.get(0.0, 'end').strip()
@@ -173,8 +206,8 @@ def logInWindow():
 
         if (email != '' and password != '' and role != ''):
 
-            if role == 'Admin':
-                if patientLogin():
+            if role == 'CAD Admin':
+                if adminLogin():
                     window.destroy()
                     from admin.adminDashboard import adminDashboardWindow
                     adminDashboardWindow()
@@ -225,11 +258,6 @@ def logInWindow():
     formFrame = ctk.CTkFrame(window, width=683, height=800, fg_color="#fff", border_color="#000", corner_radius=60 )
     formFrame.place(x=719, y=0)
 
-    # White Cornered Background image
-    # whiteBgImgPath = relative_to_assets("white-frame.png")
-    # whiteBgImg = ctk.CTkImage(light_image=Image.open(whiteBgImgPath), size=(631,800))
-    # whiteBgImgLabel = ctk.CTkLabel(window, image=whiteBgImg, text_color='#000',text='', anchor=ctk.W,)
-    # whiteBgImgLabel.place(x=719, y=0)
 
     # Label with Marketing Text 
     headerLabel1 = ctk.CTkLabel(window, text="Your Health, Our Priority", font=("Inter", 32, "bold",), text_color="#000000")
@@ -263,7 +291,7 @@ def logInWindow():
     roleDropdown = ctk.CTkComboBox(
         window, fg_color="#ffffff", text_color="#000000", width=261, height=48, 
         font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-        values=['Role', 'Patient', 'Doctor', 'Clinic Admin', 'Admin'], border_color="#b5b3b3", border_width=1,
+        values=['Role', 'Patient', 'Doctor', 'Clinic Admin', 'CAD Admin'], border_color="#b5b3b3", border_width=1,
         dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
         dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
     )
