@@ -499,7 +499,7 @@ def signInWindow():
         scrollbar_button_color="#1AFF75", border_width=1
     )
 
-    yearsOfExpLabel = ctk.CTkLabel(leftFrame, text="Year Of Experience", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+    yearsOfExpLabel = ctk.CTkLabel(leftFrame, text="Years Of Experience", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
     yearsOfExpTextBox = ctk.CTkTextbox(
         leftFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
         border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
