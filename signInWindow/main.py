@@ -336,7 +336,6 @@ def signInWindow():
 
 
 
-
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
     window = ctk.CTk()
     window.title("CaD - Doctor Appointment Booking System (Sign In Window)")
