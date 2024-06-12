@@ -332,7 +332,7 @@ def signInWindow():
             clinicAdminSignUp()
 
         else:
-            messagebox.showerror('Error',"Please select who you want sign in as.")
+            messagebox.showerror('Error',"Please select who you want to sign in as.")
 
 
 
