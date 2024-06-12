@@ -94,13 +94,17 @@ def logInWindow():
             if result:
                 if bcrypt.checkpw(password.encode('utf-8'), result[0]): # Check whether the user entered password matched the password in DB
                     messagebox.showinfo('Success', 'Logged in successfully as Patient.')
+                    return True
                 else:
                     messagebox.showerror('Error', 'Password does not match. Please try again.')
+                    return False
             else:
                 messagebox.showerror('Error', 'Email entered is not registered. Please try again.')
+                return False
 
         else:
             messagebox.showerror('Error',"Please fill up all the fields.")
+            return False
 
 
     def doctorLogin():
@@ -119,13 +123,17 @@ def logInWindow():
             if result:
                 if bcrypt.checkpw(password.encode('utf-8'), result[0]): # Check whether the user entered password matched the password in DB
                     messagebox.showinfo('Success', 'Logged in successfully as Doctor.')
+                    return True
                 else:
                     messagebox.showerror('Error', 'Password does not match. Please try again.')
+                    return False
             else:
                 messagebox.showerror('Error', 'Email entered is not registered. Please try again.')
+                return False
 
         else:
             messagebox.showerror('Error',"Please fill up all the fields.")
+            return False
 
 
     def clinicAdminLogin():
@@ -143,40 +151,53 @@ def logInWindow():
 
             if result:
                 if bcrypt.checkpw(password.encode('utf-8'), result[0]): # Check whether the user entered password matched the password in DB
-                    messagebox.showinfo('Success', 'Logged in successfully as clinicAdmin.')
+                    messagebox.showinfo('Success', 'Logged in successfully as Clinic Admin.')
+                    return True
                 else:
                     messagebox.showerror('Error', 'Password does not match. Please try again.')
+                    return False
             else:
                 messagebox.showerror('Error', 'Email entered is not registered. Please try again.')
+                return False
 
         else:
             messagebox.showerror('Error',"Please fill up all the fields.")
+            return False
 
 
-    def redirectBasedOnRole(role):
+    def redirectBasedOnRole():
+        email = emailTextBox.get(0.0, 'end').strip()
+        password = passwordTextBox.get(0.0, 'end').strip()
+        role = roleDropdown.get()
+        print(role)
 
-        if role == 'Admin':
-            patientLogin()
-            window.destroy()
-            from admin.adminDashboard import adminDashboardWindow
-            adminDashboardWindow()
-        elif role == 'Doctor':
-            patientLogin()
-            window.destroy()
-            from doctor.doctorDashboard import doctorDashboardWindow
-            doctorDashboardWindow()
-        elif role == 'Patient':
-            patientLogin()
-            window.destroy()
-            from patient.patientDashboard import patientDashboardWindow
-            patientDashboardWindow()
-        elif role == 'Clinic Admin':
-            patientLogin()
-            window.destroy()
-            from clinicAdmin.clinicAdminDashboard import clinicAdminDashboardWindow
-            clinicAdminDashboardWindow()
+        if (email != '' and password != '' and role != ''):
+
+            if role == 'Admin':
+                if patientLogin():
+                    window.destroy()
+                    from admin.adminDashboard import adminDashboardWindow
+                    adminDashboardWindow()
+            elif role == 'Doctor':
+                if doctorLogin():
+                    window.destroy()
+                    from doctor.doctorDashboard import doctorDashboardWindow
+                    doctorDashboardWindow()
+            elif role == 'Patient':
+                if patientLogin():
+                    window.destroy()
+                    from patient.patientDashboard import patientDashboardWindow
+                    patientDashboardWindow()
+            elif role == 'Clinic Admin':
+                if clinicAdminLogin():
+                    window.destroy()
+                    from clinicAdmin.clinicAdminDashboard import clinicAdminDashboardWindow
+                    clinicAdminDashboardWindow()
+            else:
+                messagebox.showerror('Error',"Please select who you want to log in as.")
+
         else:
-            messagebox.showerror('Error',"Please select who you want to log in as.")
+            messagebox.showerror('Error',"Please fill up all the fields.")
 
 
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
