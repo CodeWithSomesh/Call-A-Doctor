@@ -1,12 +1,14 @@
 import sys
 from pathlib import Path
 from PIL import Image
+from tkinter import messagebox
+import customtkinter as ctk
+import sqlite3
+import bcrypt
+
 
 # Add the parent directory to the system path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-
-from tkinter import Tk, Canvas, PhotoImage
-import customtkinter as ctk
 
 
 # Paths to assets and output directories
@@ -15,6 +17,51 @@ ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Softwa
 
 
 def signInWindow():
+
+    # Connecting to the SQLite3 Database
+    conn = sqlite3.connect('patients.db')
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS patients (
+            FirstName TEXT NOT NULL,
+            LastName TEXT NOT NULL,
+            Email TEXT NOT NULL,
+            Password TEXT NOT NULL,
+            NRIC TEXT NOT NULL,
+            Role TEXT NOT NULL,
+            Address TEXT NOT NULL
+        )          
+    """)
+
+    def signUp():
+        role = roleDropdown.get()
+
+        if role == 'Patient':
+            firstName = firstNameTextBox.get('insert', 'end').strip()
+            lastName = lastNameTextBox.get('insert', 'end').strip()
+            email = emailTextBox.get('insert', 'end').strip()
+            password = passwordTextBox.get('insert', 'end').strip()
+            nric = nricTextBox.get('insert', 'end').strip()
+            address = addressTextBox.get('insert', 'end').strip()
+
+            if (firstName != '' and lastName != '' and email != '' and password != '' and nric != '' and 
+                role != '' and address != ''):
+                # messagebox.showerror('Error', "This if stament has an issue.")
+                cursor.execute('SELECT Email FROM patients WHERE Email=?', [email])
+                if cursor.fetchone() is not None:
+                    messagebox.showerror('Error', 'Email already exist.')
+                else:
+                    encodedPassword = password.encode('utf-8')
+            
+            
+            else:
+                messagebox.showerror('Error',"Please fill up all the fields.")
+
+            # window.destroy()
+            # from patient.patientDashboard import patientDashboardWindow
+            # patientDashboardWindow()
+
+
 
     
     # Helper function to get the full path of assets
@@ -141,36 +188,6 @@ def signInWindow():
     window.focus_set()
     window.lift()
     
-
-    # Create canvas for background and layout
-    # canvas = Canvas(
-    #     window,
-    #     bg = "#fff",
-    #     height = 800,
-    #     width = 1350,
-    #     bd = 0,
-    #     highlightthickness = 0,
-    #     relief = "ridge", 
-    # )
-    # canvas.place(x = 0, y = 0)
-
-    # # Background image
-    # bgImagePath = PhotoImage(
-    #     file=relative_to_assets("image_1.png"))
-    # bgImage = canvas.create_image(
-    #     326.0,
-    #     401.0,
-    #     image=bgImagePath
-    # )
-
-    # # White background for form
-    # whiteBgPath = PhotoImage(
-    #     file=relative_to_assets("image_2.png"))
-    # whiteBg = canvas.create_image(
-    #     969.0,
-    #     400.0,
-    #     image=whiteBgPath
-    # )
 
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< LEFT IMAGE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     leftImgFrame = ctk.CTkFrame(window, width=652, height=800, fg_color="transparent",)
@@ -349,7 +366,7 @@ def signInWindow():
     submitButton = ctk.CTkButton(
         buttonFrame, text="Submit", width=620, height=64, 
         font=("Inter", 24, "bold",), fg_color="#000", hover_color="#1BCC62", 
-        command=redirectToLoginWindow
+        command=signUp
     )
 
     buttonFrame.pack(side='top', fill='x', expand=False, pady=(40, 0),)
