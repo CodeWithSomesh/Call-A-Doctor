@@ -1,12 +1,15 @@
 import sys
 from pathlib import Path
 from PIL import Image
+from tkinter import messagebox
+import customtkinter as ctk
+import sqlite3
+import bcrypt # Helps in hashing the password for increased security
+import re # Provides support for working with regular expressions
 
 # Add the parent directory to the system path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from tkinter import Tk, Canvas, PhotoImage, Entry, Button
-import customtkinter as ctk
 
 
 OUTPUT_PATH = Path(__file__).parent
@@ -15,6 +18,30 @@ ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Softwa
 
 
 def logInWindow():
+
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< CONNECTING TO SQLITE3 DATABASE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    # Connecting to Patient DB
+    patientConn = sqlite3.connect('patients.db')
+    patientCursor = patientConn.cursor()
+    
+
+    # Connecting to Doctor DB
+    doctorConn = sqlite3.connect('doctors.db')
+    doctorCursor = doctorConn.cursor()
+   
+
+    # Connecting to Clinic Admin DB
+    clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+    clinicAdminCursor = clinicAdminConn.cursor()
+
+    # Connecting to Clinic Admin DB
+    adminConn = sqlite3.connect('admins.db')
+    adminCursor = adminConn.cursor()
+    
+
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ALL FUNCTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
     # Get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
@@ -25,29 +52,186 @@ def logInWindow():
         from signInWindow.main import signInWindow
         signInWindow()
 
+
+    # Validating user's email and password for increased security
+    def validateCredentials(email, password):
+        if "@" not in email:
+            messagebox.showerror('Error', 'Enter a valid email address.')
+            return False
+        
+        if ".com" not in email:
+            messagebox.showerror('Error', 'Enter a valid email address.')
+            return False 
+        
+        if len(password) <= 8:
+            messagebox.showerror('Error', 'Password must be more than 8 characters')
+            return False
+        
+        if not re.search(r'[A-Z]', password): # Ensures there is at least one uppercase letter.
+            messagebox.showerror('Error', 'Password must contain at least 1 uppercase letter.')
+            return False
+        
+        if not re.search(r'\d', password): # Check if password contains at least one digit
+            messagebox.showerror('Error', 'Password must contain at least 1 number.')
+            return False
+        
+        if not re.search(r'[\W_]', password):  # \W matches any non-word character, _ is included to catch underscore as a symbol
+            messagebox.showerror('Error', 'Password must contain at least 1 symbol.')
+            return False
+        
+        return True
+    
+    # Handling Patient Log In process (Validations) 
+    def patientLogin():
+        email = emailTextBox.get(0.0, 'end').strip()
+        password = passwordTextBox.get(0.0, 'end').strip()
+        role = roleDropdown.get()
+
+        if (email != '' and password != '' and role != ''):
+
+            if validateCredentials(email, password) is False:
+                return
+            
+            patientCursor.execute('SELECT Password FROM patients WHERE Email=?', [email])
+            result = patientCursor.fetchone()
+
+            if result:
+                if bcrypt.checkpw(password.encode('utf-8'), result[0]): # Check whether the user entered password matched the password in DB
+                    messagebox.showinfo('Success', 'Logged in successfully as Patient.')
+                    return True
+                else:
+                    messagebox.showerror('Error', 'Password does not match. Please try again.')
+                    return False
+            else:
+                messagebox.showerror('Error', 'Email entered is not registered. Please try again.')
+                return False
+
+        else:
+            messagebox.showerror('Error',"Please fill up all the fields.")
+            return False
+
+    # Handling Doctor Log In process (Validations) 
+    def doctorLogin():
+        email = emailTextBox.get(0.0, 'end').strip()
+        password = passwordTextBox.get(0.0, 'end').strip()
+        role = roleDropdown.get()
+
+        if (email != '' and password != '' and role != ''):
+
+            if validateCredentials(email, password) is False:
+                return
+            
+            doctorCursor.execute('SELECT Password FROM doctors WHERE Email=?', [email])
+            result = doctorCursor.fetchone()
+
+            if result:
+                if bcrypt.checkpw(password.encode('utf-8'), result[0]): # Check whether the user entered password matched the password in DB
+                    messagebox.showinfo('Success', 'Logged in successfully as Doctor.')
+                    return True
+                else:
+                    messagebox.showerror('Error', 'Password does not match. Please try again.')
+                    return False
+            else:
+                messagebox.showerror('Error', 'Email entered is not registered. Please try again.')
+                return False
+
+        else:
+            messagebox.showerror('Error',"Please fill up all the fields.")
+            return False
+
+    # Handling Clinic Admin Log In process (Validations) 
+    def clinicAdminLogin():
+        email = emailTextBox.get(0.0, 'end').strip()
+        password = passwordTextBox.get(0.0, 'end').strip()
+        role = roleDropdown.get()
+
+        if (email != '' and password != '' and role != ''):
+
+            if validateCredentials(email, password) is False:
+                return
+            
+            clinicAdminCursor.execute('SELECT Password FROM clinicAdmins WHERE Email=?', [email])
+            result = clinicAdminCursor.fetchone()
+
+            if result:
+                if bcrypt.checkpw(password.encode('utf-8'), result[0]): # Check whether the user entered password matched the password in DB
+                    messagebox.showinfo('Success', 'Logged in successfully as Clinic Admin.')
+                    return True
+                else:
+                    messagebox.showerror('Error', 'Password does not match. Please try again.')
+                    return False
+            else:
+                messagebox.showerror('Error', 'Email entered is not registered. Please try again.')
+                return False
+
+        else:
+            messagebox.showerror('Error',"Please fill up all the fields.")
+            return False
+
+    # Handling CAD Admin Log In process (Validations) 
+    def adminLogin():
+        email = emailTextBox.get(0.0, 'end').strip()
+        password = passwordTextBox.get(0.0, 'end').strip()
+        role = roleDropdown.get()
+
+        if (email != '' and password != '' and role != ''):
+
+            if validateCredentials(email, password) is False:
+                return
+            
+            adminCursor.execute('SELECT Password FROM admins WHERE Email=?', [email])
+            result = adminCursor.fetchone()
+
+            if result:
+                if bcrypt.checkpw(password.encode('utf-8'), result[0]): # Check whether the user entered password matched the password in DB
+                    messagebox.showinfo('Success', 'Logged in successfully as CAD Admin.')
+                    return True
+                else:
+                    messagebox.showerror('Error', 'Password does not match. Please try again.')
+                    return False
+            else:
+                messagebox.showerror('Error', 'Email entered is not registered. Please try again.')
+                return False
+
+        else:
+            messagebox.showerror('Error',"Please fill up all the fields.")
+            return False
+        
+    # Function will run after user clicks on Submit button, redirecting the users to their respective windows based on their roles
     def redirectBasedOnRole():
+        email = emailTextBox.get(0.0, 'end').strip()
+        password = passwordTextBox.get(0.0, 'end').strip()
         role = roleDropdown.get()
         print(role)
 
-        if role == 'Admin':
-            window.destroy()
-            from admin.adminDashboard import adminDashboardWindow
-            adminDashboardWindow()
-        elif role == 'Doctor':
-            window.destroy()
-            from doctor.doctorDashboard import doctorDashboardWindow
-            doctorDashboardWindow()
-        elif role == 'Patient':
-            window.destroy()
-            from patient.patientDashboard import patientDashboardWindow
-            patientDashboardWindow()
-        elif role == 'Clinic Admin':
-            window.destroy()
-            from clinicAdmin.clinicAdminDashboard import clinicAdminDashboardWindow
-            clinicAdminDashboardWindow()
+        if (email != '' and password != '' and role != ''):
 
+            if role == 'CAD Admin':
+                if adminLogin():
+                    window.destroy()
+                    from admin.adminDashboard import adminDashboardWindow
+                    adminDashboardWindow()
+            elif role == 'Doctor':
+                if doctorLogin():
+                    window.destroy()
+                    from doctor.doctorDashboard import doctorDashboardWindow
+                    doctorDashboardWindow()
+            elif role == 'Patient':
+                if patientLogin():
+                    window.destroy()
+                    from patient.patientDashboard import patientDashboardWindow
+                    patientDashboardWindow()
+            elif role == 'Clinic Admin':
+                if clinicAdminLogin():
+                    window.destroy()
+                    from clinicAdmin.clinicAdminDashboard import clinicAdminDashboardWindow
+                    clinicAdminDashboardWindow()
+            else:
+                messagebox.showerror('Error',"Please select who you want to log in as.")
 
-        
+        else:
+            messagebox.showerror('Error',"Please fill up all the fields.")
+
 
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
     window = ctk.CTk()
@@ -74,11 +258,6 @@ def logInWindow():
     formFrame = ctk.CTkFrame(window, width=683, height=800, fg_color="#fff", border_color="#000", corner_radius=60 )
     formFrame.place(x=719, y=0)
 
-    # White Cornered Background image
-    # whiteBgImgPath = relative_to_assets("white-frame.png")
-    # whiteBgImg = ctk.CTkImage(light_image=Image.open(whiteBgImgPath), size=(631,800))
-    # whiteBgImgLabel = ctk.CTkLabel(window, image=whiteBgImg, text_color='#000',text='', anchor=ctk.W,)
-    # whiteBgImgLabel.place(x=719, y=0)
 
     # Label with Marketing Text 
     headerLabel1 = ctk.CTkLabel(window, text="Your Health, Our Priority", font=("Inter", 32, "bold",), text_color="#000000")
@@ -112,7 +291,7 @@ def logInWindow():
     roleDropdown = ctk.CTkComboBox(
         window, fg_color="#ffffff", text_color="#000000", width=261, height=48, 
         font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-        values=['Role', 'Patient', 'Doctor', 'Clinic Admin', 'Admin'], border_color="#b5b3b3", border_width=1,
+        values=['Role', 'Patient', 'Doctor', 'Clinic Admin', 'CAD Admin'], border_color="#b5b3b3", border_width=1,
         dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
         dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
     )
