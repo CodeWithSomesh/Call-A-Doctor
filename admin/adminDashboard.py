@@ -9,7 +9,7 @@ from datetime import datetime
 # Add the parent directory to the system path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from tkinter import ttk, Tk, Scrollbar, VERTICAL
+from tkinter import ttk, Tk, Scrollbar, VERTICAL, messagebox
 import customtkinter as ctk
 
 
@@ -17,12 +17,6 @@ OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\admin\assets\frame0")
 
 def adminDashboardWindow():
-
-    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< CONNECTING TO SQLITE3 DATABASE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-    # Connecting to Clinic Admin DB
-    clinicAdminConn = sqlite3.connect('clinicAdmins.db')
-    clinicAdminCursor = clinicAdminConn.cursor()
 
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ALL FUNCTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     # Get the full path of assets
@@ -56,19 +50,54 @@ def adminDashboardWindow():
     count = 0
     def insertTreeview():
         global count
+        # Connecting to Clinic Admin DB
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
         clinicAdminCursor.execute('SELECT * FROM clinicAdmins')
         clinicAdmins = clinicAdminCursor.fetchall()
         table.delete(*table.get_children())
-        data = ((count + 1), )
+
         for clinicAdmin in clinicAdmins:
+            num = count + 1
+            clinicID = clinicAdmin[0]
+            clinicName = clinicAdmin[7]
+            clinicContact = clinicAdmin[9]
+            adminName = f"{clinicAdmin[1]} {clinicAdmin[2]}"
+            adminEmail = clinicAdmin[3]
+            if clinicAdmin[10] == 0:
+                isApproved = 'Waiting For Approval'
+            else:
+                isApproved = 'Approved'
+
+            data = (clinicID, clinicName, clinicContact, adminName, adminEmail, isApproved)
+
+
             if count % 2 == 0:
-                table.insert(parent='', index='end', values=clinicAdmin, tags=("evenrow",))
+                table.insert(parent='', index='end', values=data, tags=("evenrow",))
                 print(clinicAdmin)
             else:
-                table.insert(parent='', index='end', values=clinicAdmin, tags=("oddrow",))
+                table.insert(parent='', index='end', values=data, tags=("oddrow",))
 
             count += 1
 
+    def approveClinic():
+        # Connecting to Clinic Admin DB
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
+        selectedItem = table.focus()
+
+        if not selectedItem:
+            messagebox.showerror('Error', 'Select a Clinic first.')
+        else:
+            clinicData = table.item(selectedItem)["values"]
+            clinicAdminID = clinicData[0]
+            clinicName = clinicData[1]
+            clinicAdminCursor.execute('UPDATE clinicAdmins SET IsApproved=? WHERE ClinicAdminID=?', (True, clinicAdminID))
+            clinicAdminConn.commit()
+            clinicAdminConn.close()
+            insertTreeview()
+            messagebox.showinfo('Success', f'{clinicName} has been approved.')
+            
 
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
     window = ctk.CTk()
@@ -184,7 +213,7 @@ def adminDashboardWindow():
     approveButton = ctk.CTkButton(
         whiteFrame, text=" Approve ", width=140, height=50, 
         font=("Inter", 22, "bold",), fg_color="#00C16A", hover_color="#009B2B", image=approveIcon,
-        # anchor=ctk.W 
+        command=approveClinic # anchor=ctk.W 
     )
     approveButton.place(x=700, y=225)
 
@@ -211,8 +240,8 @@ def adminDashboardWindow():
     table = ttk.Treeview(tableFrame, yscrollcommand=tableScrollbar1.set,height=12)
     table.pack(side='left', fill='both')
     table['columns'] = (
-        'No', 'Clinic ID', 'Clinic Name', 'Clinic Contact',
-        "Clinic Admin", "Admin Email"
+        'ID', 'Clinic Name', 'Clinic Contact',
+        "Clinic Admin", "Admin Email", 'Approval Status'
     )
 
     # Placing and Configuring Treeview Scrollbar
@@ -229,24 +258,24 @@ def adminDashboardWindow():
         foreground='#fff', background='#000', hover=False,
     )
     style.configure('Treeview', font=('Inter', 16), rowheight=47, fieldbackground="#DAFFF7")
-    style.map('Treeview', background=[('selected', '#00BE97')])
+    style.map('Treeview', background=[('selected', '#00BE97',)], font=[('selected', ('Inter', 16, 'bold'))],)
 
     # Treeview Table Headings Details
-    table.heading('No', text='No')
-    table.heading('Clinic ID', text='Clinic ID',)
+    table.heading('ID', text='ID',)
     table.heading('Clinic Name', text='Clinic Name')
     table.heading('Clinic Contact', text='Clinic Contact')
     table.heading('Clinic Admin', text='Clinic Admin')
     table.heading('Admin Email', text='Admin Email')
+    table.heading('Approval Status', text='Approval Status')
 
     # Treeview Table Columns Details
     table.column("#0", width=0, stretch=ctk.NO)
-    table.column("No", width=43, anchor=ctk.CENTER)
-    table.column("Clinic ID", anchor=ctk.CENTER)
+    table.column("ID", width=43, anchor=ctk.CENTER)
     table.column("Clinic Name", width=220, anchor=ctk.CENTER)
     table.column("Clinic Contact", anchor=ctk.CENTER)
     table.column("Clinic Admin", width=250, anchor=ctk.CENTER)
-    table.column("Admin Email", width=315, anchor=ctk.CENTER,)
+    table.column("Admin Email", width=270, anchor=ctk.CENTER,)
+    table.column("Approval Status", width=260, anchor=ctk.CENTER)
 
     # Setting alternating colours for the rows in Treeview
     table.tag_configure("oddrow", background="#F2F5F8")
@@ -285,30 +314,30 @@ def adminDashboardWindow():
     #     count += 1
 
     # Test the insertion in table
-    def testTableInsertion():
-        clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
-        clinicAddress = ["Kuala Lumpur", "George Town", "Ipoh", "Johor Bahru", "Kota Kinabalu", "Shah Alam", "Malacca City", "Alor Setar", "Kuantan", "Kuching"]
-        adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
+    # def testTableInsertion():
+    #     clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
+    #     clinicAddress = ["Kuala Lumpur", "George Town", "Ipoh", "Johor Bahru", "Kota Kinabalu", "Shah Alam", "Malacca City", "Alor Setar", "Kuantan", "Kuching"]
+    #     adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
 
-        for name in adminNames:
-            email = name.replace(" ", "")
+    #     for name in adminNames:
+    #         email = name.replace(" ", "")
 
-        for i in range(10):
-            num = i
-            clinicID = ''.join(random.choices('0123456789', k=12))
-            clinicName = choice(clinicNames)
-            clinicContact = ''.join(random.choices('0123456789', k=8))
-            clinicAddress = choice(clinicAddress)
-            adminName = choice(adminNames)
-            adminEmail = f'{email}@email.com'
+    #     for i in range(10):
+    #         num = i
+    #         clinicID = ''.join(random.choices('0123456789', k=12))
+    #         clinicName = choice(clinicNames)
+    #         clinicContact = ''.join(random.choices('0123456789', k=8))
+    #         clinicAddress = choice(clinicAddress)
+    #         adminName = choice(adminNames)
+    #         adminEmail = f'{email}@email.com'
 
-            data = (num, clinicID, clinicName, clinicContact, clinicAddress, adminName, adminEmail)
-            if count % 2 == 0:
-                table.insert(parent='', index=0, values=data, tags=("evenrow",))
-            else:
-                table.insert(parent='', index=0, values=data, tags=("oddrow",))
+    #         data = (num, clinicID, clinicName, clinicContact, clinicAddress, adminName, adminEmail)
+    #         if count % 2 == 0:
+    #             table.insert(parent='', index=0, values=data, tags=("evenrow",))
+    #         else:
+    #             table.insert(parent='', index=0, values=data, tags=("oddrow",))
 
-            count += 1
+            # count += 1
     
     insertTreeview()
 

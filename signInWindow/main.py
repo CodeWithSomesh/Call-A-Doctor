@@ -50,7 +50,7 @@ def signInWindow():
             Role TEXT NOT NULL,
             ClinicName TEXT NOT NULL,
             Specialization TEXT NOT NULL,
-            YearsOfExperiece TEXT NOT NULL,
+            YearsOfExperience TEXT NOT NULL,
             IsApproved BOOLEAN DEFAULT False
         )          
     """)
@@ -322,12 +322,11 @@ def signInWindow():
                 hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
                 print(hashedPassword)
                 doctorCursor.execute(
-                    'INSERT INTO doctors VALUES (?,?,?,?,?,?,?,?,?,?)', 
+                    'INSERT INTO doctors (FirstName, LastName, Email, Password, NRIC, Role, ClinicName, Specialization, YearsOfExperience, IsApproved) VALUES (?,?,?,?,?,?,?,?,?,?)', 
                     [firstName, lastName, email, hashedPassword, nric, role, clinicName, doctorSpecialization, yearsOfExp, False]
                 )
                 doctorConn.commit()
                 messagebox.showinfo('Success', "Doctor Account has been created successfully. \nWaiting for your Clinic Admin's approval. \nYou can login after their approval.")
-        
         else:
             messagebox.showerror('Error',"Please fill up all the fields.")
 
@@ -359,7 +358,7 @@ def signInWindow():
                 hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
                 print(hashedPassword)
                 clinicAdminCursor.execute(
-                    'INSERT INTO clinicAdmins VALUES (?,?,?,?,?,?,?,?,?,?)', 
+                    'INSERT INTO clinicAdmins (FirstName, LastName, Email, Password, NRIC, Role, ClinicName, ClinicAddress, ClinicNumber, IsApproved) VALUES (?,?,?,?,?,?,?,?,?,?)', 
                     [firstName, lastName, email, hashedPassword, nric, role, clinicName, clinicAddress, clinicContact, False]
                 )
                 clinicAdminConn.commit()
@@ -397,7 +396,9 @@ def signInWindow():
                 encodedPassword = password.encode('utf-8')
                 hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
                 print(hashedPassword)
-                adminCursor.execute('INSERT INTO admins VALUES (?,?,?,?,?,?,?)', [firstName, lastName, email, hashedPassword, nric, role, adminSecretKey])
+                adminCursor.execute(
+                    'INSERT INTO admins (FirstName, LastName, Email, Password, NRIC, Role, AdminSecretKey) VALUES (?,?,?,?,?,?,?)', 
+                    [firstName, lastName, email, hashedPassword, nric, role, adminSecretKey])
                 adminConn.commit()
                 messagebox.showinfo('Success', 'Admin Account has been created successfully. \nYou can now log in with your account.')
                 redirectToLoginWindow()
