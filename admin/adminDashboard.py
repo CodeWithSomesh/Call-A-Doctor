@@ -47,6 +47,28 @@ def adminDashboardWindow():
         searchInputTextBox.insert('0.0', "Search Clinics by Name or Address")
         searchInputTextBox.configure(text_color='gray')
 
+
+    # def filterTree(event):
+    #     searchTerm = searchInputTextBox.get('0.0', "end").lower()
+    #     table.delete(*table.get_children()) # Clear the current Treeview
+
+    #     # Connecting to Clinic Admin DB
+    #     clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+    #     clinicAdminCursor = clinicAdminConn.cursor()
+
+    #     # Fetch filtered data from the database
+    #     clinicAdminCursor.execute("""
+    #         SELECT ClinicAdminID, FirstName, LastName, Email, Role, IsApproved 
+    #         FROM clinicAdmins 
+    #         WHERE ClinicAdminID LIKE ? OR FirstName LIKE ? OR LastName LIKE ? OR Email LIKE ? OR Role LIKE ?
+    #     """, ('%'+searchTerm+'%', '%'+searchTerm+'%', '%'+searchTerm+'%', '%'+searchTerm+'%', '%'+searchTerm+'%'))
+    #     rows = clinicAdminCursor.fetchall()
+
+    #     # Insert filtered data into the Treeview
+    #     for row in rows:
+    #         table.insert("", "end", values=row)
+
+
     global count
     count = 0
     def insertTreeview():
@@ -244,6 +266,7 @@ def adminDashboardWindow():
     searchInputTextBox.place(x=25, y=225)
     searchInputTextBox.bind("<FocusIn>", searchbarFocus)
     searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
+    searchInputTextBox.bind("<KeyRelease>", filterTree)
 
 
     # Approve Button with Icon
