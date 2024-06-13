@@ -3,6 +3,7 @@ from pathlib import Path
 from PIL import Image
 import random
 from random import choice
+import sqlite3
 
 # Add the parent directory to the system path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -15,12 +16,20 @@ OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\admin\assets\frame0")
 
 def adminDashboardWindow():
-    # Helper function to get the full path of assets
+
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< CONNECTING TO SQLITE3 DATABASE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    # Connecting to Clinic Admin DB
+    clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+    clinicAdminCursor = clinicAdminConn.cursor()
+
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ALL FUNCTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    # Get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
 
 
-    # Function to redirect to the Log In Window
+    # Redirect to the Log In Window
     def redirectToLoginWindow():
         window.destroy()
         from logInWindow.main import logInWindow

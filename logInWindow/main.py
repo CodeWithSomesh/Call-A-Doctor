@@ -25,17 +25,15 @@ def logInWindow():
     patientConn = sqlite3.connect('patients.db')
     patientCursor = patientConn.cursor()
     
-
     # Connecting to Doctor DB
     doctorConn = sqlite3.connect('doctors.db')
     doctorCursor = doctorConn.cursor()
    
-
     # Connecting to Clinic Admin DB
     clinicAdminConn = sqlite3.connect('clinicAdmins.db')
     clinicAdminCursor = clinicAdminConn.cursor()
 
-    # Connecting to Clinic Admin DB
+    # Connecting to CAD Admin DB
     adminConn = sqlite3.connect('admins.db')
     adminCursor = adminConn.cursor()
     

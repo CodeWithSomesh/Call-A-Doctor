@@ -48,7 +48,8 @@ def signInWindow():
             Role TEXT NOT NULL,
             ClinicName TEXT NOT NULL,
             Specialization TEXT NOT NULL,
-            YearsOfExperiece TEXT NOT NULL
+            YearsOfExperiece TEXT NOT NULL,
+            IsApproved BOOLEAN DEFAULT False
         )          
     """)
 
@@ -65,7 +66,8 @@ def signInWindow():
             Role TEXT NOT NULL,
             ClinicName TEXT NOT NULL,
             ClinicAddress TEXT NOT NULL,
-            ClinicNumber TEXT NOT NULL
+            ClinicNumber TEXT NOT NULL,
+            IsApproved BOOLEAN DEFAULT False
         )          
     """)
 
@@ -314,8 +316,8 @@ def signInWindow():
                 hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
                 print(hashedPassword)
                 doctorCursor.execute(
-                    'INSERT INTO doctors VALUES (?,?,?,?,?,?,?,?,?)', 
-                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, doctorSpecialization, yearsOfExp]
+                    'INSERT INTO doctors VALUES (?,?,?,?,?,?,?,?,?,?)', 
+                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, doctorSpecialization, yearsOfExp, False]
                 )
                 doctorConn.commit()
                 messagebox.showinfo('Success', "Doctor Account has been created successfully. \nWaiting for your Clinic Admin's approval. \nYou can login after their approval.")
@@ -351,8 +353,8 @@ def signInWindow():
                 hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
                 print(hashedPassword)
                 clinicAdminCursor.execute(
-                    'INSERT INTO clinicAdmins VALUES (?,?,?,?,?,?,?,?,?)', 
-                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, clinicAddress, clinicContact]
+                    'INSERT INTO clinicAdmins VALUES (?,?,?,?,?,?,?,?,?,?)', 
+                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, clinicAddress, clinicContact, False]
                 )
                 clinicAdminConn.commit()
                 messagebox.showinfo('Success', "Clinic Admin Account has been created successfully. \nWaiting for CAD Admin's approval. \nYou can login after their approval.")
