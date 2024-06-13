@@ -320,63 +320,6 @@ def adminDashboardWindow():
     table.tag_configure("oddrow", background="#F2F5F8")
     table.tag_configure("evenrow", background="#B4EFF7")
 
-
-    # <<<<<<<<<<<<<<<<<<<< AUTOMATED TESTING >>>>>>>>>>>>>>>>>>>>>
-    
-    #     if count % 2 == 0:
-    #         table.insert(parent='', index=0, values=data, tags=("evenrow",))
-    #     else:
-    #         table.insert(parent='', index=0, values=data, tags=("oddrow",))
-
-    # global count
-    # count = 0
-    # clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
-    # adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
-
-
-
-    # for i in range(15):
-    #     num = (i+1)
-    #     clinicID = ''.join(random.choices('0123456789', k=12))
-    #     clinicName = choice(clinicNames)
-    #     clinicContact = ''.join(random.choices('0123456789', k=8))
-    #     clinicContact = f'+01{clinicContact}'
-    #     adminName = choice(adminNames)
-    #     adminEmail = f'{(adminName.replace(" ", "")).lower()}@email.com'
-
-    #     data = (num, clinicID, clinicName, clinicContact, adminName, adminEmail)
-    #     if count % 2 == 0:
-    #         table.insert(parent='', index='end', values=data, tags=("evenrow",))
-    #     else:
-    #         table.insert(parent='', index='end', values=data, tags=("oddrow",))
-
-    #     count += 1
-
-    # Test the insertion in table
-    # def testTableInsertion():
-    #     clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
-    #     clinicAddress = ["Kuala Lumpur", "George Town", "Ipoh", "Johor Bahru", "Kota Kinabalu", "Shah Alam", "Malacca City", "Alor Setar", "Kuantan", "Kuching"]
-    #     adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
-
-    #     for name in adminNames:
-    #         email = name.replace(" ", "")
-
-    #     for i in range(10):
-    #         num = i
-    #         clinicID = ''.join(random.choices('0123456789', k=12))
-    #         clinicName = choice(clinicNames)
-    #         clinicContact = ''.join(random.choices('0123456789', k=8))
-    #         clinicAddress = choice(clinicAddress)
-    #         adminName = choice(adminNames)
-    #         adminEmail = f'{email}@email.com'
-
-    #         data = (num, clinicID, clinicName, clinicContact, clinicAddress, adminName, adminEmail)
-    #         if count % 2 == 0:
-    #             table.insert(parent='', index=0, values=data, tags=("evenrow",))
-    #         else:
-    #             table.insert(parent='', index=0, values=data, tags=("oddrow",))
-
-            # count += 1
     
     insertTreeview()
 
