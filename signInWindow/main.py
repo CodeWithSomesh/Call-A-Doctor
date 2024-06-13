@@ -51,7 +51,7 @@ def signInWindow():
             ClinicName TEXT NOT NULL,
             Specialization TEXT NOT NULL,
             YearsOfExperience TEXT NOT NULL,
-            IsApproved BOOLEAN DEFAULT False
+            IsApproved INTEGER DEFAULT 0
         )          
     """)
 
@@ -70,7 +70,7 @@ def signInWindow():
             ClinicName TEXT NOT NULL,
             ClinicAddress TEXT NOT NULL,
             ClinicNumber TEXT NOT NULL,
-            IsApproved BOOLEAN DEFAULT False
+            IsApproved INTEGER DEFAULT 0
         )          
     """)
 
@@ -323,7 +323,7 @@ def signInWindow():
                 print(hashedPassword)
                 doctorCursor.execute(
                     'INSERT INTO doctors (FirstName, LastName, Email, Password, NRIC, Role, ClinicName, Specialization, YearsOfExperience, IsApproved) VALUES (?,?,?,?,?,?,?,?,?,?)', 
-                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, doctorSpecialization, yearsOfExp, False]
+                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, doctorSpecialization, yearsOfExp, 0]
                 )
                 doctorConn.commit()
                 messagebox.showinfo('Success', "Doctor Account has been created successfully. \nWaiting for your Clinic Admin's approval. \nYou can login after their approval.")
@@ -359,7 +359,7 @@ def signInWindow():
                 print(hashedPassword)
                 clinicAdminCursor.execute(
                     'INSERT INTO clinicAdmins (FirstName, LastName, Email, Password, NRIC, Role, ClinicName, ClinicAddress, ClinicNumber, IsApproved) VALUES (?,?,?,?,?,?,?,?,?,?)', 
-                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, clinicAddress, clinicContact, False]
+                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, clinicAddress, clinicContact, 0]
                 )
                 clinicAdminConn.commit()
                 messagebox.showinfo('Success', "Clinic Admin Account has been created successfully. \nWaiting for CAD Admin's approval. \nYou can login after their approval.")

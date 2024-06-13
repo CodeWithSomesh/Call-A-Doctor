@@ -26,6 +26,7 @@ def adminDashboardWindow():
 
     # Redirect to the Log In Window
     def redirectToLoginWindow():
+        messagebox.showwarning('Warning', 'Are you sure you want to logout?')
         window.destroy()
         from logInWindow.main import logInWindow
         logInWindow()
@@ -58,7 +59,6 @@ def adminDashboardWindow():
         table.delete(*table.get_children())
 
         for clinicAdmin in clinicAdmins:
-            num = count + 1
             clinicID = clinicAdmin[0]
             clinicName = clinicAdmin[7]
             clinicContact = clinicAdmin[9]
@@ -66,8 +66,10 @@ def adminDashboardWindow():
             adminEmail = clinicAdmin[3]
             if clinicAdmin[10] == 0:
                 isApproved = 'Waiting For Approval'
-            else:
+            elif clinicAdmin[10] == 1:
                 isApproved = 'Approved'
+            else:
+                isApproved = 'Rejected'
 
             data = (clinicID, clinicName, clinicContact, adminName, adminEmail, isApproved)
 
@@ -84,19 +86,56 @@ def adminDashboardWindow():
         # Connecting to Clinic Admin DB
         clinicAdminConn = sqlite3.connect('clinicAdmins.db')
         clinicAdminCursor = clinicAdminConn.cursor()
-        selectedItem = table.focus()
 
+        selectedItem = table.focus()
         if not selectedItem:
             messagebox.showerror('Error', 'Select a Clinic first.')
+            return
+
+
+        clinicData = table.item(selectedItem)["values"]
+        clinicAdminID = clinicData[0]
+        clinicName = clinicData[1]
+        isApproveStatus = clinicData[5]
+        
+
+        if isApproveStatus == 'Approved':
+            messagebox.showinfo('Info', f'{clinicName} is already approved.')
         else:
-            clinicData = table.item(selectedItem)["values"]
-            clinicAdminID = clinicData[0]
-            clinicName = clinicData[1]
-            clinicAdminCursor.execute('UPDATE clinicAdmins SET IsApproved=? WHERE ClinicAdminID=?', (True, clinicAdminID))
+            
+            clinicAdminCursor.execute('UPDATE clinicAdmins SET IsApproved=? WHERE ClinicAdminID=?', (1, clinicAdminID))
             clinicAdminConn.commit()
             clinicAdminConn.close()
             insertTreeview()
-            messagebox.showinfo('Success', f'{clinicName} has been approved.')
+            messagebox.showinfo('Success', f'{clinicName} has just been approved successfully. \nTheir Clinic Admin will be notified.')
+
+    
+    def rejectClinic():
+        # Connecting to Clinic Admin DB
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
+
+        selectedItem = table.focus()
+        if not selectedItem:
+            messagebox.showerror('Error', 'Select a Clinic first.')
+            return
+
+
+        clinicData = table.item(selectedItem)["values"]
+        clinicAdminID = clinicData[0]
+        clinicName = clinicData[1]
+        isApproveStatus = clinicData[5]
+        
+
+        if isApproveStatus == 'Rejected':
+            messagebox.showinfo('Info', f'{clinicName} is already rejected.')
+        else:
+            
+            clinicAdminCursor.execute('UPDATE clinicAdmins SET IsApproved=? WHERE ClinicAdminID=?', (2, clinicAdminID))
+            clinicAdminConn.commit()
+            clinicAdminConn.close()
+            insertTreeview()
+            messagebox.showinfo('Success', f'{clinicName} has just been rejected. \nTheir Clinic Admin will be notified.')
             
 
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
@@ -223,7 +262,7 @@ def adminDashboardWindow():
     rejectButton = ctk.CTkButton(
         whiteFrame, text=" Reject  ", width=140, height=50, 
         font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=rejectIcon,
-        # anchor=ctk.W 
+        command=rejectClinic # anchor=ctk.W 
     )
     rejectButton.place(x=870, y=225)
 
