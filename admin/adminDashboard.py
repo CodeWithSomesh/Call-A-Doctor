@@ -4,6 +4,7 @@ from PIL import Image
 import random
 from random import choice
 import sqlite3
+from datetime import datetime
 
 # Add the parent directory to the system path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -50,6 +51,23 @@ def adminDashboardWindow():
         searchInputTextBox.delete('0.0', "end")
         searchInputTextBox.insert('0.0', "Search Clinics by Name or Address")
         searchInputTextBox.configure(text_color='gray')
+
+    global count
+    count = 0
+    def insertTreeview():
+        global count
+        clinicAdminCursor.execute('SELECT * FROM clinicAdmins')
+        clinicAdmins = clinicAdminCursor.fetchall()
+        table.delete(*table.get_children())
+        data = ((count + 1), )
+        for clinicAdmin in clinicAdmins:
+            if count % 2 == 0:
+                table.insert(parent='', index='end', values=clinicAdmin, tags=("evenrow",))
+                print(clinicAdmin)
+            else:
+                table.insert(parent='', index='end', values=clinicAdmin, tags=("oddrow",))
+
+            count += 1
 
 
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
@@ -114,9 +132,23 @@ def adminDashboardWindow():
 
 
     # Label with Greeting Message & User's First Name 
+
+    now = datetime.now()  # Get the current date and time
+    formatted_date = now.strftime("%B %d, %Y") # Format the date as 'Month Day, Year'
+    current_hour = now.hour # Get the current hour
+    current_time = now.strftime("%H:%M:%S") # Get the current time
+
+    # Generate greeting message based on the current time
+    if current_hour < 12:
+        greeting = "Good Morning!"
+    elif 12 <= current_hour < 18:
+        greeting = "Good Afternoon!"
+    else:
+        greeting = "Good Evening!" 
+
     greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, Someshwar Rao", font=("Inter", 36, "bold",), text_color="#000000")
     greetingLabel1.place(x=25, y=25)
-    greetingLabel2 = ctk.CTkLabel(whiteFrame, text="Good Morning!  (January 26, 2024)", font=("Inter", 22,), text_color="#000000")
+    greetingLabel2 = ctk.CTkLabel(whiteFrame, text=f"{greeting}  ({formatted_date})", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
     roleLabel = ctk.CTkLabel(whiteFrame, text="(Admin)", font=("Inter", 36, "bold",), text_color="#000000")
     roleLabel.place(x=880, y=25)
@@ -222,34 +254,35 @@ def adminDashboardWindow():
 
 
     # <<<<<<<<<<<<<<<<<<<< AUTOMATED TESTING >>>>>>>>>>>>>>>>>>>>>
-    global count
-    count = 0
+    
     #     if count % 2 == 0:
     #         table.insert(parent='', index=0, values=data, tags=("evenrow",))
     #     else:
     #         table.insert(parent='', index=0, values=data, tags=("oddrow",))
 
-    clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
-    adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
+    # global count
+    # count = 0
+    # clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
+    # adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
 
 
 
-    for i in range(15):
-        num = (i+1)
-        clinicID = ''.join(random.choices('0123456789', k=12))
-        clinicName = choice(clinicNames)
-        clinicContact = ''.join(random.choices('0123456789', k=8))
-        clinicContact = f'+01{clinicContact}'
-        adminName = choice(adminNames)
-        adminEmail = f'{(adminName.replace(" ", "")).lower()}@email.com'
+    # for i in range(15):
+    #     num = (i+1)
+    #     clinicID = ''.join(random.choices('0123456789', k=12))
+    #     clinicName = choice(clinicNames)
+    #     clinicContact = ''.join(random.choices('0123456789', k=8))
+    #     clinicContact = f'+01{clinicContact}'
+    #     adminName = choice(adminNames)
+    #     adminEmail = f'{(adminName.replace(" ", "")).lower()}@email.com'
 
-        data = (num, clinicID, clinicName, clinicContact, adminName, adminEmail)
-        if count % 2 == 0:
-            table.insert(parent='', index='end', values=data, tags=("evenrow",))
-        else:
-            table.insert(parent='', index='end', values=data, tags=("oddrow",))
+    #     data = (num, clinicID, clinicName, clinicContact, adminName, adminEmail)
+    #     if count % 2 == 0:
+    #         table.insert(parent='', index='end', values=data, tags=("evenrow",))
+    #     else:
+    #         table.insert(parent='', index='end', values=data, tags=("oddrow",))
 
-        count += 1
+    #     count += 1
 
     # Test the insertion in table
     def testTableInsertion():
@@ -277,7 +310,7 @@ def adminDashboardWindow():
 
             count += 1
     
-
+    insertTreeview()
 
     window.mainloop()
 
