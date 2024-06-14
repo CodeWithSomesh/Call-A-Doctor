@@ -461,7 +461,7 @@ def signInWindow():
 
 
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SCROLLABLE FRAME INSIDE WHITE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    scrollable_frame = ctk.CTkScrollableFrame(whiteImgFrame, width=683, height=850, fg_color="#FFFDFD", scrollbar_fg_color="#000", scrollbar_button_color="#000", )
+    scrollable_frame = ctk.CTkScrollableFrame(whiteImgFrame, width=683, height=850, fg_color="#FFFDFD", scrollbar_fg_color="#000", scrollbar_button_color="#000", scrollbar_button_hover_color="#1AFF75")
     scrollable_frame.place(x=56, y=0)
 
     # Label for Create Account

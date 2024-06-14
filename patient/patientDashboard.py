@@ -3,6 +3,8 @@ from pathlib import Path
 from PIL import Image
 import sqlite3
 from datetime import datetime
+from tkintermapview import TkinterMapView
+from tkcalendar import *
 
 # Add the parent directory to the system path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -61,13 +63,13 @@ def patientDashboardWindow(email):
         toplevel.attributes("-topmost",True)
         toplevel.configure(fg_color = "#fff")
 
-        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< PARENT FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        parentFrame = ctk.CTkScrollableFrame(toplevel, width=800, height=600, fg_color="#fff",)
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< PARENT SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        parentFrame = ctk.CTkScrollableFrame(toplevel, width=800, height=600, fg_color="#fff", scrollbar_fg_color="#000", scrollbar_button_color="#000",)
         parentFrame.place(x=0, y=0)
 
-        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< TOP SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        topFrame = ctk.CTkFrame(parentFrame, width=650, height=500, fg_color="#FFFDFD",)
-        topFrame.pack(side='top', fill='x', expand=False, padx=65, pady=(20,0))
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< TOP FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        topFrame = ctk.CTkFrame(parentFrame, width=650, height=500, fg_color="#FFFDFD" )
+        topFrame.pack(side='top', fill='x', expand=False, padx=(65, 80), pady=(20,0))
         
         # Select Clinic Dropdown Menu
         clinicNameLabel = ctk.CTkLabel(topFrame, text="Select Clinic", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
@@ -80,90 +82,127 @@ def patientDashboardWindow(email):
             dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
         )
         clinicNameDropdown.pack(side='top', fill='x', expand=False,)
+
+        gMapsWidget = TkinterMapView(topFrame, width=650, height=400)
+        gMapsWidget.pack(side='top', fill='x', expand=True, pady=(10,0), padx=(0,5))
+        gMapsWidget.set_tile_server("https://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", max_zoom=22)  # google normal
+        gMapsWidget.set_address("Bayan Lepas, Penang, Malaysia", marker=True)
+        gMapsWidget.set_zoom(12)
+
+        # gMapsWidget.set_tile_server("https://a.tile.openstreetmap.org/{z}/{x}/{y}.png")  # OpenStreetMap (default)
+        # gMapsWidget.set_tile_server("https://mt0.google.com/vt/lyrs=s&hl=e...{x}&y={y}&z={z}&s=Ga", max_zoom=22)  # google satellite
+        # gMapsWidget.set_tile_server("http://c.tile.stamen.com/watercolor/{z}/{x}/{y}.png")  # painting style
+        # marker.set_text("Select A Clinic")
         
 
-        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< TOP SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        doctorTypeLabel = ctk.CTkLabel(topFrame, text="Select Type Of Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+        doctorTypeLabel.pack(side='top', fill='x', expand=False, pady=(30,0))
+        doctorTypes = [
+            "Allergist", "Cardiologist", "Dermatologist", "Endocrinologist", 
+            "Gastroenterologist", "Geriatrician", "Internist", "Nephrologist", "Neurologist", 
+            "Obstetrician/Gynecologist", "Oncologist", "Ophthalmologist", "Orthopedic Surgeon", 
+            "Pediatrician", "Podiatrist", "Psychiatrist", "Pulmonologist", "Rheumatologist", 
+            "General Practitioner", "Family Medicine Doctor", "Home Health Care Doctor", 
+            "Emergency Medicine Specialist"]
+        doctorTypeDropdown = ctk.CTkComboBox(
+            topFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+            font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+            values=doctorTypes, border_color="#b5b3b3", border_width=1,
+            dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+        )
+        doctorTypeDropdown.pack(side='top', fill='x', expand=False, pady=(0,0), padx=(0,5))
+
+
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< LEFT FRAME INSDIE PARENT SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         leftFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD", )
         leftFrame.pack(side='left', fill='both', expand=False, padx=65, pady=30)
 
-        
-        clinicNameLabel = ctk.CTkLabel(leftFrame, text="Select Clinic", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
-        clinicNameLabel.pack(side='top', fill='x', expand=False)
-        clinicNameDropdown = ctk.CTkComboBox(
+        doctorDropdownLabel = ctk.CTkLabel(leftFrame, text="Select Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+        doctorDropdownLabel.pack(side='top', fill='x', expand=False,)
+        doctorDropdown = ctk.CTkComboBox(
             leftFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            values=['Clinic Name', 'Panmedic', 'Health Sync', 'Clinic Sungai Ara'], border_color="#b5b3b3", border_width=1,
+            values=['Select Doctor', 'Maisarah Majdi', 'Someshwar Rao', 'Karen Khor Siew Li'], border_color="#b5b3b3", border_width=1,
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
             dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
         )
-        clinicNameDropdown.pack(side='top', fill='x', expand=False,)
-        # First name field
-        # firstNameLabel = ctk.CTkLabel(leftFrame, text="First Name", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
-        # firstNameLabel.pack(side='top', fill='x', expand=False)
-        # firstNameTextBox = ctk.CTkTextbox(
-        #     leftFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
-        #     border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
-        #     scrollbar_button_color="#1AFF75", border_width=1
-        # )
-        # firstNameTextBox.pack(side='top', fill='x', expand=False,)
+        doctorDropdown.pack(side='top', fill='x', expand=False,)
 
-        # Email field
-        emailLabel = ctk.CTkLabel(leftFrame, text="Email", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
-        emailLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
-        emailTextBox = ctk.CTkTextbox(
+        times = [
+            '9:00 AM', '10:00 AM', '11:00 AM', 
+            '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', 
+            '6:00 PM', '7:00 PM', '8:00 PM', '9:00 PM', '10:00 PM', '11:00 PM',
+            '12:00 AM', '1:00 AM', '2:00 AM', '3:00 AM', '4:00 AM', '5:00 AM', 
+            '6:00 AM', '7:00 AM', '8:00 AM'
+        ]
+        consultationTimeDropdownLabel = ctk.CTkLabel(leftFrame, text="Select Consultation Time", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+        consultationTimeDropdownLabel.pack(side='top', fill='x', expand=False, pady=(193,0))
+        consultationTimeDropdown = ctk.CTkComboBox(
             leftFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
-            border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
-            scrollbar_button_color="#1AFF75", border_width=1
+            font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+            values=times, border_color="#b5b3b3", border_width=1,
+            dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
         )
-        emailTextBox.pack(side='top', fill='x', expand=False,)
+        consultationTimeDropdown.pack(side='top', fill='x', expand=False,)
 
-        # NRIC field
-        nricLabel = ctk.CTkLabel(leftFrame, text="NRIC", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
-        nricLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
-        nricTextBox = ctk.CTkTextbox(
-            leftFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
-            border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
-            scrollbar_button_color="#1AFF75", border_width=1
+        # Cancel Button with Icon
+        cancelIconPath = relative_to_assets("reject-icon.png")
+        cancelIcon = ctk.CTkImage(light_image=Image.open(cancelIconPath), size=(33,33),)
+        cancelButton = ctk.CTkButton(
+            leftFrame, text=" Cancel ", width=280, height=60, 
+            font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=cancelIcon,
+            command=toplevel.destroy # anchor=ctk.W 
         )
-        nricTextBox.pack(side='top', fill='x', expand=False,)
+        cancelButton.pack(side='top', fill='x', expand=False,pady=(40,15))
 
 
-        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< RIGHT FRAME INSIDE SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< RIGHT FRAME INSIDE PARENT SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         rightFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD",)
         rightFrame.pack(side='left', fill='both', expand=False, padx=(0,0), pady=30)
+        
 
-        # Last name field
-        lastNameLabel = ctk.CTkLabel(rightFrame, text="Last Name", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
-        lastNameLabel.pack(side='top', fill='x', expand=False)
-        lastNameTextBox = ctk.CTkTextbox(
-            rightFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
-            border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
-            scrollbar_button_color="#1AFF75", border_width=1
+        # Select Consultation Date Widget
+        consultationDateLabel = ctk.CTkLabel(rightFrame, text="Select Consultation Date", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+        consultationDateLabel.pack(side='top', fill='x', expand=False,)
+        # consultationDate = ctk.CTkComboBox(
+        #     rightFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+        #     font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+        #     values=['Select Doctor', 'Maisarah Majdi', 'Someshwar Rao', 'Karen Khor Siew Li'], border_color="#b5b3b3", border_width=1,
+        #     dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+        #     dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+        # )
+        # consultationDate.pack(side='top', fill='x', expand=False,)
+        # datePicker = DateEntry(rightFrame, height=48, setmode="day", font=("Inter", 12), date_pattern="dd-mm-yyyy")
+        # datePicker.pack(side='top', fill='x', expand=False,)
+        calendar = Calendar(
+            rightFrame, selectmode="day", year=thisYear, font=("Inter", 12),
+            month=thisMonth, day=todayInt, background="#1AFF75", 
+            selectbackground="#36D8B7", foreground="black"
         )
-        lastNameTextBox.pack(side='top', fill='x', expand=False,)
+        calendar.pack(side='top', fill='x', expand=False,)
 
-        # Password field
-        passwordLabel = ctk.CTkLabel(rightFrame, text="Password", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
-        passwordLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
-        passwordTextBox = ctk.CTkTextbox(
-            rightFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
-            border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
-            scrollbar_button_color="#1AFF75", border_width=1
-        )
-        passwordTextBox.pack(side='top', fill='x', expand=False,)
-
-
-        # Role dropdown field
-        roleLabel = ctk.CTkLabel(rightFrame, text="Sign In As", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
-        roleLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
-        roleDropdown = ctk.CTkComboBox(
+        consultationDurationDropdownLabel = ctk.CTkLabel(rightFrame, text="Select Consultation Duration", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+        consultationDurationDropdownLabel.pack(side='top', fill='x', expand=False, pady=(30,0))
+        consultationDurationDropdown = ctk.CTkComboBox(
             rightFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            values=['Role', 'Patient', 'Doctor', 'Clinic Admin', 'CAD Admin'], border_color="#b5b3b3", border_width=1,
+            values=['Select Duration', 'Maisarah Majdi', 'Someshwar Rao', 'Karen Khor Siew Li'], border_color="#b5b3b3", border_width=1,
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
             dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
         )
-        roleDropdown.pack(side='top', fill='x', expand=False,)
+        consultationDurationDropdown.pack(side='top', fill='x', expand=False,)
+
+        # Book Button 2 with Icon
+        approveIconPath = relative_to_assets("approve-icon.png")
+        approveIcon = ctk.CTkImage(light_image=Image.open(approveIconPath), size=(33,33),)
+        bookButton2 = ctk.CTkButton(
+            rightFrame, text=" Book Appointment", width=280, height=60, 
+            font=("Inter", 22, "bold",), fg_color="#17D463", hover_color="#009B2B", image=approveIcon,
+            command=bookAppointment # anchor=ctk.W 
+        )
+        bookButton2.pack(side='top', fill='x', expand=False,pady=(40,15))
 
 
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -230,6 +269,9 @@ def patientDashboardWindow(email):
     # Label with Greeting Message & User's Full Name 
 
     now = datetime.now()  # Get the current date and time
+    todayInt = now.day # Get the current date in integer
+    thisMonth = now.month # Get the current month in integer
+    thisYear = now.year # Get the current year in integer
     formatted_date = now.strftime("%B %d, %Y") # Format the date as 'Month Day, Year'
     current_hour = now.hour # Get the current hour
     current_time = now.strftime("%H:%M:%S") # Get the current time
@@ -294,10 +336,16 @@ def patientDashboardWindow(email):
     consultationTimeDropdown.place(x=25, y=290)
     
     # Select Consultation Duration Dropdown Menu
+    durationArray = [
+        'Select Consultation Duration', '1 hour', '1 hour 30 Minutes',
+        '2 hours', '2 hours 30 Minutes', '3 hours', '3 hour 30 Minutes', '4 hours', 
+        '4 hours 30 Minutes', '5 hours'
+    ]
+    
     consultationDurationDropdown = ctk.CTkComboBox(
         whiteFrame, fg_color="#ffffff", text_color="#000000", width=320, height=48, 
         font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-        values=['Select Consultation Duration', '30 Minutes', '1 hour', '1 hour 30 Minutes'], border_color="#b5b3b3", border_width=1,
+        values=durationArray, border_color="#b5b3b3", border_width=1,
         dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
         dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
     )
