@@ -44,7 +44,7 @@ def adminDashboardWindow():
     def searchbarOutFocus(event):
         print(event)
         searchInputTextBox.delete('0.0', "end")
-        searchInputTextBox.insert('0.0', "Search Clinics by Name or Address")
+        searchInputTextBox.insert('0.0', "Search by Clinic Details")
         searchInputTextBox.configure(text_color='gray')
 
 
@@ -256,17 +256,37 @@ def adminDashboardWindow():
         )
     descLabel.place(x=25, y=182)
 
+    # Search Box Dropdown Menu 
+    searchByDropdown = ctk.CTkComboBox(
+        whiteFrame, fg_color="#ffffff", text_color="#000000", width=252, height=50, 
+        font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+        values=['Search By', 'Clinic Admin ID', 'Clinic Name', 'Clinic Contact', 'Clinic Admin Name', 'Admin Email', 'Approval Status'], border_color="#000", border_width=1,
+        dropdown_font=("Inter", 20), dropdown_fg_color='#fff',
+        dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+    )
+    searchByDropdown.place(x=25, y=225)
+
     # Search Box field 
     searchInputTextBox = ctk.CTkTextbox(
-            whiteFrame, fg_color="#ffffff", text_color="gray", width=660, height=50, 
-            border_color="#000", font=("Inter", 21), border_spacing=8,
-            scrollbar_button_color="#1AFF75", border_width=2,
-        )
-    searchInputTextBox.insert('insert', "Search Clinics by Name or Address")
-    searchInputTextBox.place(x=25, y=225)
+        whiteFrame, fg_color="#ffffff", text_color="gray", width=395, height=50, 
+        border_color="#000", font=("Inter", 21), border_spacing=8,
+        scrollbar_button_color="#1AFF75", border_width=2,
+    )
+    searchInputTextBox.insert('insert', "Search by Clinic Details")
+    searchInputTextBox.place(x=290, y=225)
     searchInputTextBox.bind("<FocusIn>", searchbarFocus)
     searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
-    searchInputTextBox.bind("<KeyRelease>", filterTree)
+    #searchInputTextBox.bind("<KeyRelease>", filterTree)
+
+    # Search Button with Icon
+    searchIconPath = relative_to_assets("approve-icon.png")
+    searchIcon = ctk.CTkImage(light_image=Image.open(searchIconPath), size=(33,33),)
+    searchButton = ctk.CTkButton(
+        whiteFrame, text="", width=50, height=50, 
+        font=("Inter", 22, "bold",), fg_color="#000", hover_color="#333333", image=searchIcon, corner_radius=4, border_color="#000", border_width=2,
+        # command=searchClinic # anchor=ctk.W 
+    )
+    searchButton.place(x=635, y=225)
 
 
     # Approve Button with Icon
