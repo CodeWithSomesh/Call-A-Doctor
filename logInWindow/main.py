@@ -208,7 +208,7 @@ def logInWindow():
                 if adminLogin():
                     window.destroy()
                     from admin.adminDashboard import adminDashboardWindow
-                    adminDashboardWindow()
+                    adminDashboardWindow(email)
             elif role == 'Doctor':
                 if doctorLogin():
                     window.destroy()

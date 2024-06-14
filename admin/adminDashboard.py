@@ -16,7 +16,14 @@ import customtkinter as ctk
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\admin\assets\frame0")
 
-def adminDashboardWindow():
+def adminDashboardWindow(email):
+
+    # Connecting to Clinic Admin DB
+    adminConn = sqlite3.connect('admins.db')
+    adminCursor = adminConn.cursor()
+    adminCursor.execute('SELECT * FROM admins WHERE Email=?', [email])
+    result = adminCursor.fetchone()
+    username = f"{result[1]} {result[2]}"
 
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ALL FUNCTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     # Get the full path of assets
@@ -46,27 +53,6 @@ def adminDashboardWindow():
         searchInputTextBox.delete('0.0', "end")
         searchInputTextBox.insert('0.0', "Search by Clinic Details")
         searchInputTextBox.configure(text_color='gray')
-
-
-    # def filterTree(event):
-    #     searchTerm = searchInputTextBox.get('0.0', "end").lower()
-    #     table.delete(*table.get_children()) # Clear the current Treeview
-
-    #     # Connecting to Clinic Admin DB
-    #     clinicAdminConn = sqlite3.connect('clinicAdmins.db')
-    #     clinicAdminCursor = clinicAdminConn.cursor()
-
-    #     # Fetch filtered data from the database
-    #     clinicAdminCursor.execute("""
-    #         SELECT ClinicAdminID, FirstName, LastName, Email, Role, IsApproved 
-    #         FROM clinicAdmins 
-    #         WHERE ClinicAdminID LIKE ? OR FirstName LIKE ? OR LastName LIKE ? OR Email LIKE ? OR Role LIKE ?
-    #     """, ('%'+searchTerm+'%', '%'+searchTerm+'%', '%'+searchTerm+'%', '%'+searchTerm+'%', '%'+searchTerm+'%'))
-    #     rows = clinicAdminCursor.fetchall()
-
-    #     # Insert filtered data into the Treeview
-    #     for row in rows:
-    #         table.insert("", "end", values=row)
 
 
     global count
@@ -300,7 +286,7 @@ def adminDashboardWindow():
     else:
         greeting = "Good Evening!" 
 
-    greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, Someshwar Rao", font=("Inter", 36, "bold",), text_color="#000000")
+    greetingLabel1 = ctk.CTkLabel(whiteFrame, text=f"Welcome, {username}", font=("Inter", 36, "bold",), text_color="#000000")
     greetingLabel1.place(x=25, y=25)
     greetingLabel2 = ctk.CTkLabel(whiteFrame, text=f"{greeting}  ({formatted_date})", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
@@ -447,4 +433,4 @@ def adminDashboardWindow():
 
 # Only execute the Admin Window if this script is run directly
 if __name__ == "__main__":
-    adminDashboardWindow()
+    adminDashboardWindow(email=None)
