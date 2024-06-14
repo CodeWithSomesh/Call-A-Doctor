@@ -71,7 +71,7 @@ def adminDashboardWindow():
 
     global count
     count = 0
-    def insertTreeview():
+    def insertTreeview(array=None):
         global count
         # Connecting to Clinic Admin DB
         clinicAdminConn = sqlite3.connect('clinicAdmins.db')
@@ -80,29 +80,55 @@ def adminDashboardWindow():
         clinicAdmins = clinicAdminCursor.fetchall()
         table.delete(*table.get_children())
 
-        for clinicAdmin in clinicAdmins:
-            clinicID = clinicAdmin[0]
-            clinicName = clinicAdmin[7]
-            clinicContact = clinicAdmin[9]
-            adminName = f"{clinicAdmin[1]} {clinicAdmin[2]}"
-            adminEmail = clinicAdmin[3]
-            if clinicAdmin[10] == 0:
-                isApproved = 'Waiting For Approval'
-            elif clinicAdmin[10] == 1:
-                isApproved = 'Approved'
-            else:
-                isApproved = 'Rejected'
+        if array is None:
+            for clinicAdmin in clinicAdmins:
+                clinicID = clinicAdmin[0]
+                clinicName = clinicAdmin[7]
+                clinicContact = clinicAdmin[9]
+                adminName = f"{clinicAdmin[1]} {clinicAdmin[2]}"
+                adminEmail = clinicAdmin[3]
+                if clinicAdmin[10] == 0:
+                    isApproved = 'Waiting For Approval'
+                elif clinicAdmin[10] == 1:
+                    isApproved = 'Approved'
+                else:
+                    isApproved = 'Rejected'
 
-            data = (clinicID, clinicName, clinicContact, adminName, adminEmail, isApproved)
+                data = (clinicID, clinicName, clinicContact, adminName, adminEmail, isApproved)
 
 
-            if count % 2 == 0:
-                table.insert(parent='', index='end', values=data, tags=("evenrow",))
-                print(clinicAdmin)
-            else:
-                table.insert(parent='', index='end', values=data, tags=("oddrow",))
+                if count % 2 == 0:
+                    table.insert(parent='', index='end', values=data, tags=("evenrow",))
+                    print(clinicAdmin)
+                else:
+                    table.insert(parent='', index='end', values=data, tags=("oddrow",))
 
-            count += 1
+                count += 1
+        else:
+            for clinicAdmin in array:
+                clinicID = clinicAdmin[0]
+                clinicName = clinicAdmin[7]
+                clinicContact = clinicAdmin[9]
+                adminName = f"{clinicAdmin[1]} {clinicAdmin[2]}"
+                adminEmail = clinicAdmin[3]
+                if clinicAdmin[10] == 0:
+                    isApproved = 'Waiting For Approval'
+                elif clinicAdmin[10] == 1:
+                    isApproved = 'Approved'
+                else:
+                    isApproved = 'Rejected'
+
+                data = (clinicID, clinicName, clinicContact, adminName, adminEmail, isApproved)
+
+
+                if count % 2 == 0:
+                    table.insert(parent='', index='end', values=data, tags=("evenrow",))
+                    print(clinicAdmin)
+                else:
+                    table.insert(parent='', index='end', values=data, tags=("oddrow",))
+
+                count += 1
+
 
     def approveClinic():
         # Connecting to Clinic Admin DB
@@ -159,6 +185,44 @@ def adminDashboardWindow():
             insertTreeview()
             messagebox.showinfo('Success', f'{clinicName} has just been rejected. \nTheir Clinic Admin will be notified.')
             
+
+    def searchBy():
+        # Connecting to Clinic Admin DB
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
+        searchTerm = searchInputTextBox.get('0.0', 'end').strip()
+        searchOption = searchByDropdown.get()
+
+        if searchOption == 'Clinic Admin ID':
+            searchOption = "ClinicAdminID"
+        elif searchOption == 'Clinic Name':
+            searchOption = "ClinicName"
+        elif searchOption == 'Clinic Contact':
+            searchOption = "ClinicNumber"
+        elif searchOption == 'Admin Email':
+            searchOption = "Email"
+        elif searchOption == 'Approval Status':
+            searchOption = "IsApproved"
+
+            if searchTerm == 'Waiting For Approval':
+                searchTerm = '0'
+            elif searchTerm == 'Approved':
+                searchTerm = '1'
+            else:
+                searchTerm = '2'
+
+
+        if searchTerm == "":
+            messagebox.showerror('Error', 'Enter value to search.')
+        elif searchOption == 'Search By Option':
+            messagebox.showerror('Error', 'Please select an option.')
+        else:
+            clinicAdminCursor.execute(f'SELECT * FROM clinicAdmins WHERE {searchOption}=?', searchTerm)
+            result = clinicAdminCursor.fetchall()
+            insertTreeview(result)
+            
+            
+
 
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
     window = ctk.CTk()
@@ -260,7 +324,7 @@ def adminDashboardWindow():
     searchByDropdown = ctk.CTkComboBox(
         whiteFrame, fg_color="#ffffff", text_color="#000000", width=252, height=50, 
         font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-        values=['Search By', 'Clinic Admin ID', 'Clinic Name', 'Clinic Contact', 'Clinic Admin Name', 'Admin Email', 'Approval Status'], border_color="#000", border_width=1,
+        values=['Search By Option', 'Clinic Admin ID', 'Clinic Name', 'Clinic Contact', 'Admin Email', 'Approval Status'], border_color="#000", border_width=1,
         dropdown_font=("Inter", 20), dropdown_fg_color='#fff',
         dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
     )
@@ -273,20 +337,32 @@ def adminDashboardWindow():
         scrollbar_button_color="#1AFF75", border_width=2,
     )
     searchInputTextBox.insert('insert', "Search by Clinic Details")
-    searchInputTextBox.place(x=290, y=225)
+    searchInputTextBox.place(x=293, y=225)
     searchInputTextBox.bind("<FocusIn>", searchbarFocus)
     searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
     #searchInputTextBox.bind("<KeyRelease>", filterTree)
 
+
     # Search Button with Icon
-    searchIconPath = relative_to_assets("approve-icon.png")
-    searchIcon = ctk.CTkImage(light_image=Image.open(searchIconPath), size=(33,33),)
+    searchIconPath = relative_to_assets("search-icon-1.png")
+    searchIcon = ctk.CTkImage(light_image=Image.open(searchIconPath), size=(25,25),)
     searchButton = ctk.CTkButton(
-        whiteFrame, text="", width=50, height=50, 
-        font=("Inter", 22, "bold",), fg_color="#000", hover_color="#333333", image=searchIcon, corner_radius=4, border_color="#000", border_width=2,
-        # command=searchClinic # anchor=ctk.W 
+        whiteFrame, text="", width=49, height=50, 
+        font=("Inter", 22, "bold",), fg_color="#000", hover_color="#333333", image=searchIcon, 
+        corner_radius=4, command=searchBy # anchor=ctk.W 
     )
-    searchButton.place(x=635, y=225)
+    searchButton.place(x=595, y=225)
+
+
+    # Search Button with Icon
+    cancelSearchIconPath = relative_to_assets("reject-icon.png")
+    cancelSearchIcon = ctk.CTkImage(light_image=Image.open(cancelSearchIconPath), size=(33,33),)
+    cancelSearchButton = ctk.CTkButton(
+        whiteFrame, text="", width=50, height=50, 
+        font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=cancelSearchIcon, corner_radius=4,
+        command=insertTreeview # anchor=ctk.W 
+    )
+    cancelSearchButton.place(x=643, y=225)
 
 
     # Approve Button with Icon
@@ -297,7 +373,7 @@ def adminDashboardWindow():
         font=("Inter", 22, "bold",), fg_color="#00C16A", hover_color="#009B2B", image=approveIcon,
         command=approveClinic # anchor=ctk.W 
     )
-    approveButton.place(x=700, y=225)
+    approveButton.place(x=706, y=225)
 
     # Reject Button with Icon
     rejectIconPath = relative_to_assets("reject-icon.png")
@@ -307,7 +383,7 @@ def adminDashboardWindow():
         font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=rejectIcon,
         command=rejectClinic # anchor=ctk.W 
     )
-    rejectButton.place(x=870, y=225)
+    rejectButton.place(x=878, y=225)
 
 
     # <<<<<<<<<<<<<<<<<<<< TABLE FRAME STORING TREEVIEW >>>>>>>>>>>>>>>>>>>>> 
