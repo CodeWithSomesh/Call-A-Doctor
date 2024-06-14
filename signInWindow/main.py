@@ -25,6 +25,7 @@ def signInWindow():
     patientCursor = patientConn.cursor()
     patientCursor.execute("""
         CREATE TABLE IF NOT EXISTS patients (
+            PatientID INTEGER PRIMARY KEY AUTOINCREMENT,
             FirstName TEXT NOT NULL,
             LastName TEXT NOT NULL,
             Email TEXT NOT NULL,
@@ -40,6 +41,7 @@ def signInWindow():
     doctorCursor = doctorConn.cursor()
     doctorCursor.execute("""
         CREATE TABLE IF NOT EXISTS doctors (
+            DoctorID INTEGER PRIMARY KEY AUTOINCREMENT,
             FirstName TEXT NOT NULL,
             LastName TEXT NOT NULL,
             Email TEXT NOT NULL,
@@ -48,7 +50,8 @@ def signInWindow():
             Role TEXT NOT NULL,
             ClinicName TEXT NOT NULL,
             Specialization TEXT NOT NULL,
-            YearsOfExperiece TEXT NOT NULL
+            YearsOfExperience TEXT NOT NULL,
+            IsApproved INTEGER DEFAULT 0
         )          
     """)
 
@@ -57,6 +60,7 @@ def signInWindow():
     clinicAdminCursor = clinicAdminConn.cursor()
     clinicAdminCursor.execute("""
         CREATE TABLE IF NOT EXISTS clinicAdmins (
+            ClinicAdminID INTEGER PRIMARY KEY AUTOINCREMENT,
             FirstName TEXT NOT NULL,
             LastName TEXT NOT NULL,
             Email TEXT NOT NULL,
@@ -65,7 +69,8 @@ def signInWindow():
             Role TEXT NOT NULL,
             ClinicName TEXT NOT NULL,
             ClinicAddress TEXT NOT NULL,
-            ClinicNumber TEXT NOT NULL
+            ClinicNumber TEXT NOT NULL,
+            IsApproved INTEGER DEFAULT 0
         )          
     """)
 
@@ -74,6 +79,7 @@ def signInWindow():
     adminCursor = adminConn.cursor()
     adminCursor.execute("""
         CREATE TABLE IF NOT EXISTS admins (
+            AdminID INTEGER PRIMARY KEY AUTOINCREMENT,
             FirstName TEXT NOT NULL,
             LastName TEXT NOT NULL,
             Email TEXT NOT NULL,
@@ -279,7 +285,9 @@ def signInWindow():
                 encodedPassword = password.encode('utf-8')
                 hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
                 print(hashedPassword)
-                patientCursor.execute('INSERT INTO patients VALUES (?,?,?,?,?,?,?)', [firstName, lastName, email, hashedPassword, nric, role, address])
+                patientCursor.execute(
+                    'INSERT INTO patients (FirstName, LastName, Email, Password, NRIC, Role, Address) VALUES (?,?,?,?,?,?,?)', 
+                    [firstName, lastName, email, hashedPassword, nric, role, address])
                 patientConn.commit()
                 messagebox.showinfo('Success', 'Patient Account has been created successfully. \nYou can now log in with your account.')
                 redirectToLoginWindow()
@@ -314,12 +322,11 @@ def signInWindow():
                 hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
                 print(hashedPassword)
                 doctorCursor.execute(
-                    'INSERT INTO doctors VALUES (?,?,?,?,?,?,?,?,?)', 
-                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, doctorSpecialization, yearsOfExp]
+                    'INSERT INTO doctors (FirstName, LastName, Email, Password, NRIC, Role, ClinicName, Specialization, YearsOfExperience, IsApproved) VALUES (?,?,?,?,?,?,?,?,?,?)', 
+                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, doctorSpecialization, yearsOfExp, 0]
                 )
                 doctorConn.commit()
                 messagebox.showinfo('Success', "Doctor Account has been created successfully. \nWaiting for your Clinic Admin's approval. \nYou can login after their approval.")
-        
         else:
             messagebox.showerror('Error',"Please fill up all the fields.")
 
@@ -351,8 +358,8 @@ def signInWindow():
                 hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
                 print(hashedPassword)
                 clinicAdminCursor.execute(
-                    'INSERT INTO clinicAdmins VALUES (?,?,?,?,?,?,?,?,?)', 
-                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, clinicAddress, clinicContact]
+                    'INSERT INTO clinicAdmins (FirstName, LastName, Email, Password, NRIC, Role, ClinicName, ClinicAddress, ClinicNumber, IsApproved) VALUES (?,?,?,?,?,?,?,?,?,?)', 
+                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, clinicAddress, clinicContact, 0]
                 )
                 clinicAdminConn.commit()
                 messagebox.showinfo('Success', "Clinic Admin Account has been created successfully. \nWaiting for CAD Admin's approval. \nYou can login after their approval.")
@@ -389,7 +396,9 @@ def signInWindow():
                 encodedPassword = password.encode('utf-8')
                 hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
                 print(hashedPassword)
-                adminCursor.execute('INSERT INTO admins VALUES (?,?,?,?,?,?,?)', [firstName, lastName, email, hashedPassword, nric, role, adminSecretKey])
+                adminCursor.execute(
+                    'INSERT INTO admins (FirstName, LastName, Email, Password, NRIC, Role, AdminSecretKey) VALUES (?,?,?,?,?,?,?)', 
+                    [firstName, lastName, email, hashedPassword, nric, role, adminSecretKey])
                 adminConn.commit()
                 messagebox.showinfo('Success', 'Admin Account has been created successfully. \nYou can now log in with your account.')
                 redirectToLoginWindow()

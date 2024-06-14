@@ -3,11 +3,13 @@ from pathlib import Path
 from PIL import Image
 import random
 from random import choice
+import sqlite3
+from datetime import datetime
 
 # Add the parent directory to the system path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from tkinter import ttk, Tk, Scrollbar, VERTICAL
+from tkinter import ttk, Tk, Scrollbar, VERTICAL, messagebox
 import customtkinter as ctk
 
 
@@ -15,13 +17,16 @@ OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\admin\assets\frame0")
 
 def adminDashboardWindow():
-    # Helper function to get the full path of assets
+
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ALL FUNCTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    # Get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
 
 
-    # Function to redirect to the Log In Window
+    # Redirect to the Log In Window
     def redirectToLoginWindow():
+        messagebox.showwarning('Warning', 'Are you sure you want to logout?')
         window.destroy()
         from logInWindow.main import logInWindow
         logInWindow()
@@ -39,8 +44,184 @@ def adminDashboardWindow():
     def searchbarOutFocus(event):
         print(event)
         searchInputTextBox.delete('0.0', "end")
-        searchInputTextBox.insert('0.0', "Search Clinics by Name or Address")
+        searchInputTextBox.insert('0.0', "Search by Clinic Details")
         searchInputTextBox.configure(text_color='gray')
+
+
+    # def filterTree(event):
+    #     searchTerm = searchInputTextBox.get('0.0', "end").lower()
+    #     table.delete(*table.get_children()) # Clear the current Treeview
+
+    #     # Connecting to Clinic Admin DB
+    #     clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+    #     clinicAdminCursor = clinicAdminConn.cursor()
+
+    #     # Fetch filtered data from the database
+    #     clinicAdminCursor.execute("""
+    #         SELECT ClinicAdminID, FirstName, LastName, Email, Role, IsApproved 
+    #         FROM clinicAdmins 
+    #         WHERE ClinicAdminID LIKE ? OR FirstName LIKE ? OR LastName LIKE ? OR Email LIKE ? OR Role LIKE ?
+    #     """, ('%'+searchTerm+'%', '%'+searchTerm+'%', '%'+searchTerm+'%', '%'+searchTerm+'%', '%'+searchTerm+'%'))
+    #     rows = clinicAdminCursor.fetchall()
+
+    #     # Insert filtered data into the Treeview
+    #     for row in rows:
+    #         table.insert("", "end", values=row)
+
+
+    global count
+    count = 0
+    def insertTreeview(array=None):
+        global count
+        # Connecting to Clinic Admin DB
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
+        clinicAdminCursor.execute('SELECT * FROM clinicAdmins')
+        clinicAdmins = clinicAdminCursor.fetchall()
+        table.delete(*table.get_children())
+
+        if array is None:
+            for clinicAdmin in clinicAdmins:
+                clinicID = clinicAdmin[0]
+                clinicName = clinicAdmin[7]
+                clinicContact = clinicAdmin[9]
+                adminName = f"{clinicAdmin[1]} {clinicAdmin[2]}"
+                adminEmail = clinicAdmin[3]
+                if clinicAdmin[10] == 0:
+                    isApproved = 'Waiting For Approval'
+                elif clinicAdmin[10] == 1:
+                    isApproved = 'Approved'
+                else:
+                    isApproved = 'Rejected'
+
+                data = (clinicID, clinicName, clinicContact, adminName, adminEmail, isApproved)
+
+
+                if count % 2 == 0:
+                    table.insert(parent='', index='end', values=data, tags=("evenrow",))
+                    print(clinicAdmin)
+                else:
+                    table.insert(parent='', index='end', values=data, tags=("oddrow",))
+
+                count += 1
+        else:
+            for clinicAdmin in array:
+                clinicID = clinicAdmin[0]
+                clinicName = clinicAdmin[7]
+                clinicContact = clinicAdmin[9]
+                adminName = f"{clinicAdmin[1]} {clinicAdmin[2]}"
+                adminEmail = clinicAdmin[3]
+                if clinicAdmin[10] == 0:
+                    isApproved = 'Waiting For Approval'
+                elif clinicAdmin[10] == 1:
+                    isApproved = 'Approved'
+                else:
+                    isApproved = 'Rejected'
+
+                data = (clinicID, clinicName, clinicContact, adminName, adminEmail, isApproved)
+
+
+                if count % 2 == 0:
+                    table.insert(parent='', index='end', values=data, tags=("evenrow",))
+                    print(clinicAdmin)
+                else:
+                    table.insert(parent='', index='end', values=data, tags=("oddrow",))
+
+                count += 1
+
+
+    def approveClinic():
+        # Connecting to Clinic Admin DB
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
+
+        selectedItem = table.focus()
+        if not selectedItem:
+            messagebox.showerror('Error', 'Select a Clinic first.')
+            return
+
+
+        clinicData = table.item(selectedItem)["values"]
+        clinicAdminID = clinicData[0]
+        clinicName = clinicData[1]
+        isApproveStatus = clinicData[5]
+        
+
+        if isApproveStatus == 'Approved':
+            messagebox.showinfo('Info', f'{clinicName} is already approved.')
+        else:
+            
+            clinicAdminCursor.execute('UPDATE clinicAdmins SET IsApproved=? WHERE ClinicAdminID=?', (1, clinicAdminID))
+            clinicAdminConn.commit()
+            clinicAdminConn.close()
+            insertTreeview()
+            messagebox.showinfo('Success', f'{clinicName} has just been approved successfully. \nTheir Clinic Admin will be notified.')
+
+    
+    def rejectClinic():
+        # Connecting to Clinic Admin DB
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
+
+        selectedItem = table.focus()
+        if not selectedItem:
+            messagebox.showerror('Error', 'Select a Clinic first.')
+            return
+
+
+        clinicData = table.item(selectedItem)["values"]
+        clinicAdminID = clinicData[0]
+        clinicName = clinicData[1]
+        isApproveStatus = clinicData[5]
+        
+
+        if isApproveStatus == 'Rejected':
+            messagebox.showinfo('Info', f'{clinicName} is already rejected.')
+        else:
+            
+            clinicAdminCursor.execute('UPDATE clinicAdmins SET IsApproved=? WHERE ClinicAdminID=?', (2, clinicAdminID))
+            clinicAdminConn.commit()
+            clinicAdminConn.close()
+            insertTreeview()
+            messagebox.showinfo('Success', f'{clinicName} has just been rejected. \nTheir Clinic Admin will be notified.')
+            
+
+    def searchBy():
+        # Connecting to Clinic Admin DB
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
+        searchTerm = searchInputTextBox.get('0.0', 'end').strip()
+        searchOption = searchByDropdown.get()
+
+        if searchOption == 'Clinic Admin ID':
+            searchOption = "ClinicAdminID"
+        elif searchOption == 'Clinic Name':
+            searchOption = "ClinicName"
+        elif searchOption == 'Clinic Contact':
+            searchOption = "ClinicNumber"
+        elif searchOption == 'Admin Email':
+            searchOption = "Email"
+        elif searchOption == 'Approval Status':
+            searchOption = "IsApproved"
+
+            if searchTerm == 'Waiting For Approval':
+                searchTerm = '0'
+            elif searchTerm == 'Approved':
+                searchTerm = '1'
+            else:
+                searchTerm = '2'
+
+
+        if searchTerm == "":
+            messagebox.showerror('Error', 'Enter value to search.')
+        elif searchOption == 'Search By Option':
+            messagebox.showerror('Error', 'Please select an option.')
+        else:
+            clinicAdminCursor.execute(f'SELECT * FROM clinicAdmins WHERE {searchOption}=?', searchTerm)
+            result = clinicAdminCursor.fetchall()
+            insertTreeview(result)
+            
+            
 
 
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
@@ -105,9 +286,23 @@ def adminDashboardWindow():
 
 
     # Label with Greeting Message & User's First Name 
+
+    now = datetime.now()  # Get the current date and time
+    formatted_date = now.strftime("%B %d, %Y") # Format the date as 'Month Day, Year'
+    current_hour = now.hour # Get the current hour
+    current_time = now.strftime("%H:%M:%S") # Get the current time
+
+    # Generate greeting message based on the current time
+    if current_hour < 12:
+        greeting = "Good Morning!"
+    elif 12 <= current_hour < 18:
+        greeting = "Good Afternoon!"
+    else:
+        greeting = "Good Evening!" 
+
     greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, Someshwar Rao", font=("Inter", 36, "bold",), text_color="#000000")
     greetingLabel1.place(x=25, y=25)
-    greetingLabel2 = ctk.CTkLabel(whiteFrame, text="Good Morning!  (January 26, 2024)", font=("Inter", 22,), text_color="#000000")
+    greetingLabel2 = ctk.CTkLabel(whiteFrame, text=f"{greeting}  ({formatted_date})", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
     roleLabel = ctk.CTkLabel(whiteFrame, text="(Admin)", font=("Inter", 36, "bold",), text_color="#000000")
     roleLabel.place(x=880, y=25)
@@ -125,16 +320,49 @@ def adminDashboardWindow():
         )
     descLabel.place(x=25, y=182)
 
+    # Search Box Dropdown Menu 
+    searchByDropdown = ctk.CTkComboBox(
+        whiteFrame, fg_color="#ffffff", text_color="#000000", width=252, height=50, 
+        font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+        values=['Search By Option', 'Clinic Admin ID', 'Clinic Name', 'Clinic Contact', 'Admin Email', 'Approval Status'], border_color="#000", border_width=1,
+        dropdown_font=("Inter", 20), dropdown_fg_color='#fff',
+        dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+    )
+    searchByDropdown.place(x=25, y=225)
+
     # Search Box field 
     searchInputTextBox = ctk.CTkTextbox(
-            whiteFrame, fg_color="#ffffff", text_color="gray", width=660, height=50, 
-            border_color="#000", font=("Inter", 21), border_spacing=8,
-            scrollbar_button_color="#1AFF75", border_width=2,
-        )
-    searchInputTextBox.insert('insert', "Search Clinics by Name or Address")
-    searchInputTextBox.place(x=25, y=225)
+        whiteFrame, fg_color="#ffffff", text_color="gray", width=395, height=50, 
+        border_color="#000", font=("Inter", 21), border_spacing=8,
+        scrollbar_button_color="#1AFF75", border_width=2,
+    )
+    searchInputTextBox.insert('insert', "Search by Clinic Details")
+    searchInputTextBox.place(x=293, y=225)
     searchInputTextBox.bind("<FocusIn>", searchbarFocus)
     searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
+    #searchInputTextBox.bind("<KeyRelease>", filterTree)
+
+
+    # Search Button with Icon
+    searchIconPath = relative_to_assets("search-icon-1.png")
+    searchIcon = ctk.CTkImage(light_image=Image.open(searchIconPath), size=(25,25),)
+    searchButton = ctk.CTkButton(
+        whiteFrame, text="", width=49, height=50, 
+        font=("Inter", 22, "bold",), fg_color="#000", hover_color="#333333", image=searchIcon, 
+        corner_radius=4, command=searchBy # anchor=ctk.W 
+    )
+    searchButton.place(x=595, y=225)
+
+
+    # Cancel Search Button with Icon
+    cancelSearchIconPath = relative_to_assets("reject-icon.png")
+    cancelSearchIcon = ctk.CTkImage(light_image=Image.open(cancelSearchIconPath), size=(33,33),)
+    cancelSearchButton = ctk.CTkButton(
+        whiteFrame, text="", width=50, height=50, 
+        font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=cancelSearchIcon, corner_radius=4,
+        command=insertTreeview # anchor=ctk.W 
+    )
+    cancelSearchButton.place(x=643, y=225)
 
 
     # Approve Button with Icon
@@ -143,9 +371,9 @@ def adminDashboardWindow():
     approveButton = ctk.CTkButton(
         whiteFrame, text=" Approve ", width=140, height=50, 
         font=("Inter", 22, "bold",), fg_color="#00C16A", hover_color="#009B2B", image=approveIcon,
-        # anchor=ctk.W 
+        command=approveClinic # anchor=ctk.W 
     )
-    approveButton.place(x=700, y=225)
+    approveButton.place(x=706, y=225)
 
     # Reject Button with Icon
     rejectIconPath = relative_to_assets("reject-icon.png")
@@ -153,9 +381,9 @@ def adminDashboardWindow():
     rejectButton = ctk.CTkButton(
         whiteFrame, text=" Reject  ", width=140, height=50, 
         font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=rejectIcon,
-        # anchor=ctk.W 
+        command=rejectClinic # anchor=ctk.W 
     )
-    rejectButton.place(x=870, y=225)
+    rejectButton.place(x=878, y=225)
 
 
     # <<<<<<<<<<<<<<<<<<<< TABLE FRAME STORING TREEVIEW >>>>>>>>>>>>>>>>>>>>> 
@@ -170,8 +398,8 @@ def adminDashboardWindow():
     table = ttk.Treeview(tableFrame, yscrollcommand=tableScrollbar1.set,height=12)
     table.pack(side='left', fill='both')
     table['columns'] = (
-        'No', 'Clinic ID', 'Clinic Name', 'Clinic Contact',
-        "Clinic Admin", "Admin Email"
+        'ID', 'Clinic Name', 'Clinic Contact',
+        "Clinic Admin", "Admin Email", 'Approval Status'
     )
 
     # Placing and Configuring Treeview Scrollbar
@@ -188,87 +416,31 @@ def adminDashboardWindow():
         foreground='#fff', background='#000', hover=False,
     )
     style.configure('Treeview', font=('Inter', 16), rowheight=47, fieldbackground="#DAFFF7")
-    style.map('Treeview', background=[('selected', '#00BE97')])
+    style.map('Treeview', background=[('selected', '#00BE97',)], font=[('selected', ('Inter', 16, 'bold'))],)
 
     # Treeview Table Headings Details
-    table.heading('No', text='No')
-    table.heading('Clinic ID', text='Clinic ID',)
+    table.heading('ID', text='ID',)
     table.heading('Clinic Name', text='Clinic Name')
     table.heading('Clinic Contact', text='Clinic Contact')
     table.heading('Clinic Admin', text='Clinic Admin')
     table.heading('Admin Email', text='Admin Email')
+    table.heading('Approval Status', text='Approval Status')
 
     # Treeview Table Columns Details
     table.column("#0", width=0, stretch=ctk.NO)
-    table.column("No", width=43, anchor=ctk.CENTER)
-    table.column("Clinic ID", anchor=ctk.CENTER)
+    table.column("ID", width=43, anchor=ctk.CENTER)
     table.column("Clinic Name", width=220, anchor=ctk.CENTER)
     table.column("Clinic Contact", anchor=ctk.CENTER)
     table.column("Clinic Admin", width=250, anchor=ctk.CENTER)
-    table.column("Admin Email", width=315, anchor=ctk.CENTER,)
+    table.column("Admin Email", width=270, anchor=ctk.CENTER,)
+    table.column("Approval Status", width=260, anchor=ctk.CENTER)
 
     # Setting alternating colours for the rows in Treeview
     table.tag_configure("oddrow", background="#F2F5F8")
     table.tag_configure("evenrow", background="#B4EFF7")
 
-
-    # <<<<<<<<<<<<<<<<<<<< AUTOMATED TESTING >>>>>>>>>>>>>>>>>>>>>
-    global count
-    count = 0
-    #     if count % 2 == 0:
-    #         table.insert(parent='', index=0, values=data, tags=("evenrow",))
-    #     else:
-    #         table.insert(parent='', index=0, values=data, tags=("oddrow",))
-
-    clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
-    adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
-
-
-
-    for i in range(15):
-        num = (i+1)
-        clinicID = ''.join(random.choices('0123456789', k=12))
-        clinicName = choice(clinicNames)
-        clinicContact = ''.join(random.choices('0123456789', k=8))
-        clinicContact = f'+01{clinicContact}'
-        adminName = choice(adminNames)
-        adminEmail = f'{(adminName.replace(" ", "")).lower()}@email.com'
-
-        data = (num, clinicID, clinicName, clinicContact, adminName, adminEmail)
-        if count % 2 == 0:
-            table.insert(parent='', index='end', values=data, tags=("evenrow",))
-        else:
-            table.insert(parent='', index='end', values=data, tags=("oddrow",))
-
-        count += 1
-
-    # Test the insertion in table
-    def testTableInsertion():
-        clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
-        clinicAddress = ["Kuala Lumpur", "George Town", "Ipoh", "Johor Bahru", "Kota Kinabalu", "Shah Alam", "Malacca City", "Alor Setar", "Kuantan", "Kuching"]
-        adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
-
-        for name in adminNames:
-            email = name.replace(" ", "")
-
-        for i in range(10):
-            num = i
-            clinicID = ''.join(random.choices('0123456789', k=12))
-            clinicName = choice(clinicNames)
-            clinicContact = ''.join(random.choices('0123456789', k=8))
-            clinicAddress = choice(clinicAddress)
-            adminName = choice(adminNames)
-            adminEmail = f'{email}@email.com'
-
-            data = (num, clinicID, clinicName, clinicContact, clinicAddress, adminName, adminEmail)
-            if count % 2 == 0:
-                table.insert(parent='', index=0, values=data, tags=("evenrow",))
-            else:
-                table.insert(parent='', index=0, values=data, tags=("oddrow",))
-
-            count += 1
     
-
+    insertTreeview()
 
     window.mainloop()
 
