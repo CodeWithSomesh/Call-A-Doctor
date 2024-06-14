@@ -1,8 +1,6 @@
 import sys
 from pathlib import Path
 from PIL import Image
-import random
-from random import choice
 import sqlite3
 from datetime import datetime
 
@@ -18,12 +16,12 @@ ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Softwa
 
 def adminDashboardWindow(email):
 
-    # Connecting to Clinic Admin DB
+    # Connecting to CAD Admin DB
     adminConn = sqlite3.connect('admins.db')
     adminCursor = adminConn.cursor()
     adminCursor.execute('SELECT * FROM admins WHERE Email=?', [email])
     result = adminCursor.fetchone()
-    username = f"{result[1]} {result[2]}"
+    username = f"{result[1]} {result[2]}" # Getting user's full name to display on top 
 
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ALL FUNCTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     # Get the full path of assets
@@ -402,8 +400,12 @@ def adminDashboardWindow(email):
         foreground='#fff', background='#000', hover=False,
     )
     style.configure('Treeview', font=('Inter', 16), rowheight=47, fieldbackground="#DAFFF7")
-    style.map('Treeview', background=[('selected', '#00BE97',)], font=[('selected', ('Inter', 16, 'bold'))],)
-
+    style.map(
+        'Treeview', 
+        background=[('selected', '#00BE97',)], 
+        font=[('selected', ('Inter', 16, 'bold'))],
+    )
+    
     # Treeview Table Headings Details
     table.heading('ID', text='ID',)
     table.heading('Clinic Name', text='Clinic Name')

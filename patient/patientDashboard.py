@@ -1,20 +1,29 @@
 import sys
 from pathlib import Path
 from PIL import Image
-import random
-from random import choice
+import sqlite3
+from datetime import datetime
 
 # Add the parent directory to the system path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from tkinter import ttk, Tk, Scrollbar, VERTICAL
+from tkinter import ttk, Tk, Scrollbar, VERTICAL, messagebox
 import customtkinter as ctk
 
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\patient\assets\frame0")
 
-def patientDashboardWindow():
+def patientDashboardWindow(email):
+
+    #Connecting to Patient Admin DB
+    # patientConn = sqlite3.connect('patients.db')
+    # patientCursor = patientConn.cursor()
+    # patientCursor.execute('SELECT * FROM patients WHERE Email=?', [email])
+    # result = patientCursor.fetchone()
+    # username = f"{result[1]} {result[2]}" # Getting user's full name to display on top 
+
+
     # Helper function to get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
@@ -22,6 +31,7 @@ def patientDashboardWindow():
 
     # Function to redirect to the Log In Window
     def redirectToLoginWindow():
+        messagebox.showwarning('Warning', 'Are you sure you want to logout?')
         window.destroy()
         from logInWindow.main import logInWindow
         logInWindow()
@@ -41,6 +51,119 @@ def patientDashboardWindow():
         searchInputTextBox.delete('0.0', "end")
         searchInputTextBox.insert('0.0', "Search Appointments by Date, Clinic Name or Doctor Name")
         searchInputTextBox.configure(text_color='gray')
+
+    
+    def bookAppointment():
+        toplevel = ctk.CTkToplevel(window)
+        toplevel.title("Book Appointment")
+        toplevel.geometry("800x600+460+100")
+        toplevel.resizable(False, False)
+        toplevel.attributes("-topmost",True)
+        toplevel.configure(fg_color = "#fff")
+
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< PARENT FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        parentFrame = ctk.CTkScrollableFrame(toplevel, width=800, height=600, fg_color="#fff",)
+        parentFrame.place(x=0, y=0)
+
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< TOP SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        topFrame = ctk.CTkFrame(parentFrame, width=650, height=500, fg_color="#FFFDFD",)
+        topFrame.pack(side='top', fill='x', expand=False, padx=65, pady=(20,0))
+        
+        # Select Clinic Dropdown Menu
+        clinicNameLabel = ctk.CTkLabel(topFrame, text="Select Clinic", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+        clinicNameLabel.pack(side='top', fill='x', expand=False)
+        clinicNameDropdown = ctk.CTkComboBox(
+            topFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+            font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+            values=['Clinic Name', 'Panmedic', 'Health Sync', 'Clinic Sungai Ara'], border_color="#b5b3b3", border_width=1,
+            dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+        )
+        clinicNameDropdown.pack(side='top', fill='x', expand=False,)
+        
+
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< TOP SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        leftFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD", )
+        leftFrame.pack(side='left', fill='both', expand=False, padx=65, pady=30)
+
+        
+        clinicNameLabel = ctk.CTkLabel(leftFrame, text="Select Clinic", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+        clinicNameLabel.pack(side='top', fill='x', expand=False)
+        clinicNameDropdown = ctk.CTkComboBox(
+            leftFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+            font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+            values=['Clinic Name', 'Panmedic', 'Health Sync', 'Clinic Sungai Ara'], border_color="#b5b3b3", border_width=1,
+            dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+        )
+        clinicNameDropdown.pack(side='top', fill='x', expand=False,)
+        # First name field
+        # firstNameLabel = ctk.CTkLabel(leftFrame, text="First Name", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+        # firstNameLabel.pack(side='top', fill='x', expand=False)
+        # firstNameTextBox = ctk.CTkTextbox(
+        #     leftFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+        #     border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
+        #     scrollbar_button_color="#1AFF75", border_width=1
+        # )
+        # firstNameTextBox.pack(side='top', fill='x', expand=False,)
+
+        # Email field
+        emailLabel = ctk.CTkLabel(leftFrame, text="Email", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+        emailLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
+        emailTextBox = ctk.CTkTextbox(
+            leftFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+            border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
+            scrollbar_button_color="#1AFF75", border_width=1
+        )
+        emailTextBox.pack(side='top', fill='x', expand=False,)
+
+        # NRIC field
+        nricLabel = ctk.CTkLabel(leftFrame, text="NRIC", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+        nricLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
+        nricTextBox = ctk.CTkTextbox(
+            leftFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+            border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
+            scrollbar_button_color="#1AFF75", border_width=1
+        )
+        nricTextBox.pack(side='top', fill='x', expand=False,)
+
+
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< RIGHT FRAME INSIDE SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        rightFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD",)
+        rightFrame.pack(side='left', fill='both', expand=False, padx=(0,0), pady=30)
+
+        # Last name field
+        lastNameLabel = ctk.CTkLabel(rightFrame, text="Last Name", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+        lastNameLabel.pack(side='top', fill='x', expand=False)
+        lastNameTextBox = ctk.CTkTextbox(
+            rightFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+            border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
+            scrollbar_button_color="#1AFF75", border_width=1
+        )
+        lastNameTextBox.pack(side='top', fill='x', expand=False,)
+
+        # Password field
+        passwordLabel = ctk.CTkLabel(rightFrame, text="Password", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+        passwordLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
+        passwordTextBox = ctk.CTkTextbox(
+            rightFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+            border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
+            scrollbar_button_color="#1AFF75", border_width=1
+        )
+        passwordTextBox.pack(side='top', fill='x', expand=False,)
+
+
+        # Role dropdown field
+        roleLabel = ctk.CTkLabel(rightFrame, text="Sign In As", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+        roleLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
+        roleDropdown = ctk.CTkComboBox(
+            rightFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+            font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+            values=['Role', 'Patient', 'Doctor', 'Clinic Admin', 'CAD Admin'], border_color="#b5b3b3", border_width=1,
+            dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+        )
+        roleDropdown.pack(side='top', fill='x', expand=False,)
 
 
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -105,9 +228,24 @@ def patientDashboardWindow():
 
 
     # Label with Greeting Message & User's Full Name 
-    greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, Someshwar Rao", font=("Inter", 36, "bold",), text_color="#000000")
+
+    now = datetime.now()  # Get the current date and time
+    formatted_date = now.strftime("%B %d, %Y") # Format the date as 'Month Day, Year'
+    current_hour = now.hour # Get the current hour
+    current_time = now.strftime("%H:%M:%S") # Get the current time
+
+    # Generate greeting message based on the current time
+    if current_hour < 12:
+        greeting = "Good Morning!"
+    elif 12 <= current_hour < 18:
+        greeting = "Good Afternoon!"
+    else:
+        greeting = "Good Evening!" 
+
+
+    greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, {username}", font=("Inter", 36, "bold",), text_color="#000000")
     greetingLabel1.place(x=25, y=25)
-    greetingLabel2 = ctk.CTkLabel(whiteFrame, text="Good Morning!  (January 26, 2024)", font=("Inter", 22,), text_color="#000000")
+    greetingLabel2 = ctk.CTkLabel(whiteFrame, text=f"{greeting}  ({formatted_date})", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
     roleLabel = ctk.CTkLabel(whiteFrame, text="(Patient)", font=("Inter", 36, "bold",), text_color="#000000")
     roleLabel.place(x=872, y=25)
@@ -171,7 +309,7 @@ def patientDashboardWindow():
     bookButton = ctk.CTkButton(
         whiteFrame, text=" Book Appointment", width=280, height=48, 
         font=("Inter", 22, "bold",), fg_color="#17D463", hover_color="#009B2B", image=appointmentIcon,
-        # anchor=ctk.W 
+        command=bookAppointment # anchor=ctk.W 
     )
     bookButton.place(x=735, y=290)
 
@@ -206,7 +344,12 @@ def patientDashboardWindow():
         foreground='#fff', background='#000', hover=False,
     )
     style.configure('Treeview', font=('Inter', 16), rowheight=45, fieldbackground="#DAFFF7")
-    style.map('Treeview', background=[('selected', '#00BE97')])
+    style.map(
+        'Treeview', 
+        background=[('selected', '#00BE97',)], 
+        font=[('selected', ('Inter', 16, 'bold'))],
+    )
+
 
     # Treeview Table Headings Details
     table.heading('No', text='No')
@@ -265,60 +408,60 @@ def patientDashboardWindow():
 
 
     # <<<<<<<<<<<<<<<<<<<< AUTOMATED TESTING >>>>>>>>>>>>>>>>>>>>>
-    global count
-    count = 0
+    # global count
+    # count = 0
+    # #     if count % 2 == 0:
+    # #         table.insert(parent='', index=0, values=data, tags=("evenrow",))
+    # #     else:
+    # #         table.insert(parent='', index=0, values=data, tags=("oddrow",))
+
+    # clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
+    # adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
+
+
+
+    # for i in range(15):
+    #     num = (i+1)
+    #     clinicID = ''.join(random.choices('0123456789', k=12))
+    #     clinicName = choice(clinicNames)
+    #     clinicContact = ''.join(random.choices('0123456789', k=8))
+    #     clinicContact = f'+01{clinicContact}'
+    #     adminName = choice(adminNames)
+    #     adminEmail = f'{(adminName.replace(" ", "")).lower()}@email.com'
+
+    #     data = (num, clinicID, clinicName, clinicContact, adminName, adminEmail)
     #     if count % 2 == 0:
-    #         table.insert(parent='', index=0, values=data, tags=("evenrow",))
+    #         table.insert(parent='', index='end', values=data, tags=("evenrow",))
     #     else:
-    #         table.insert(parent='', index=0, values=data, tags=("oddrow",))
+    #         table.insert(parent='', index='end', values=data, tags=("oddrow",))
 
-    clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
-    adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
+    #     count += 1
 
+    # # Test the insertion in table
+    # def testTableInsertion():
+    #     clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
+    #     clinicAddress = ["Kuala Lumpur", "George Town", "Ipoh", "Johor Bahru", "Kota Kinabalu", "Shah Alam", "Malacca City", "Alor Setar", "Kuantan", "Kuching"]
+    #     adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
 
+    #     for name in adminNames:
+    #         email = name.replace(" ", "")
 
-    for i in range(15):
-        num = (i+1)
-        clinicID = ''.join(random.choices('0123456789', k=12))
-        clinicName = choice(clinicNames)
-        clinicContact = ''.join(random.choices('0123456789', k=8))
-        clinicContact = f'+01{clinicContact}'
-        adminName = choice(adminNames)
-        adminEmail = f'{(adminName.replace(" ", "")).lower()}@email.com'
+    #     for i in range(10):
+    #         num = i
+    #         clinicID = ''.join(random.choices('0123456789', k=12))
+    #         clinicName = choice(clinicNames)
+    #         clinicContact = ''.join(random.choices('0123456789', k=8))
+    #         clinicAddress = choice(clinicAddress)
+    #         adminName = choice(adminNames)
+    #         adminEmail = f'{email}@email.com'
 
-        data = (num, clinicID, clinicName, clinicContact, adminName, adminEmail)
-        if count % 2 == 0:
-            table.insert(parent='', index='end', values=data, tags=("evenrow",))
-        else:
-            table.insert(parent='', index='end', values=data, tags=("oddrow",))
+    #         data = (num, clinicID, clinicName, clinicContact, clinicAddress, adminName, adminEmail)
+    #         if count % 2 == 0:
+    #             table.insert(parent='', index=0, values=data, tags=("evenrow",))
+    #         else:
+    #             table.insert(parent='', index=0, values=data, tags=("oddrow",))
 
-        count += 1
-
-    # Test the insertion in table
-    def testTableInsertion():
-        clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
-        clinicAddress = ["Kuala Lumpur", "George Town", "Ipoh", "Johor Bahru", "Kota Kinabalu", "Shah Alam", "Malacca City", "Alor Setar", "Kuantan", "Kuching"]
-        adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
-
-        for name in adminNames:
-            email = name.replace(" ", "")
-
-        for i in range(10):
-            num = i
-            clinicID = ''.join(random.choices('0123456789', k=12))
-            clinicName = choice(clinicNames)
-            clinicContact = ''.join(random.choices('0123456789', k=8))
-            clinicAddress = choice(clinicAddress)
-            adminName = choice(adminNames)
-            adminEmail = f'{email}@email.com'
-
-            data = (num, clinicID, clinicName, clinicContact, clinicAddress, adminName, adminEmail)
-            if count % 2 == 0:
-                table.insert(parent='', index=0, values=data, tags=("evenrow",))
-            else:
-                table.insert(parent='', index=0, values=data, tags=("oddrow",))
-
-            count += 1
+    #         count += 1
     
 
 
@@ -327,4 +470,4 @@ def patientDashboardWindow():
 
 # Only execute the Patient Dashboard Window if this script is run directly
 if __name__ == "__main__":
-    patientDashboardWindow()
+    patientDashboardWindow(email=None)

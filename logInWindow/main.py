@@ -213,17 +213,17 @@ def logInWindow():
                 if doctorLogin():
                     window.destroy()
                     from doctor.doctorDashboard import doctorDashboardWindow
-                    doctorDashboardWindow()
+                    doctorDashboardWindow(email)
             elif role == 'Patient':
                 if patientLogin():
                     window.destroy()
                     from patient.patientDashboard import patientDashboardWindow
-                    patientDashboardWindow()
+                    patientDashboardWindow(email)
             elif role == 'Clinic Admin':
                 if clinicAdminLogin():
                     window.destroy()
                     from clinicAdmin.clinicAdminDashboard import clinicAdminDashboardWindow
-                    clinicAdminDashboardWindow()
+                    clinicAdminDashboardWindow(email)
             else:
                 messagebox.showerror('Error',"Please select who you want to log in as.")
 
