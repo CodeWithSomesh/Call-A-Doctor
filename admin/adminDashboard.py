@@ -354,7 +354,7 @@ def adminDashboardWindow():
     searchButton.place(x=595, y=225)
 
 
-    # Search Button with Icon
+    # Cancel Search Button with Icon
     cancelSearchIconPath = relative_to_assets("reject-icon.png")
     cancelSearchIcon = ctk.CTkImage(light_image=Image.open(cancelSearchIconPath), size=(33,33),)
     cancelSearchButton = ctk.CTkButton(
