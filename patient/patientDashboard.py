@@ -41,12 +41,12 @@ def patientDashboardWindow(email):
         )          
     """)
 
-    #Connecting to Patient Admin DB
-    # patientConn = sqlite3.connect('patients.db')
-    # patientCursor = patientConn.cursor()
-    # patientCursor.execute('SELECT * FROM patients WHERE Email=?', [email])
-    # result = patientCursor.fetchone()
-    # username = f"{result[1]} {result[2]}" # Getting user's full name to display on top 
+    # Connecting to Patient Admin DB
+    patientConn = sqlite3.connect('patients.db')
+    patientCursor = patientConn.cursor()
+    patientCursor.execute('SELECT * FROM patients WHERE Email=?', [email])
+    result = patientCursor.fetchone()
+    username = f"{result[1]} {result[2]}" # Getting user's full name to display on top 
 
 
     # Helper function to get the full path of assets
@@ -205,12 +205,18 @@ def patientDashboardWindow(email):
         )
         calendar.pack(side='top', fill='x', expand=False,)
 
+         # Select Consultation Duration Dropdown Menu
+        durationArray = [
+            'Select Consultation Duration', '1 hour', '1 hour 30 Minutes',
+            '2 hours', '2 hours 30 Minutes', '3 hours', '3 hour 30 Minutes', '4 hours', 
+            '4 hours 30 Minutes', '5 hours'
+        ]
         consultationDurationDropdownLabel = ctk.CTkLabel(rightFrame, text="Select Consultation Duration", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         consultationDurationDropdownLabel.pack(side='top', fill='x', expand=False, pady=(30,0))
         consultationDurationDropdown = ctk.CTkComboBox(
             rightFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            values=['Select Duration', 'Maisarah Majdi', 'Someshwar Rao', 'Karen Khor Siew Li'], border_color="#b5b3b3", border_width=1,
+            values=durationArray, border_color="#b5b3b3", border_width=1,
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
             dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
         )
@@ -225,61 +231,58 @@ def patientDashboardWindow(email):
             command=bookAppointment # anchor=ctk.W 
         )
         bookButton2.pack(side='top', fill='x', expand=False,pady=(40,15))
+        # bookButton2.bind("<Button-1>", command=bookAppointment)
 
 
-    def bookAppointment(
-            clinicNameDropdown, doctorTypeDropdown, painDetailsTextBox, 
-            doctorDropdown, doctorName, calendar, consultationTimeDropdown, consultationDurationDropdown
-        ):
-        
-        clinicName = clinicNameDropdown.get()
-        doctorType = doctorTypeDropdown.get()
-        painDetails = painDetailsTextBox.get(0.0, 'end').strip()
-        doctorName = doctorDropdown.get()
-        doctorFirstName = doctorName.split()[0]
-        date = calendar.get_date()
-        time = consultationTimeDropdown.get()
-        duration = consultationDurationDropdown.get()
+        def bookAppointment(event):
+            
+            clinicName = clinicNameDropdown.get()
+            doctorType = doctorTypeDropdown.get()
+            painDetails = painDetailsTextBox.get(0.0, 'end').strip()
+            doctorName = doctorDropdown.get()
+            doctorFirstName = doctorName.split()[0]
+            date = calendar.get_date()
+            time = consultationTimeDropdown.get()
+            duration = consultationDurationDropdown.get()
 
-        # Connecting to Patient DB to get Patient Name & ID
-        patientConn = sqlite3.connect('patients.db')
-        patientCursor = patientConn.cursor()
-        patientCursor.execute('SELECT * FROM patients WHERE Email=?', [email])
-        patientResult = patientCursor.fetchone()
-        patientName = f"{patientResult[1]} {patientResult[2]}"
-        patientID = patientResult[0]
+            # Connecting to Patient DB to get Patient Name & ID
+            patientConn = sqlite3.connect('patients.db')
+            patientCursor = patientConn.cursor()
+            patientCursor.execute('SELECT * FROM patients WHERE Email=?', [email])
+            patientResult = patientCursor.fetchone()
+            patientName = f"{patientResult[1]} {patientResult[2]}"
+            patientID = patientResult[0]
 
-        # Connecting to Doctor DB to get Doctor ID
-        doctorConn = sqlite3.connect('doctors.db')
-        doctorCursor = doctorConn.cursor()
-        doctorCursor.execute('SELECT * FROM doctors WHERE FirstName=?', [doctorFirstName])
-        doctorResult = doctorCursor.fetchone()
-        doctorID = doctorResult[0]
-        doctorAvailability = 0
+            # Connecting to Doctor DB to get Doctor ID
+            doctorConn = sqlite3.connect('doctors.db')
+            doctorCursor = doctorConn.cursor()
+            doctorCursor.execute('SELECT * FROM doctors WHERE FirstName=?', [doctorFirstName])
+            doctorResult = doctorCursor.fetchone()
+            doctorID = doctorResult[0]
+            doctorAvailability = 0
 
-        # Connecting to Doctor DB to get Doctor ID
-        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
-        clinicAdminCursor = clinicAdminConn.cursor()
-        clinicAdminCursor.execute('SELECT * FROM clinicAdmins WHERE ClinicName=?', [clinicName])
-        clinicAdminResult = clinicAdminCursor.fetchone()
-        clinicAdminID = clinicAdminResult[0]
+            # Connecting to Doctor DB to get Doctor ID
+            clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+            clinicAdminCursor = clinicAdminConn.cursor()
+            clinicAdminCursor.execute('SELECT * FROM clinicAdmins WHERE ClinicName=?', [clinicName])
+            clinicAdminResult = clinicAdminCursor.fetchone()
+            clinicAdminID = clinicAdminResult[0]
 
-        currentDateTime = datetime.now()
-        appointmentCreatedAt = currentDateTime.strftime('%Y-%m-%d %H:%M:%S')
+            currentDateTime = datetime.now()
+            appointmentCreatedAt = currentDateTime.strftime('%Y-%m-%d %H:%M:%S')
 
-        if (clinicName != '' and doctorType != '' and painDetails != '' and doctorName != '' and date != '' and 
-            time != '' and duration != ''):
+            if (clinicName != '' and doctorType != '' and painDetails != '' and doctorName != '' and date != '' and 
+                time != '' and duration != ''):
 
-            appointmentCursor.execute(
-                'INSERT INTO appointments (PatientName, PatientID, DoctorName, DoctorID, DoctorAvailability, ClinicName, ClinicID, AppointmentDate, AppointmentTime, AppointmentDuration, AppointmentCreatedTime, PainDetails) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', 
-                [patientName, patientID, doctorName, doctorID, doctorAvailability, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails])
-            appointmentConn.commit()
-            messagebox.showinfo('Success', 'Appointment successfully added.')
-            toplevel.destroy()
-            patientDashboardWindow(email)
-        
-        else:
-            messagebox.showerror('Error',"Please fill up all the fields.")
+                appointmentCursor.execute(
+                    'INSERT INTO appointments (PatientName, PatientID, DoctorName, DoctorID, DoctorAvailability, ClinicName, ClinicID, AppointmentDate, AppointmentTime, AppointmentDuration, AppointmentCreatedTime, PainDetails) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', 
+                    [patientName, patientID, doctorName, doctorID, doctorAvailability, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails])
+                appointmentConn.commit()
+                messagebox.showinfo('Success', 'Appointment successfully added.')
+                patientDashboardWindow(email)
+            
+            else:
+                messagebox.showerror('Error',"Please fill up all the fields.")
 
 
 
@@ -364,7 +367,7 @@ def patientDashboardWindow(email):
         greeting = "Good Evening!" 
 
 
-    greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, {username}", font=("Inter", 36, "bold",), text_color="#000000")
+    greetingLabel1 = ctk.CTkLabel(whiteFrame, text=f"Welcome, {username}", font=("Inter", 36, "bold",), text_color="#000000")
     greetingLabel1.place(x=25, y=25)
     greetingLabel2 = ctk.CTkLabel(whiteFrame, text=f"{greeting}  ({formatted_date})", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
