@@ -18,6 +18,29 @@ ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Softwa
 
 def patientDashboardWindow(email):
 
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< CONNECTING TO SQLITE3 DATABASE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    # Creating Appointments DB
+    appointmentConn = sqlite3.connect('appointments.db')
+    appointmentCursor = appointmentConn.cursor()
+    appointmentCursor.execute("""
+        CREATE TABLE IF NOT EXISTS appointments (
+            AppointmentID INTEGER PRIMARY KEY AUTOINCREMENT,
+            PatientName TEXT NOT NULL,
+            PatientID TEXT NOT NULL,
+            DoctorName TEXT NOT NULL,
+            DoctorID TEXT NOT NULL,
+            DoctorAvailability INTEGER DEFAULT 0,
+            ClinicName TEXT NOT NULL,
+            ClinicID TEXT NOT NULL,
+            AppointmentDate TEXT NOT NULL,
+            AppointmentTime TEXT NOT NULL,
+            AppointmentDuration TEXT NOT NULL,
+            AppointmentCreatedTime TEXT NOT NULL,
+            PainDetails TEXT NOT NULL
+        )          
+    """)
+
     #Connecting to Patient Admin DB
     # patientConn = sqlite3.connect('patients.db')
     # patientCursor = patientConn.cursor()
@@ -55,7 +78,7 @@ def patientDashboardWindow(email):
         searchInputTextBox.configure(text_color='gray')
 
     
-    def bookAppointment():
+    def topLevel():
         toplevel = ctk.CTkToplevel(window)
         toplevel.title("Book Appointment")
         toplevel.geometry("800x600+460+100")
@@ -113,6 +136,15 @@ def patientDashboardWindow(email):
         )
         doctorTypeDropdown.pack(side='top', fill='x', expand=False, pady=(0,0), padx=(0,5))
 
+        painDetailsLabel = ctk.CTkLabel(topFrame, text="Explain Pain Details", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+        painDetailsLabel.pack(side='top', fill='x', expand=False, pady=(30,0))
+        painDetailsTextBox = ctk.CTkTextbox(
+            topFrame, fg_color="#ffffff", text_color="#000000", width=648, height=88, 
+            border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
+            scrollbar_button_color="#1AFF75", border_width=1
+        )
+        painDetailsTextBox.pack(side='top', fill='none', expand=False, pady=(0, 10), anchor="w")
+
 
         # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< LEFT FRAME INSDIE PARENT SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         leftFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD", )
@@ -137,7 +169,7 @@ def patientDashboardWindow(email):
             '6:00 AM', '7:00 AM', '8:00 AM'
         ]
         consultationTimeDropdownLabel = ctk.CTkLabel(leftFrame, text="Select Consultation Time", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
-        consultationTimeDropdownLabel.pack(side='top', fill='x', expand=False, pady=(193,0))
+        consultationTimeDropdownLabel.pack(side='top', fill='x', expand=False, pady=(150,0))
         consultationTimeDropdown = ctk.CTkComboBox(
             leftFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
@@ -166,16 +198,6 @@ def patientDashboardWindow(email):
         # Select Consultation Date Widget
         consultationDateLabel = ctk.CTkLabel(rightFrame, text="Select Consultation Date", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         consultationDateLabel.pack(side='top', fill='x', expand=False,)
-        # consultationDate = ctk.CTkComboBox(
-        #     rightFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
-        #     font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-        #     values=['Select Doctor', 'Maisarah Majdi', 'Someshwar Rao', 'Karen Khor Siew Li'], border_color="#b5b3b3", border_width=1,
-        #     dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
-        #     dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
-        # )
-        # consultationDate.pack(side='top', fill='x', expand=False,)
-        # datePicker = DateEntry(rightFrame, height=48, setmode="day", font=("Inter", 12), date_pattern="dd-mm-yyyy")
-        # datePicker.pack(side='top', fill='x', expand=False,)
         calendar = Calendar(
             rightFrame, selectmode="day", year=thisYear, font=("Inter", 12),
             month=thisMonth, day=todayInt, background="#1AFF75", 
@@ -203,6 +225,63 @@ def patientDashboardWindow(email):
             command=bookAppointment # anchor=ctk.W 
         )
         bookButton2.pack(side='top', fill='x', expand=False,pady=(40,15))
+
+
+    def bookAppointment(
+            clinicNameDropdown, doctorTypeDropdown, painDetailsTextBox, 
+            doctorDropdown, doctorName, calendar, consultationTimeDropdown, consultationDurationDropdown
+        ):
+        
+        clinicName = clinicNameDropdown.get()
+        doctorType = doctorTypeDropdown.get()
+        painDetails = painDetailsTextBox.get(0.0, 'end').strip()
+        doctorName = doctorDropdown.get()
+        doctorFirstName = doctorName.split()[0]
+        date = calendar.get_date()
+        time = consultationTimeDropdown.get()
+        duration = consultationDurationDropdown.get()
+
+        # Connecting to Patient DB to get Patient Name & ID
+        patientConn = sqlite3.connect('patients.db')
+        patientCursor = patientConn.cursor()
+        patientCursor.execute('SELECT * FROM patients WHERE Email=?', [email])
+        patientResult = patientCursor.fetchone()
+        patientName = f"{patientResult[1]} {patientResult[2]}"
+        patientID = patientResult[0]
+
+        # Connecting to Doctor DB to get Doctor ID
+        doctorConn = sqlite3.connect('doctors.db')
+        doctorCursor = doctorConn.cursor()
+        doctorCursor.execute('SELECT * FROM doctors WHERE FirstName=?', [doctorFirstName])
+        doctorResult = doctorCursor.fetchone()
+        doctorID = doctorResult[0]
+        doctorAvailability = 0
+
+        # Connecting to Doctor DB to get Doctor ID
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
+        clinicAdminCursor.execute('SELECT * FROM clinicAdmins WHERE ClinicName=?', [clinicName])
+        clinicAdminResult = clinicAdminCursor.fetchone()
+        clinicAdminID = clinicAdminResult[0]
+
+        currentDateTime = datetime.now()
+        appointmentCreatedAt = currentDateTime.strftime('%Y-%m-%d %H:%M:%S')
+
+        if (clinicName != '' and doctorType != '' and painDetails != '' and doctorName != '' and date != '' and 
+            time != '' and duration != ''):
+
+            appointmentCursor.execute(
+                'INSERT INTO appointments (PatientName, PatientID, DoctorName, DoctorID, DoctorAvailability, ClinicName, ClinicID, AppointmentDate, AppointmentTime, AppointmentDuration, AppointmentCreatedTime, PainDetails) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', 
+                [patientName, patientID, doctorName, doctorID, doctorAvailability, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails])
+            appointmentConn.commit()
+            messagebox.showinfo('Success', 'Appointment successfully added.')
+            toplevel.destroy()
+            patientDashboardWindow(email)
+        
+        else:
+            messagebox.showerror('Error',"Please fill up all the fields.")
+
+
 
 
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -357,7 +436,7 @@ def patientDashboardWindow(email):
     bookButton = ctk.CTkButton(
         whiteFrame, text=" Book Appointment", width=280, height=48, 
         font=("Inter", 22, "bold",), fg_color="#17D463", hover_color="#009B2B", image=appointmentIcon,
-        command=bookAppointment # anchor=ctk.W 
+        command=topLevel # anchor=ctk.W 
     )
     bookButton.place(x=735, y=290)
 
