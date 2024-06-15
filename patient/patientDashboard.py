@@ -58,10 +58,13 @@ def patientDashboardWindow(email):
 
     # Function to redirect to the Log In Window
     def redirectToLoginWindow():
-        messagebox.showwarning('Warning', 'Are you sure you want to logout?')
-        window.destroy()
-        from logInWindow.main import logInWindow
-        logInWindow()
+        msg = messagebox.askokcancel('Warning', 'Are you sure you want to logout?')
+
+        if msg:
+            window.destroy()
+            from logInWindow.main import logInWindow
+            logInWindow()
+
 
 
     # When user is typing remove placeholder
@@ -345,7 +348,7 @@ def patientDashboardWindow(email):
         # Executed when searchbar is entered
         if array is None:
             for appointment in appointments:
-                num = count + 1
+                num = 1
                 clinicName = appointment[7]
                 doctorType = appointment[5]
                 doctorName = appointment[3]
@@ -372,12 +375,13 @@ def patientDashboardWindow(email):
                 else:
                     table.insert(parent='', index='end', values=data, tags=("oddrow",))
 
+                num  += 1
                 count += 1
         
         # Executed when Approve Button is clicked
         else:
             for appointment in appointments:
-                num = count + 1
+                num = 1
                 clinicName = appointment[7]
                 doctorType = appointment[5]
                 doctorName = appointment[3]
@@ -404,6 +408,7 @@ def patientDashboardWindow(email):
                 else:
                     table.insert(parent='', index='end', values=data, tags=("oddrow",))
 
+                num  += 1
                 count += 1
         
 

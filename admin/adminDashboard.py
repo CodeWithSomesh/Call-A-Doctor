@@ -21,7 +21,7 @@ def adminDashboardWindow(email):
     adminCursor = adminConn.cursor()
     adminCursor.execute('SELECT * FROM admins WHERE Email=?', [email])
     result = adminCursor.fetchone()
-    username = f"{result[1]} {result[2]}" # Getting user's full name to display on top 
+    #username = f"{result[1]} {result[2]}" # Getting user's full name to display on top 
 
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ALL FUNCTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     # Get the full path of assets
@@ -31,10 +31,12 @@ def adminDashboardWindow(email):
 
     # Redirect to the Log In Window
     def redirectToLoginWindow():
-        messagebox.showwarning('Warning', 'Are you sure you want to logout?')
-        window.destroy()
-        from logInWindow.main import logInWindow
-        logInWindow()
+        msg = messagebox.askokcancel('Warning', 'Are you sure you want to logout?')
+
+        if msg:
+            window.destroy()
+            from logInWindow.main import logInWindow
+            logInWindow()
 
 
     # When user is typing remove placeholder
@@ -287,7 +289,7 @@ def adminDashboardWindow(email):
     else:
         greeting = "Good Evening!" 
 
-    greetingLabel1 = ctk.CTkLabel(whiteFrame, text=f"Welcome, {username}", font=("Inter", 36, "bold",), text_color="#000000")
+    greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, {username}", font=("Inter", 36, "bold",), text_color="#000000")
     greetingLabel1.place(x=25, y=25)
     greetingLabel2 = ctk.CTkLabel(whiteFrame, text=f"{greeting}  ({formatted_date})", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
@@ -346,10 +348,10 @@ def adminDashboardWindow(email):
     cancelSearchIcon = ctk.CTkImage(light_image=Image.open(cancelSearchIconPath), size=(33,33),)
     cancelSearchButton = ctk.CTkButton(
         whiteFrame, text="", width=50, height=50, 
-        font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=cancelSearchIcon, corner_radius=4,
+        font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=cancelSearchIcon, corner_radius=0,
         command=insertTreeview # anchor=ctk.W 
     )
-    cancelSearchButton.place(x=643, y=225)
+    cancelSearchButton.place(x=642, y=225)
 
 
     # Approve Button with Icon
