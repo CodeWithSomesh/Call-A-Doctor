@@ -48,7 +48,7 @@ def patientDashboardWindow(email):
     patientCursor = patientConn.cursor()
     patientCursor.execute('SELECT * FROM patients WHERE Email=?', [email])
     result = patientCursor.fetchone()
-    #username = f"{result[1]} {result[2]}" # Getting user's full name to display on top 
+    username = f"{result[1]} {result[2]}" # Getting user's full name to display on top 
 
 
     # Helper function to get the full path of assets
@@ -85,6 +85,13 @@ def patientDashboardWindow(email):
     def updateAppointmentTopLevel():
 
         def updateAppointment():  
+            clinicName = clinicNameDropdown.get()
+            doctorType = doctorTypeDropdown.get()
+            painDetails = painDetailsTextBox.get(0.0, 'end').strip()
+            doctorName = doctorDropdown.get()
+            date = calendar.get_date()
+            time = consultationTimeDropdown.get()
+            duration = consultationDurationDropdown.get()
 
             if (clinicName != '' and doctorType != '' and painDetails != '' and doctorName != '' and date != '' and 
                 time != '' and duration != ''):
@@ -146,6 +153,8 @@ def patientDashboardWindow(email):
                 if messagebox:
                     toplevel.attributes("-topmost",True)
 
+
+
         selectedItem = table.focus()
         if not selectedItem:
             messagebox.showerror('Error', 'Select an Appointment first.')
@@ -156,24 +165,6 @@ def patientDashboardWindow(email):
         appointmentID = appointmentData[6]
         print(appointmentID)
 
-        # Connecting to Appointment DB
-        appointmentConn = sqlite3.connect('appointments.db')
-        appointmentCursor = appointmentConn.cursor()
-
-        appointmentCursor.execute('SELECT * FROM appointments WHERE AppointmentID=?', [appointmentID])
-        result = appointmentCursor.fetchone()
-        print(result)
-
-        clinicName = clinicNameDropdown.set(result[7])
-        doctorType = doctorTypeDropdown.set(result[6])
-        painDetails = painDetailsTextBox.insert('insert', result[13])
-        doctorName = doctorDropdown.set(result[3])
-        date = calendar.selection_set(result[9])
-        time = consultationTimeDropdown.set(result[10])
-        duration = consultationDurationDropdown.set(result[11])
-
-        
-           
 
         toplevel = ctk.CTkToplevel(window)
         toplevel.title("Update Appointment")
@@ -328,7 +319,21 @@ def patientDashboardWindow(email):
         )
         updateButton.pack(side='top', fill='x', expand=False,pady=(40,15))
 
-    
+        # Connecting to Appointment DB
+        appointmentConn = sqlite3.connect('appointments.db')
+        appointmentCursor = appointmentConn.cursor()
+
+        appointmentCursor.execute('SELECT * FROM appointments WHERE AppointmentID=?', [appointmentID])
+        result = appointmentCursor.fetchone()
+        print(result)
+
+        clinicName = clinicNameDropdown.set(result[7])
+        doctorType = doctorTypeDropdown.set(result[6])
+        painDetails = painDetailsTextBox.insert('insert', result[13])
+        doctorName = doctorDropdown.set(result[3])
+        date = calendar.selection_set(result[9])
+        time = consultationTimeDropdown.set(result[10])
+        duration = consultationDurationDropdown.set(result[11])
 
       
 
@@ -815,7 +820,7 @@ def patientDashboardWindow(email):
         greeting = "Good Evening!" 
 
 
-    greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, {username}", font=("Inter", 36, "bold",), text_color="#000000")
+    greetingLabel1 = ctk.CTkLabel(whiteFrame, text=f"Welcome, {username}", font=("Inter", 36, "bold",), text_color="#000000")
     greetingLabel1.place(x=25, y=25)
     greetingLabel2 = ctk.CTkLabel(whiteFrame, text=f"{greeting}  ({formatted_date})", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
