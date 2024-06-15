@@ -862,51 +862,6 @@ def patientDashboardWindow(email):
         )
     descLabel.place(x=25, y=182)
 
-    # Select Clinic Dropdown Menu
-    # clinicDropdown = ctk.CTkComboBox(
-    #     whiteFrame, fg_color="#ffffff", text_color="#000000", width=360, height=48, 
-    #     font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-    #     values=['Select Clinic', 'Panmedic', 'Health Sync', 'Clinic Sungai Ara'], border_color="#b5b3b3", border_width=1,
-    #     dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
-    #     dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
-    # )
-    # clinicDropdown.place(x=25, y=225)
-
-    # # Select Doctor Dropdown Menu
-    # doctorDropdown = ctk.CTkComboBox(
-    #     whiteFrame, fg_color="#ffffff", text_color="#000000", width=615, height=48, 
-    #     font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-    #     values=['Select Doctor', 'Maisarah Majdi (Cardiologist)', 'Someshwar Rao (Neurosurgeon)', 'Karen Khor Siew Li (Psychologist)'], border_color="#b5b3b3", border_width=1,
-    #     dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
-    #     dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
-    # )
-    # doctorDropdown.place(x=400, y=225)
-
-    # # Select Consultation Time Dropdown Menu
-    # consultationTimeDropdown = ctk.CTkComboBox(
-    #     whiteFrame, fg_color="#ffffff", text_color="#000000", width=360, height=48, 
-    #     font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-    #     values=['Select Consultation Time', '9am', '10am', '11am'], border_color="#b5b3b3", border_width=1,
-    #     dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
-    #     dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
-    # )
-    # consultationTimeDropdown.place(x=25, y=290)
-    
-    # # Select Consultation Duration Dropdown Menu
-    # durationArray = [
-    #     'Select Consultation Duration', '1 hour', '1 hour 30 Minutes',
-    #     '2 hours', '2 hours 30 Minutes', '3 hours', '3 hour 30 Minutes', '4 hours', 
-    #     '4 hours 30 Minutes', '5 hours'
-    # ]
-    
-    # consultationDurationDropdown = ctk.CTkComboBox(
-    #     whiteFrame, fg_color="#ffffff", text_color="#000000", width=320, height=48, 
-    #     font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-    #     values=durationArray, border_color="#b5b3b3", border_width=1,
-    #     dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
-    #     dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
-    # )
-    # consultationDurationDropdown.place(x=400, y=290)
 
     # Search Box Dropdown Menu 
     searchByDropdown = ctk.CTkComboBox(
@@ -928,7 +883,6 @@ def patientDashboardWindow(email):
     searchInputTextBox.place(x=293, y=290)
     searchInputTextBox.bind("<FocusIn>", searchbarFocus)
     searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
-    #searchInputTextBox.bind("<KeyRelease>", filterTree)
 
 
     # Search Button with Icon
@@ -1045,77 +999,6 @@ def patientDashboardWindow(email):
     table.tag_configure("evenrow", background="#B4EFF7")
 
 
-    # Search Box field 
-    # searchInputTextBox = ctk.CTkTextbox(
-    #         whiteFrame, fg_color="#ffffff", text_color="gray", width=620, height=48, 
-    #         border_color="#000", font=("Inter", 21), border_spacing=8,
-    #         scrollbar_button_color="#1AFF75", border_width=2,
-    #     )
-    # searchInputTextBox.insert('insert', "Search Appointments by Date, Clinic Name or Doctor Name")
-    # searchInputTextBox.place(x=25, y=726)
-    # searchInputTextBox.bind("<FocusIn>", searchbarFocus)
-    # searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
-
-    
-
-
-
-
-    # <<<<<<<<<<<<<<<<<<<< AUTOMATED TESTING >>>>>>>>>>>>>>>>>>>>>
-    # global count
-    # count = 0
-    # #     if count % 2 == 0:
-    # #         table.insert(parent='', index=0, values=data, tags=("evenrow",))
-    # #     else:
-    # #         table.insert(parent='', index=0, values=data, tags=("oddrow",))
-
-    # clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
-    # adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
-
-
-
-    # for i in range(15):
-    #     num = (i+1)
-    #     clinicID = ''.join(random.choices('0123456789', k=12))
-    #     clinicName = choice(clinicNames)
-    #     clinicContact = ''.join(random.choices('0123456789', k=8))
-    #     clinicContact = f'+01{clinicContact}'
-    #     adminName = choice(adminNames)
-    #     adminEmail = f'{(adminName.replace(" ", "")).lower()}@email.com'
-
-    #     data = (num, clinicID, clinicName, clinicContact, adminName, adminEmail)
-    #     if count % 2 == 0:
-    #         table.insert(parent='', index='end', values=data, tags=("evenrow",))
-    #     else:
-    #         table.insert(parent='', index='end', values=data, tags=("oddrow",))
-
-    #     count += 1
-
-    # # Test the insertion in table
-    # def testTableInsertion():
-    #     clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
-    #     clinicAddress = ["Kuala Lumpur", "George Town", "Ipoh", "Johor Bahru", "Kota Kinabalu", "Shah Alam", "Malacca City", "Alor Setar", "Kuantan", "Kuching"]
-    #     adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
-
-    #     for name in adminNames:
-    #         email = name.replace(" ", "")
-
-    #     for i in range(10):
-    #         num = i
-    #         clinicID = ''.join(random.choices('0123456789', k=12))
-    #         clinicName = choice(clinicNames)
-    #         clinicContact = ''.join(random.choices('0123456789', k=8))
-    #         clinicAddress = choice(clinicAddress)
-    #         adminName = choice(adminNames)
-    #         adminEmail = f'{email}@email.com'
-
-    #         data = (num, clinicID, clinicName, clinicContact, clinicAddress, adminName, adminEmail)
-    #         if count % 2 == 0:
-    #             table.insert(parent='', index=0, values=data, tags=("evenrow",))
-    #         else:
-    #             table.insert(parent='', index=0, values=data, tags=("oddrow",))
-
-    #         count += 1
     
     insertTreeview()
 
