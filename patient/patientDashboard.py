@@ -736,7 +736,29 @@ def patientDashboardWindow(email):
             insertTreeview(result)    
 
 
-    
+    def deleteAppointment():  
+        
+        selectedItem = table.focus()
+        if not selectedItem:
+            messagebox.showerror('Error', 'Select an Appointment first.')
+            return
+        
+        appointmentData = table.item(selectedItem)["values"]
+        print(appointmentData)
+        appointmentID = appointmentData[6]
+        print(appointmentID)
+
+        msg = messagebox.askokcancel('Warning', 'Are you sure you want to delete your appointment?')
+            
+
+        if msg:
+            appointmentCursor.execute('DELETE FROM appointments WHERE AppointmentID = ?', (appointmentID,))
+            appointmentConn.commit()
+            messagebox.showinfo('Success', 'Appointment deleted successfully.')
+            insertTreeview()
+        else:
+            return
+            
         
 
 
@@ -956,7 +978,7 @@ def patientDashboardWindow(email):
     deleteButton = ctk.CTkButton(
         whiteFrame, text=" Delete Appointment", height=48, width=290,
         font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=deleteIcon,
-        # anchor=ctk.W 
+        command=deleteAppointment # anchor=ctk.W 
     )
     deleteButton.place(x=728, y=225)
 
