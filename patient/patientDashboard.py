@@ -79,7 +79,7 @@ def patientDashboardWindow(email):
     def searchbarOutFocus(event):
         print(event)
         searchInputTextBox.delete('0.0', "end")
-        searchInputTextBox.insert('0.0', "Search Appointments by Date, Clinic Name or Doctor Name")
+        searchInputTextBox.insert('0.0', "Search by Appointment Details")
         searchInputTextBox.configure(text_color='gray')
 
     
@@ -161,11 +161,28 @@ def patientDashboardWindow(email):
                         toplevel.attributes("-topmost",True)
                     return
 
+                # Connecting to Patients DB to retrieve Number Of Appointments
+                patientConn = sqlite3.connect('patients.db')
+                patientCursor = patientConn.cursor()
+                patientCursor.execute('SELECT NumberOfAppointments FROM patients WHERE Email=?', [email])
+                result = patientCursor.fetchone()
+                currentAppointments = result[0]
 
                 appointmentCursor.execute(
                     'INSERT INTO appointments (PatientName, PatientID, DoctorName, DoctorID, DoctorType, DoctorAvailability, ClinicName, ClinicID, AppointmentDate, AppointmentTime, AppointmentDuration, AppointmentCreatedTime, PainDetails, IsConfirmed) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
                     [patientName, patientID, doctorName, doctorID, doctorAvailability, doctorType, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails, 0])
                 appointmentConn.commit()
+
+                if result:
+                    newAppointments = currentAppointments + 1
+
+                    # Update the number of appointments
+                    patientCursor.execute('UPDATE patients SET NumberOfAppointments = ? WHERE Email= ?', (newAppointments, email))
+                    patientConn.commit()
+
+                patientConn.close()
+                
+
                 toplevel.attributes("-topmost",False)
                 messagebox.showinfo('Success', 'Appointment successfully added.')
                 toplevel.destroy()
@@ -338,17 +355,27 @@ def patientDashboardWindow(email):
     count = 0
     def insertTreeview(array=None):
         global count
-        # Connecting to Clinic Admin DB
+
+        # Connecting to Patients DB
+        patientConn = sqlite3.connect('patients.db')
+        patientCursor = patientConn.cursor()
+        patientCursor.execute('SELECT * FROM patients WHERE Email=?', [email])
+        result = patientCursor.fetchone()
+        patientID = result[0] # Getting Patient's ID
+        numOfAppointments = result[8] # Getting Patient's number of appointments
+        
+
+        # Connecting to Appointments DB
         appointmentConn = sqlite3.connect('appointments.db')
         appointmentCursor = appointmentConn.cursor()
-        appointmentCursor.execute('SELECT * FROM appointments')
+        appointmentCursor.execute('SELECT * FROM appointments WHERE PatientID=?', [patientID])
         appointments = appointmentCursor.fetchall()
         table.delete(*table.get_children())
+
 
         # Executed when searchbar is entered
         if array is None:
             for appointment in appointments:
-                num = 1
                 clinicName = appointment[7]
                 doctorType = appointment[5]
                 doctorName = appointment[3]
@@ -366,7 +393,7 @@ def patientDashboardWindow(email):
                     isConfirmed = 'Doctor Replaced'
                 
 
-                data = (num, clinicName, doctorName, dateAndTime, duration, isConfirmed)
+                data = (numOfAppointments, clinicName, doctorName, dateAndTime, duration, isConfirmed)
 
 
                 if count % 2 == 0:
@@ -375,13 +402,11 @@ def patientDashboardWindow(email):
                 else:
                     table.insert(parent='', index='end', values=data, tags=("oddrow",))
 
-                num  += 1
                 count += 1
         
         # Executed when Approve Button is clicked
         else:
-            for appointment in appointments:
-                num = 1
+            for appointment in array:
                 clinicName = appointment[7]
                 doctorType = appointment[5]
                 doctorName = appointment[3]
@@ -399,7 +424,7 @@ def patientDashboardWindow(email):
                     isConfirmed = 'Doctor Replaced'
                 
 
-                data = (num, clinicName, doctorName, dateAndTime, duration, isConfirmed)
+                data = (numOfAppointments, clinicName, doctorName, dateAndTime, duration, isConfirmed)
 
 
                 if count % 2 == 0:
@@ -408,9 +433,47 @@ def patientDashboardWindow(email):
                 else:
                     table.insert(parent='', index='end', values=data, tags=("oddrow",))
 
-                num  += 1
+
                 count += 1
-        
+
+
+    def searchBy():
+        # Connecting to Appointment DB
+        appointmentConn = sqlite3.connect('appointments.db')
+        appointmentCursor = appointmentConn.cursor()
+        searchTerm = searchInputTextBox.get('0.0', 'end').strip()
+        print(searchTerm)
+        searchOption = searchByDropdown.get()
+
+        if searchOption == 'Clinic Name':
+            searchOption = "ClinicName"
+        elif searchOption == 'Doctor Name':
+            searchOption = "DoctorName"
+        elif searchOption == 'Date & Time':
+            searchOption = "AppointmentDate"
+        elif searchOption == 'Duration':
+            searchOption = "AppointmentDuration"
+        elif searchOption == 'Confirmation Status':
+            searchOption = "IsConfirmed"
+
+            if searchTerm == 'Waiting For Confirmation':
+                searchTerm = '0'
+            elif searchTerm == 'Confirmed':
+                searchTerm = '1'
+            elif searchTerm == 'Rejected':
+                searchTerm = '2'
+            else:
+                searchTerm = '3'
+
+
+        if searchTerm == "":
+            messagebox.showerror('Error', 'Enter value to search.')
+        elif searchOption == 'Search By Option':
+            messagebox.showerror('Error', 'Please select an option.')
+        else:
+            appointmentCursor.execute(f'SELECT * FROM appointments WHERE {searchOption}=?', (searchTerm,))
+            result = appointmentCursor.fetchall()
+            insertTreeview(result)    
 
 
 
@@ -561,15 +624,79 @@ def patientDashboardWindow(email):
     # )
     # consultationDurationDropdown.place(x=400, y=290)
 
+    # Search Box Dropdown Menu 
+    searchByDropdown = ctk.CTkComboBox(
+        whiteFrame, fg_color="#ffffff", text_color="#000000", width=252, height=50, 
+        font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+        values=['Search By Option', 'Clinic Name', 'Doctor Name', 'Date & Time', "Duration", 'Confirmation Status'], border_color="#000", border_width=1,
+        dropdown_font=("Inter", 20), dropdown_fg_color='#fff',
+        dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+    )
+    searchByDropdown.place(x=25, y=290)
+
+    # Search Box field 
+    searchInputTextBox = ctk.CTkTextbox(
+        whiteFrame, fg_color="#ffffff", text_color="gray", width=725, height=50, 
+        border_color="#000", font=("Inter", 21), border_spacing=8,
+        scrollbar_button_color="#1AFF75", border_width=2,
+    )
+    searchInputTextBox.insert('insert', "Search by Appointment Details")
+    searchInputTextBox.place(x=293, y=290)
+    searchInputTextBox.bind("<FocusIn>", searchbarFocus)
+    searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
+    #searchInputTextBox.bind("<KeyRelease>", filterTree)
+
+
+    # Search Button with Icon
+    searchIconPath = relative_to_assets("search-icon-1.png")
+    searchIcon = ctk.CTkImage(light_image=Image.open(searchIconPath), size=(25,25),)
+    searchButton = ctk.CTkButton(
+        whiteFrame, text="", width=50, height=50, 
+        font=("Inter", 22, "bold",), fg_color="#000", hover_color="#333333", image=searchIcon, 
+        corner_radius=0, command=searchBy # anchor=ctk.W 
+    )
+    searchButton.place(x=918, y=290)
+
+
+    # Cancel Search Button with Icon
+    cancelSearchIconPath = relative_to_assets("reject-icon.png")
+    cancelSearchIcon = ctk.CTkImage(light_image=Image.open(cancelSearchIconPath), size=(30,30),)
+    cancelSearchButton = ctk.CTkButton(
+        whiteFrame, text="", width=51, height=50, 
+        font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=cancelSearchIcon, corner_radius=0,
+        command=insertTreeview # anchor=ctk.W 
+    )
+    cancelSearchButton.place(x=966, y=290)
+
     # Book Appointment Button with Icon
     appointmentIconPath = relative_to_assets("add-icon.png")
     appointmentIcon = ctk.CTkImage(light_image=Image.open(appointmentIconPath), size=(28,28),)
     bookButton = ctk.CTkButton(
-        whiteFrame, text=" Book Appointment", width=280, height=48, 
+        whiteFrame, text=" Book Appointment", width=290, height=48, 
         font=("Inter", 22, "bold",), fg_color="#17D463", hover_color="#009B2B", image=appointmentIcon,
         command=topLevel # anchor=ctk.W 
     )
-    bookButton.place(x=735, y=290)
+    bookButton.place(x=25, y=225)
+
+    # Update Appointment Details Button with Icon
+    updateIconPath = relative_to_assets("update-icon.png")
+    updateIcon = ctk.CTkImage(light_image=Image.open(updateIconPath), size=(33,33),)
+    updateButton = ctk.CTkButton(
+        whiteFrame, text=" Update Appointment Details", height=48, width=378,
+        font=("Inter", 22, "bold",), fg_color="#1BC5DC", hover_color="#1695A7", image=updateIcon,
+        # anchor=ctk.W 
+    )
+    updateButton.place(x=333, y=225)
+
+    # Delete Appointment Button with Icon
+    deleteIconPath = relative_to_assets("delete-icon.png")
+    deleteIcon = ctk.CTkImage(light_image=Image.open(deleteIconPath), size=(26,26),)
+    deleteButton = ctk.CTkButton(
+        whiteFrame, text=" Delete Appointment", height=48, width=290,
+        font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=deleteIcon,
+        # anchor=ctk.W 
+    )
+    deleteButton.place(x=728, y=225)
 
     
     # <<<<<<<<<<<<<<<<<<<< TABLE FRAME STORING TREEVIEW >>>>>>>>>>>>>>>>>>>>> 
@@ -634,35 +761,17 @@ def patientDashboardWindow(email):
 
 
     # Search Box field 
-    searchInputTextBox = ctk.CTkTextbox(
-            whiteFrame, fg_color="#ffffff", text_color="gray", width=620, height=48, 
-            border_color="#000", font=("Inter", 21), border_spacing=8,
-            scrollbar_button_color="#1AFF75", border_width=2,
-        )
-    searchInputTextBox.insert('insert', "Search Appointments by Date, Clinic Name or Doctor Name")
-    searchInputTextBox.place(x=25, y=726)
-    searchInputTextBox.bind("<FocusIn>", searchbarFocus)
-    searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
+    # searchInputTextBox = ctk.CTkTextbox(
+    #         whiteFrame, fg_color="#ffffff", text_color="gray", width=620, height=48, 
+    #         border_color="#000", font=("Inter", 21), border_spacing=8,
+    #         scrollbar_button_color="#1AFF75", border_width=2,
+    #     )
+    # searchInputTextBox.insert('insert', "Search Appointments by Date, Clinic Name or Doctor Name")
+    # searchInputTextBox.place(x=25, y=726)
+    # searchInputTextBox.bind("<FocusIn>", searchbarFocus)
+    # searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
 
-    # Update Appointment Details Button with Icon
-    updateIconPath = relative_to_assets("update-icon.png")
-    updateIcon = ctk.CTkImage(light_image=Image.open(updateIconPath), size=(33,33),)
-    updateButton = ctk.CTkButton(
-        whiteFrame, text=" Update  ", height=48, width=172,
-        font=("Inter", 22, "bold",), fg_color="#1BC5DC", hover_color="#1695A7", image=updateIcon,
-        # anchor=ctk.W 
-    )
-    updateButton.place(x=660, y=726)
-
-    # Delete Appointment Button with Icon
-    deleteIconPath = relative_to_assets("delete-icon.png")
-    deleteIcon = ctk.CTkImage(light_image=Image.open(deleteIconPath), size=(26,26),)
-    deleteButton = ctk.CTkButton(
-        whiteFrame, text=" Delete ", height=48, width=172,
-        font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=deleteIcon,
-        # anchor=ctk.W 
-    )
-    deleteButton.place(x=847, y=726)
+    
 
 
 
