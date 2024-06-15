@@ -64,6 +64,7 @@ def adminDashboardWindow(email):
         clinicAdmins = clinicAdminCursor.fetchall()
         table.delete(*table.get_children())
 
+        # Executed when searchbar is entered
         if array is None:
             for clinicAdmin in clinicAdmins:
                 clinicID = clinicAdmin[0]
@@ -88,6 +89,8 @@ def adminDashboardWindow(email):
                     table.insert(parent='', index='end', values=data, tags=("oddrow",))
 
                 count += 1
+        
+        # Executed when Approve Button is clicked
         else:
             for clinicAdmin in array:
                 clinicID = clinicAdmin[0]

@@ -30,6 +30,7 @@ def patientDashboardWindow(email):
             PatientID TEXT NOT NULL,
             DoctorName TEXT NOT NULL,
             DoctorID TEXT NOT NULL,
+            DoctorType TEXT NOT NULL,
             DoctorAvailability INTEGER DEFAULT 0,
             ClinicName TEXT NOT NULL,
             ClinicID TEXT NOT NULL,
@@ -37,7 +38,8 @@ def patientDashboardWindow(email):
             AppointmentTime TEXT NOT NULL,
             AppointmentDuration TEXT NOT NULL,
             AppointmentCreatedTime TEXT NOT NULL,
-            PainDetails TEXT NOT NULL
+            PainDetails TEXT NOT NULL,
+            IsConfirmed INTEGER DEFAULT 0
         )          
     """)
 
@@ -121,14 +123,50 @@ def patientDashboardWindow(email):
             if (clinicName != '' and doctorType != '' and painDetails != '' and doctorName != '' and date != '' and 
                 time != '' and duration != ''):
 
+                if clinicName == 'Clinic Name':
+                    toplevel.attributes("-topmost",False)
+                    messagebox.showerror('Error',"Please select a Clinic.")
+                    if messagebox:
+                        toplevel.attributes("-topmost",True)
+                    return
+                
+                if doctorType == 'Select Type':
+                    toplevel.attributes("-topmost",False)
+                    messagebox.showerror('Error',"Please select the Type of Doctor.")
+                    if messagebox:
+                        toplevel.attributes("-topmost",True)
+                    return
+                
+                if doctorName == 'Select Doctor':
+                    toplevel.attributes("-topmost",False)
+                    messagebox.showerror('Error',"Please select a Doctor.")
+                    if messagebox:
+                        toplevel.attributes("-topmost",True)
+                    return
+                
+                if time == 'Select Time':
+                    toplevel.attributes("-topmost",False)
+                    messagebox.showerror('Error',"Please select the Consultaion Time.")
+                    if messagebox:
+                        toplevel.attributes("-topmost",True)
+                    return
+                
+                if duration == 'Select Duration':
+                    toplevel.attributes("-topmost",False)
+                    messagebox.showerror('Error',"Please select the Consultaion Duration.")
+                    if messagebox:
+                        toplevel.attributes("-topmost",True)
+                    return
+
+
                 appointmentCursor.execute(
-                    'INSERT INTO appointments (PatientName, PatientID, DoctorName, DoctorID, DoctorAvailability, ClinicName, ClinicID, AppointmentDate, AppointmentTime, AppointmentDuration, AppointmentCreatedTime, PainDetails) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', 
-                    [patientName, patientID, doctorName, doctorID, doctorAvailability, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails])
+                    'INSERT INTO appointments (PatientName, PatientID, DoctorName, DoctorID, DoctorType, DoctorAvailability, ClinicName, ClinicID, AppointmentDate, AppointmentTime, AppointmentDuration, AppointmentCreatedTime, PainDetails, IsConfirmed) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
+                    [patientName, patientID, doctorName, doctorID, doctorAvailability, doctorType, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails, 0])
                 appointmentConn.commit()
                 toplevel.attributes("-topmost",False)
                 messagebox.showinfo('Success', 'Appointment successfully added.')
                 toplevel.destroy()
-                patientDashboardWindow(email)
+                insertTreeview()
                 
             
             else:
@@ -181,7 +219,7 @@ def patientDashboardWindow(email):
         doctorTypeLabel = ctk.CTkLabel(topFrame, text="Select Type Of Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         doctorTypeLabel.pack(side='top', fill='x', expand=False, pady=(30,0))
         doctorTypes = [
-            "Allergist", "Cardiologist", "Dermatologist", "Endocrinologist", 
+            "Select Type","Allergist", "Cardiologist", "Dermatologist", "Endocrinologist", 
             "Gastroenterologist", "Geriatrician", "Internist", "Nephrologist", "Neurologist", 
             "Obstetrician/Gynecologist", "Oncologist", "Ophthalmologist", "Orthopedic Surgeon", 
             "Pediatrician", "Podiatrist", "Psychiatrist", "Pulmonologist", "Rheumatologist", 
@@ -222,7 +260,7 @@ def patientDashboardWindow(email):
         doctorDropdown.pack(side='top', fill='x', expand=False,)
 
         times = [
-            '9:00 AM', '10:00 AM', '11:00 AM', 
+            "Select Time",'9:00 AM', '10:00 AM', '11:00 AM', 
             '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', 
             '6:00 PM', '7:00 PM', '8:00 PM', '9:00 PM', '10:00 PM', '11:00 PM',
             '12:00 AM', '1:00 AM', '2:00 AM', '3:00 AM', '4:00 AM', '5:00 AM', 
@@ -267,7 +305,7 @@ def patientDashboardWindow(email):
 
          # Select Consultation Duration Dropdown Menu
         durationArray = [
-            'Select Consultation Duration', '1 hour', '1 hour 30 Minutes',
+            'Select Duration', '1 hour', '1 hour 30 Minutes',
             '2 hours', '2 hours 30 Minutes', '3 hours', '3 hour 30 Minutes', '4 hours', 
             '4 hours 30 Minutes', '5 hours'
         ]
@@ -293,7 +331,80 @@ def patientDashboardWindow(email):
         bookButton2.pack(side='top', fill='x', expand=False,pady=(40,15))
         # bookButton2.bind("<Button-1>", command=bookAppointment)
 
+    global count
+    count = 0
+    def insertTreeview(array=None):
+        global count
+        # Connecting to Clinic Admin DB
+        appointmentConn = sqlite3.connect('appointments.db')
+        appointmentCursor = appointmentConn.cursor()
+        appointmentCursor.execute('SELECT * FROM appointments')
+        appointments = appointmentCursor.fetchall()
+        table.delete(*table.get_children())
 
+        # Executed when searchbar is entered
+        if array is None:
+            for appointment in appointments:
+                num = count + 1
+                clinicName = appointment[7]
+                doctorType = appointment[5]
+                doctorName = appointment[3]
+                date = appointment[9]
+                time = appointment[10]
+                dateAndTime = f'{date} ({time})'
+                duration = appointment[11]
+                if appointment[14] == 0:
+                    isConfirmed = 'Waiting For Confirmation'
+                elif appointment[14] == 1:
+                    isConfirmed = 'Confirmed'
+                elif appointment[14] == 2:
+                    isConfirmed = 'Rejected'
+                else:
+                    isConfirmed = 'Doctor Replaced'
+                
+
+                data = (num, clinicName, doctorName, dateAndTime, duration, isConfirmed)
+
+
+                if count % 2 == 0:
+                    table.insert(parent='', index='end', values=data, tags=("evenrow",))
+                    print(appointment)
+                else:
+                    table.insert(parent='', index='end', values=data, tags=("oddrow",))
+
+                count += 1
+        
+        # Executed when Approve Button is clicked
+        else:
+            for appointment in appointments:
+                num = count + 1
+                clinicName = appointment[7]
+                doctorType = appointment[5]
+                doctorName = appointment[3]
+                date = appointment[9]
+                time = appointment[10]
+                dateAndTime = f'{date} {time}'
+                duration = appointment[11]
+                if appointment[14] == 0:
+                    isConfirmed = 'Waiting For Confirmation'
+                elif appointment[14] == 1:
+                    isConfirmed = 'Confirmed'
+                elif appointment[14] == 2:
+                    isConfirmed = 'Rejected'
+                else:
+                    isConfirmed = 'Doctor Replaced'
+                
+
+                data = (num, clinicName, doctorName, dateAndTime, duration, isConfirmed)
+
+
+                if count % 2 == 0:
+                    table.insert(parent='', index='end', values=data, tags=("evenrow",))
+                    print(appointment)
+                else:
+                    table.insert(parent='', index='end', values=data, tags=("oddrow",))
+
+                count += 1
         
 
 
@@ -400,50 +511,50 @@ def patientDashboardWindow(email):
     descLabel.place(x=25, y=182)
 
     # Select Clinic Dropdown Menu
-    clinicDropdown = ctk.CTkComboBox(
-        whiteFrame, fg_color="#ffffff", text_color="#000000", width=360, height=48, 
-        font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-        values=['Select Clinic', 'Panmedic', 'Health Sync', 'Clinic Sungai Ara'], border_color="#b5b3b3", border_width=1,
-        dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
-        dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
-    )
-    clinicDropdown.place(x=25, y=225)
+    # clinicDropdown = ctk.CTkComboBox(
+    #     whiteFrame, fg_color="#ffffff", text_color="#000000", width=360, height=48, 
+    #     font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+    #     values=['Select Clinic', 'Panmedic', 'Health Sync', 'Clinic Sungai Ara'], border_color="#b5b3b3", border_width=1,
+    #     dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+    #     dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+    # )
+    # clinicDropdown.place(x=25, y=225)
 
-    # Select Doctor Dropdown Menu
-    doctorDropdown = ctk.CTkComboBox(
-        whiteFrame, fg_color="#ffffff", text_color="#000000", width=615, height=48, 
-        font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-        values=['Select Doctor', 'Maisarah Majdi (Cardiologist)', 'Someshwar Rao (Neurosurgeon)', 'Karen Khor Siew Li (Psychologist)'], border_color="#b5b3b3", border_width=1,
-        dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
-        dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
-    )
-    doctorDropdown.place(x=400, y=225)
+    # # Select Doctor Dropdown Menu
+    # doctorDropdown = ctk.CTkComboBox(
+    #     whiteFrame, fg_color="#ffffff", text_color="#000000", width=615, height=48, 
+    #     font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+    #     values=['Select Doctor', 'Maisarah Majdi (Cardiologist)', 'Someshwar Rao (Neurosurgeon)', 'Karen Khor Siew Li (Psychologist)'], border_color="#b5b3b3", border_width=1,
+    #     dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+    #     dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+    # )
+    # doctorDropdown.place(x=400, y=225)
 
-    # Select Consultation Time Dropdown Menu
-    consultationTimeDropdown = ctk.CTkComboBox(
-        whiteFrame, fg_color="#ffffff", text_color="#000000", width=360, height=48, 
-        font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-        values=['Select Consultation Time', '9am', '10am', '11am'], border_color="#b5b3b3", border_width=1,
-        dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
-        dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
-    )
-    consultationTimeDropdown.place(x=25, y=290)
+    # # Select Consultation Time Dropdown Menu
+    # consultationTimeDropdown = ctk.CTkComboBox(
+    #     whiteFrame, fg_color="#ffffff", text_color="#000000", width=360, height=48, 
+    #     font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+    #     values=['Select Consultation Time', '9am', '10am', '11am'], border_color="#b5b3b3", border_width=1,
+    #     dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+    #     dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+    # )
+    # consultationTimeDropdown.place(x=25, y=290)
     
-    # Select Consultation Duration Dropdown Menu
-    durationArray = [
-        'Select Consultation Duration', '1 hour', '1 hour 30 Minutes',
-        '2 hours', '2 hours 30 Minutes', '3 hours', '3 hour 30 Minutes', '4 hours', 
-        '4 hours 30 Minutes', '5 hours'
-    ]
+    # # Select Consultation Duration Dropdown Menu
+    # durationArray = [
+    #     'Select Consultation Duration', '1 hour', '1 hour 30 Minutes',
+    #     '2 hours', '2 hours 30 Minutes', '3 hours', '3 hour 30 Minutes', '4 hours', 
+    #     '4 hours 30 Minutes', '5 hours'
+    # ]
     
-    consultationDurationDropdown = ctk.CTkComboBox(
-        whiteFrame, fg_color="#ffffff", text_color="#000000", width=320, height=48, 
-        font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-        values=durationArray, border_color="#b5b3b3", border_width=1,
-        dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
-        dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
-    )
-    consultationDurationDropdown.place(x=400, y=290)
+    # consultationDurationDropdown = ctk.CTkComboBox(
+    #     whiteFrame, fg_color="#ffffff", text_color="#000000", width=320, height=48, 
+    #     font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+    #     values=durationArray, border_color="#b5b3b3", border_width=1,
+    #     dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+    #     dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+    # )
+    # consultationDurationDropdown.place(x=400, y=290)
 
     # Book Appointment Button with Icon
     appointmentIconPath = relative_to_assets("add-icon.png")
@@ -468,8 +579,8 @@ def patientDashboardWindow(email):
     table = ttk.Treeview(tableFrame, yscrollcommand=tableScrollbar1.set,height=9)
     table.pack(side='left', fill='both')
     table['columns'] = (
-        'No', 'Clinic ID', 'Clinic Name', 'Clinic Contact',
-        "Clinic Admin", "Admin Email"
+        'No', 'Clinic Name',
+        "Doctor Name", "Date & Time", "Duration", "Confirmation Status"
     )
 
     # Placing and Configuring Treeview Scrollbar
@@ -495,20 +606,22 @@ def patientDashboardWindow(email):
 
     # Treeview Table Headings Details
     table.heading('No', text='No')
-    table.heading('Clinic ID', text='Clinic ID',)
     table.heading('Clinic Name', text='Clinic Name')
-    table.heading('Clinic Contact', text='Clinic Contact')
-    table.heading('Clinic Admin', text='Clinic Admin')
-    table.heading('Admin Email', text='Admin Email')
+    #table.heading('Doctor Type', text='Doctor Type')
+    table.heading('Doctor Name', text='Doctor Name')
+    table.heading('Date & Time', text='Date & Time')
+    table.heading('Duration', text='Duration')
+    table.heading('Confirmation Status', text='Confirmation Status')
 
     # Treeview Table Columns Details
     table.column("#0", width=0, stretch=ctk.NO)
     table.column("No", width=43, anchor=ctk.CENTER)
-    table.column("Clinic ID", anchor=ctk.CENTER)
-    table.column("Clinic Name", width=220, anchor=ctk.CENTER)
-    table.column("Clinic Contact", anchor=ctk.CENTER)
-    table.column("Clinic Admin", width=250, anchor=ctk.CENTER)
-    table.column("Admin Email", width=315, anchor=ctk.CENTER,)
+    table.column("Clinic Name",width=250, anchor=ctk.CENTER)
+    #table.column("Doctor Type", anchor=ctk.CENTER)
+    table.column("Doctor Name", width=265, anchor=ctk.CENTER)
+    table.column("Date & Time", width=200, anchor=ctk.CENTER,)
+    table.column("Duration",anchor=ctk.CENTER,)
+    table.column("Confirmation Status", width=260, anchor=ctk.CENTER)
 
     # Setting alternating colours for the rows in Treeview
     table.tag_configure("oddrow", background="#F2F5F8")
@@ -605,7 +718,7 @@ def patientDashboardWindow(email):
 
     #         count += 1
     
-
+    insertTreeview()
 
     window.mainloop()
 
