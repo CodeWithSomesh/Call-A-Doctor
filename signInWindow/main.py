@@ -405,6 +405,7 @@ def signInWindow():
         
         else:
             messagebox.showerror('Error',"Please fill up all the fields.")
+            
 
     # Function will run after user clicks on Submit button
     def handleSignUp():
