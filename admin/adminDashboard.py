@@ -1,8 +1,6 @@
 import sys
 from pathlib import Path
 from PIL import Image
-import random
-from random import choice
 import sqlite3
 from datetime import datetime
 
@@ -16,7 +14,14 @@ import customtkinter as ctk
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\admin\assets\frame0")
 
-def adminDashboardWindow():
+def adminDashboardWindow(email):
+
+    # Connecting to CAD Admin DB
+    adminConn = sqlite3.connect('admins.db')
+    adminCursor = adminConn.cursor()
+    adminCursor.execute('SELECT * FROM admins WHERE Email=?', [email])
+    result = adminCursor.fetchone()
+    #username = f"{result[1]} {result[2]}" # Getting user's full name to display on top 
 
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ALL FUNCTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     # Get the full path of assets
@@ -26,10 +31,12 @@ def adminDashboardWindow():
 
     # Redirect to the Log In Window
     def redirectToLoginWindow():
-        messagebox.showwarning('Warning', 'Are you sure you want to logout?')
-        window.destroy()
-        from logInWindow.main import logInWindow
-        logInWindow()
+        msg = messagebox.askokcancel('Warning', 'Are you sure you want to logout?')
+
+        if msg:
+            window.destroy()
+            from logInWindow.main import logInWindow
+            logInWindow()
 
 
     # When user is typing remove placeholder
@@ -48,27 +55,6 @@ def adminDashboardWindow():
         searchInputTextBox.configure(text_color='gray')
 
 
-    # def filterTree(event):
-    #     searchTerm = searchInputTextBox.get('0.0', "end").lower()
-    #     table.delete(*table.get_children()) # Clear the current Treeview
-
-    #     # Connecting to Clinic Admin DB
-    #     clinicAdminConn = sqlite3.connect('clinicAdmins.db')
-    #     clinicAdminCursor = clinicAdminConn.cursor()
-
-    #     # Fetch filtered data from the database
-    #     clinicAdminCursor.execute("""
-    #         SELECT ClinicAdminID, FirstName, LastName, Email, Role, IsApproved 
-    #         FROM clinicAdmins 
-    #         WHERE ClinicAdminID LIKE ? OR FirstName LIKE ? OR LastName LIKE ? OR Email LIKE ? OR Role LIKE ?
-    #     """, ('%'+searchTerm+'%', '%'+searchTerm+'%', '%'+searchTerm+'%', '%'+searchTerm+'%', '%'+searchTerm+'%'))
-    #     rows = clinicAdminCursor.fetchall()
-
-    #     # Insert filtered data into the Treeview
-    #     for row in rows:
-    #         table.insert("", "end", values=row)
-
-
     global count
     count = 0
     def insertTreeview(array=None):
@@ -80,6 +66,7 @@ def adminDashboardWindow():
         clinicAdmins = clinicAdminCursor.fetchall()
         table.delete(*table.get_children())
 
+        # Executed when searchbar is entered
         if array is None:
             for clinicAdmin in clinicAdmins:
                 clinicID = clinicAdmin[0]
@@ -104,6 +91,8 @@ def adminDashboardWindow():
                     table.insert(parent='', index='end', values=data, tags=("oddrow",))
 
                 count += 1
+        
+        # Executed when Approve Button is clicked
         else:
             for clinicAdmin in array:
                 clinicID = clinicAdmin[0]
@@ -300,7 +289,7 @@ def adminDashboardWindow():
     else:
         greeting = "Good Evening!" 
 
-    greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, Someshwar Rao", font=("Inter", 36, "bold",), text_color="#000000")
+    greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, {username}", font=("Inter", 36, "bold",), text_color="#000000")
     greetingLabel1.place(x=25, y=25)
     greetingLabel2 = ctk.CTkLabel(whiteFrame, text=f"{greeting}  ({formatted_date})", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
@@ -359,10 +348,10 @@ def adminDashboardWindow():
     cancelSearchIcon = ctk.CTkImage(light_image=Image.open(cancelSearchIconPath), size=(33,33),)
     cancelSearchButton = ctk.CTkButton(
         whiteFrame, text="", width=50, height=50, 
-        font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=cancelSearchIcon, corner_radius=4,
+        font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=cancelSearchIcon, corner_radius=0,
         command=insertTreeview # anchor=ctk.W 
     )
-    cancelSearchButton.place(x=643, y=225)
+    cancelSearchButton.place(x=642, y=225)
 
 
     # Approve Button with Icon
@@ -416,8 +405,12 @@ def adminDashboardWindow():
         foreground='#fff', background='#000', hover=False,
     )
     style.configure('Treeview', font=('Inter', 16), rowheight=47, fieldbackground="#DAFFF7")
-    style.map('Treeview', background=[('selected', '#00BE97',)], font=[('selected', ('Inter', 16, 'bold'))],)
-
+    style.map(
+        'Treeview', 
+        background=[('selected', '#00BE97',)], 
+        font=[('selected', ('Inter', 16, 'bold'))],
+    )
+    
     # Treeview Table Headings Details
     table.heading('ID', text='ID',)
     table.heading('Clinic Name', text='Clinic Name')
@@ -447,4 +440,4 @@ def adminDashboardWindow():
 
 # Only execute the Admin Window if this script is run directly
 if __name__ == "__main__":
-    adminDashboardWindow()
+    adminDashboardWindow(email=None)

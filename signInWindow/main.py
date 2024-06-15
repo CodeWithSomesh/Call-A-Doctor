@@ -32,7 +32,8 @@ def signInWindow():
             Password TEXT NOT NULL,
             NRIC TEXT NOT NULL,
             Role TEXT NOT NULL,
-            Address TEXT NOT NULL
+            Address TEXT NOT NULL,
+            NumberOfAppointments INTEGER NOT NULL
         )          
     """)
 
@@ -115,7 +116,7 @@ def signInWindow():
             adminBottomFrame.pack_forget()
             doctorSpecializationLabel.pack_forget()
             yearsOfExpLabel.pack_forget()
-            doctorSpecializationTextBox.pack_forget()
+            doctorTypeDropdown.pack_forget()
             yearsOfExpTextBox.pack_forget()
             doctorBottomFrame.pack_forget()
             doctorClinicNameLabel.pack_forget()
@@ -142,7 +143,7 @@ def signInWindow():
             clinicAddressTextBox.pack_forget()
             doctorSpecializationLabel.pack_forget()
             yearsOfExpLabel.pack_forget()
-            doctorSpecializationTextBox.pack_forget()
+            doctorTypeDropdown.pack_forget()
             yearsOfExpTextBox.pack_forget()
             doctorBottomFrame.pack_forget()
             doctorClinicNameLabel.pack_forget()
@@ -168,7 +169,7 @@ def signInWindow():
             # Show doctor specific fields
             doctorSpecializationLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
             yearsOfExpLabel.pack(side='top', fill='x', expand=False, pady=(30, 0))
-            doctorSpecializationTextBox.pack(side='top', fill='x', expand=False,)
+            doctorTypeDropdown.pack(side='top', fill='x', expand=False,)
             yearsOfExpTextBox.pack(side='top', fill='x', expand=False,)
             doctorBottomFrame.pack(side='top', fill='x', expand=False, pady=(30, 0))
             doctorClinicNameLabel.pack(side='top', fill='x', expand=False, )
@@ -186,7 +187,7 @@ def signInWindow():
             clinicAddressTextBox.pack_forget()
             doctorSpecializationLabel.pack_forget()
             yearsOfExpLabel.pack_forget()
-            doctorSpecializationTextBox.pack_forget()
+            doctorTypeDropdown.pack_forget()
             yearsOfExpTextBox.pack_forget()
             doctorBottomFrame.pack_forget()
             doctorClinicNameLabel.pack_forget()
@@ -211,7 +212,7 @@ def signInWindow():
             clinicAddressTextBox.pack_forget()
             doctorSpecializationLabel.pack_forget()
             yearsOfExpLabel.pack_forget()
-            doctorSpecializationTextBox.pack_forget()
+            doctorTypeDropdown.pack_forget()
             yearsOfExpTextBox.pack_forget()
             doctorBottomFrame.pack_forget()
             doctorClinicNameLabel.pack_forget()
@@ -286,8 +287,8 @@ def signInWindow():
                 hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
                 print(hashedPassword)
                 patientCursor.execute(
-                    'INSERT INTO patients (FirstName, LastName, Email, Password, NRIC, Role, Address) VALUES (?,?,?,?,?,?,?)', 
-                    [firstName, lastName, email, hashedPassword, nric, role, address])
+                    'INSERT INTO patients (FirstName, LastName, Email, Password, NRIC, Role, Address, NumberOfAppointments) VALUES (?,?,?,?,?,?,?,?)', 
+                    [firstName, lastName, email, hashedPassword, nric, role, address, 0])
                 patientConn.commit()
                 messagebox.showinfo('Success', 'Patient Account has been created successfully. \nYou can now log in with your account.')
                 redirectToLoginWindow()
@@ -304,7 +305,7 @@ def signInWindow():
         role = roleDropdown.get()
         nric = nricTextBox.get(0.0, 'end').strip()
         clinicName = doctorClinicNameDropdown.get()
-        doctorSpecialization = doctorSpecializationTextBox.get(0.0, 'end').strip()
+        doctorSpecialization = doctorTypeDropdown.get()
         yearsOfExp = yearsOfExpTextBox.get(0.0, 'end').strip()
 
         
@@ -312,6 +313,10 @@ def signInWindow():
             role != '' and clinicName != '' and doctorSpecialization != '' and yearsOfExp != '' ):
 
             if validateCredentials(email, password) is False:
+                return
+            
+            if doctorSpecialization == 'Select Type':
+                messagebox.showerror('Error', 'Please select your Specialization.')
                 return
         
             doctorCursor.execute('SELECT Email FROM doctors WHERE Email=?', [email])
@@ -405,6 +410,7 @@ def signInWindow():
         
         else:
             messagebox.showerror('Error',"Please fill up all the fields.")
+            
 
     # Function will run after user clicks on Submit button
     def handleSignUp():
@@ -461,7 +467,7 @@ def signInWindow():
 
 
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SCROLLABLE FRAME INSIDE WHITE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    scrollable_frame = ctk.CTkScrollableFrame(whiteImgFrame, width=683, height=850, fg_color="#FFFDFD", scrollbar_fg_color="#000", scrollbar_button_color="#000", )
+    scrollable_frame = ctk.CTkScrollableFrame(whiteImgFrame, width=683, height=850, fg_color="#FFFDFD", scrollbar_fg_color="#000", scrollbar_button_color="#000", scrollbar_button_hover_color="#1AFF75")
     scrollable_frame.place(x=56, y=0)
 
     # Label for Create Account
@@ -594,10 +600,19 @@ def signInWindow():
 
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Doctor-specific fields for Doctor role >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     doctorSpecializationLabel = ctk.CTkLabel(rightFrame, text="Specialization", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
-    doctorSpecializationTextBox = ctk.CTkTextbox(
+    doctorTypes = [
+        "Select Type","Allergist", "Cardiologist", "Dermatologist", "Endocrinologist", 
+        "Gastroenterologist", "Geriatrician", "Internist", "Nephrologist", "Neurologist", 
+        "Obstetrician/Gynecologist", "Oncologist", "Ophthalmologist", "Orthopedic Surgeon", 
+        "Pediatrician", "Podiatrist", "Psychiatrist", "Pulmonologist", "Rheumatologist", 
+        "General Practitioner", "Family Medicine Doctor", "Home Health Care Doctor", 
+        "Emergency Medicine Specialist"]
+    doctorTypeDropdown = ctk.CTkComboBox(
         rightFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
-        border_color="#b5b3b3", font=("Inter", 20), border_spacing=10,
-        scrollbar_button_color="#1AFF75", border_width=1
+        font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+        values=doctorTypes, border_color="#b5b3b3", border_width=1,
+        dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+        dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
     )
 
     yearsOfExpLabel = ctk.CTkLabel(leftFrame, text="Years Of Experience", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
