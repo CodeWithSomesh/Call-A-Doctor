@@ -110,7 +110,7 @@ def patientDashboardWindow(email):
         doctorType = doctorTypeDropdown.set(result[6])
         painDetails = painDetailsTextBox.insert('insert', result[13])
         doctorName = doctorDropdown.set(result[3])
-        date = calendar.set_date(result[9])
+        date = calendar.selection_set(result[9])
         time = consultationTimeDropdown.set(result[10])
         duration = consultationDurationDropdown.set(result[11])
 
