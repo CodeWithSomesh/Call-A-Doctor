@@ -82,6 +82,107 @@ def patientDashboardWindow(email):
         searchInputTextBox.insert('0.0', "Search by Appointment Details")
         searchInputTextBox.configure(text_color='gray')
 
+
+    def updateAppointment():
+        # Connecting to Appointment DB
+        appointmentConn = sqlite3.connect('appointments.db')
+        appointmentCursor = appointmentConn.cursor()
+
+        selectedItem = table.focus()
+        if not selectedItem:
+            messagebox.showerror('Error', 'Select an Appointment first.')
+            return
+        
+        appointmentData = table.item(selectedItem)["values"]
+        print(appointmentData)
+        appointmentID = appointmentData[6]
+        print(appointmentID)
+
+        
+        (clinicNameDropdown, doctorTypeDropdown, painDetailsTextBox, doctorDropdown, 
+                calendar, consultationTimeDropdown, consultationDurationDropdown, toplevel) = topLevel()
+
+        appointmentCursor.execute('SELECT * FROM appointments WHERE AppointmentID=?', [appointmentID])
+        result = appointmentCursor.fetchone()
+        print(result)
+
+        clinicName = clinicNameDropdown.set(result[7])
+        doctorType = doctorTypeDropdown.set(result[6])
+        painDetails = painDetailsTextBox.insert('insert', result[13])
+        doctorName = doctorDropdown.set(result[3])
+        date = calendar.set_date(result[9])
+        time = consultationTimeDropdown.set(result[10])
+        duration = consultationDurationDropdown.set(result[11])
+
+        if (clinicName != '' and doctorType != '' and painDetails != '' and doctorName != '' and date != '' and 
+            time != '' and duration != ''):
+
+            if clinicName == 'Clinic Name':
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',"Please select a Clinic.")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                return
+            
+            if doctorType == 'Select Type':
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',"Please select the Type of Doctor.")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                return
+            
+            if doctorName == 'Select Doctor':
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',"Please select a Doctor.")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                return
+            
+            if time == 'Select Time':
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',"Please select the Consultaion Time.")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                return
+            
+            if duration == 'Select Duration':
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',"Please select the Consultaion Duration.")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                return
+
+            print('Testing successful')
+
+            # appointmentCursor.execute(
+            #     'INSERT INTO appointments (PatientName, PatientID, DoctorName, DoctorID, DoctorType, DoctorAvailability, ClinicName, ClinicID, AppointmentDate, AppointmentTime, AppointmentDuration, AppointmentCreatedTime, PainDetails, IsConfirmed) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
+            #     [patientName, patientID, doctorName, doctorID, doctorAvailability, doctorType, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails, 0])
+            # appointmentConn.commit()
+
+            # if result:
+            #     newAppointments = currentAppointments + 1
+
+            #     # Update the number of appointments
+            #     patientCursor.execute('UPDATE patients SET NumberOfAppointments = ? WHERE Email= ?', (newAppointments, email))
+            #     patientConn.commit()
+
+            # patientConn.close()
+            
+
+            # toplevel.attributes("-topmost",False)
+            # messagebox.showinfo('Success', 'Appointment successfully added.')
+            # toplevel.destroy()
+            # insertTreeview()
+            
+        
+        else:
+            toplevel.attributes("-topmost",False)
+            messagebox.showerror('Error',"Please fill up all the fields.")
+            if messagebox:
+                toplevel.attributes("-topmost",True)
+
+        
+
     
     def topLevel():
 
@@ -90,11 +191,10 @@ def patientDashboardWindow(email):
             doctorType = doctorTypeDropdown.get()
             painDetails = painDetailsTextBox.get(0.0, 'end').strip()
             doctorName = doctorDropdown.get()
-            doctorFirstName = doctorName.split()[0]
             date = calendar.get_date()
             time = consultationTimeDropdown.get()
             duration = consultationDurationDropdown.get()
-
+            
             # Connecting to Patient DB to get Patient Name & ID
             patientConn = sqlite3.connect('patients.db')
             patientCursor = patientConn.cursor()
@@ -194,6 +294,9 @@ def patientDashboardWindow(email):
                 messagebox.showerror('Error',"Please fill up all the fields.")
                 if messagebox:
                     toplevel.attributes("-topmost",True)
+
+        
+
 
 
 
@@ -351,6 +454,9 @@ def patientDashboardWindow(email):
         bookButton2.pack(side='top', fill='x', expand=False,pady=(40,15))
         # bookButton2.bind("<Button-1>", command=bookAppointment)
 
+        return (clinicNameDropdown, doctorTypeDropdown, painDetailsTextBox, doctorDropdown, 
+                calendar, consultationTimeDropdown, consultationDurationDropdown, toplevel)
+
     global count
     count = 0
     def insertTreeview(array=None):
@@ -376,6 +482,7 @@ def patientDashboardWindow(email):
         # Executed when searchbar is entered
         if array is None:
             for appointment in appointments:
+                appointmentID = appointment[0]
                 clinicName = appointment[7]
                 doctorType = appointment[5]
                 doctorName = appointment[3]
@@ -393,7 +500,7 @@ def patientDashboardWindow(email):
                     isConfirmed = 'Doctor Replaced'
                 
 
-                data = (numOfAppointments, clinicName, doctorName, dateAndTime, duration, isConfirmed)
+                data = (numOfAppointments, clinicName, doctorName, dateAndTime, duration, isConfirmed, appointmentID)
 
 
                 if count % 2 == 0:
@@ -407,6 +514,7 @@ def patientDashboardWindow(email):
         # Executed when Approve Button is clicked
         else:
             for appointment in array:
+                appointmentID = appointment[0]
                 clinicName = appointment[7]
                 doctorType = appointment[5]
                 doctorName = appointment[3]
@@ -424,7 +532,7 @@ def patientDashboardWindow(email):
                     isConfirmed = 'Doctor Replaced'
                 
 
-                data = (numOfAppointments, clinicName, doctorName, dateAndTime, duration, isConfirmed)
+                data = (numOfAppointments, clinicName, doctorName, dateAndTime, duration, isConfirmed, appointmentID)
 
 
                 if count % 2 == 0:
@@ -476,6 +584,8 @@ def patientDashboardWindow(email):
             insertTreeview(result)    
 
 
+    
+        
 
 
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -684,7 +794,7 @@ def patientDashboardWindow(email):
     updateButton = ctk.CTkButton(
         whiteFrame, text=" Update Appointment Details", height=48, width=378,
         font=("Inter", 22, "bold",), fg_color="#1BC5DC", hover_color="#1695A7", image=updateIcon,
-        # anchor=ctk.W 
+        command=updateAppointment # anchor=ctk.W 
     )
     updateButton.place(x=333, y=225)
 
@@ -711,8 +821,8 @@ def patientDashboardWindow(email):
     table = ttk.Treeview(tableFrame, yscrollcommand=tableScrollbar1.set,height=9)
     table.pack(side='left', fill='both')
     table['columns'] = (
-        'No', 'Clinic Name',
-        "Doctor Name", "Date & Time", "Duration", "Confirmation Status"
+        'No', 'Clinic Name',"Doctor Name", "Date & Time", 
+        "Duration", "Confirmation Status", "Appointment ID"
     )
 
     # Placing and Configuring Treeview Scrollbar
@@ -754,6 +864,7 @@ def patientDashboardWindow(email):
     table.column("Date & Time", width=200, anchor=ctk.CENTER,)
     table.column("Duration",anchor=ctk.CENTER,)
     table.column("Confirmation Status", width=260, anchor=ctk.CENTER)
+    table.column("Appointment ID", width=0, stretch=ctk.NO)
 
     # Setting alternating colours for the rows in Treeview
     table.tag_configure("oddrow", background="#F2F5F8")
