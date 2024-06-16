@@ -232,6 +232,8 @@ def clinicAdminDoctorWindow(email):
             if result:
                 print('Valid search term')
                 insertTreeview(result)
+            else:
+                table.delete(*table.get_children())
 
 
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
