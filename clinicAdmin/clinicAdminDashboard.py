@@ -187,17 +187,46 @@ def clinicAdminDashboardWindow(email):
             messagebox.showinfo('Success', f'This Appointment (ID: {appointmentID}) has just been rejected. \nThe Patient will be notified.')
 
 
+    
+    def reassignToplevel():
 
-    def reassignDoctor():
-        # Connecting to Appointments DB
-        appointmentConn = sqlite3.connect('appointments.db')
-        appointmentCursor = appointmentConn.cursor()
+        def reassignDoctor():
+            # Validate dropdown option 
+            newDoctorName = doctorDropdown.get()
+            if newDoctorName == 'Select Doctor':
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',"Please select a Doctor.")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                return
+            
+            # Validate new Doctor Name is not same as old Doctor Name 
+            if newDoctorName == doctorName:
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',f"Please select another Doctor.\nDoctor {doctorName} is busy with another appointment at this Consultation Time.")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                return
+
+            # Connecting to Appointments DB
+            appointmentConn = sqlite3.connect('appointments.db')
+            appointmentCursor = appointmentConn.cursor()
+            
+            appointmentCursor.execute('UPDATE appointments SET IsConfirmed=?, DoctorName=?, DoctorAvailability=? WHERE AppointmentID=?', (3, newDoctorName, 0, appointmentID))
+            appointmentConn.commit()
+            appointmentConn.close()
+                  
+
+            toplevel.attributes("-topmost",False)
+            messagebox.showinfo('Success', f'Doctor {doctorName} for this Appointment (ID: {appointmentID}) has just been replaced by Doctor {newDoctorName}. \nThe Patient will be notified.')  
+            toplevel.destroy()
+            insertTreeview()
+        
 
         selectedItem = table.focus()
         if not selectedItem:
             messagebox.showerror('Error', 'Select an Appointment first.')
             return
-
 
         appointmentData = table.item(selectedItem)["values"]
         appointmentID = appointmentData[0]
@@ -206,20 +235,13 @@ def clinicAdminDashboardWindow(email):
         
 
         if doctorAvailability == 'Available':
-            messagebox.showinfo('Info', f'Doctor {doctorName}) is Available for this appointment schedule.\nThis appointment cannot be reassigned.')
-        else:
-            reassignToplevel()
-            # appointmentCursor.execute('UPDATE appointments SET IsConfirmed=? WHERE AppointmentID=?', (3, appointmentID))
-            # appointmentConn.commit()
-            # appointmentConn.close()
-            # insertTreeview()
-            # messagebox.showinfo('Success', f'This Appointment (ID: {appointmentID}) has just been rejected. \nThe Patient will be notified.')        
+            messagebox.showerror('Error', f'Doctor {doctorName}) is Available for this appointment schedule.\nThis appointment cannot be reassigned.')
+            return
 
-    
-    def reassignToplevel():
+
         toplevel = ctk.CTkToplevel(window)
         toplevel.title("Reassign Appointment")
-        toplevel.geometry("600x200+600+300")
+        toplevel.geometry("750x200+600+300")
         toplevel.resizable(False, False)
         toplevel.attributes("-topmost",True)
         toplevel.configure(fg_color = "#fff")
@@ -238,7 +260,19 @@ def clinicAdminDashboardWindow(email):
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
             dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
         )
-        doctorDropdown.pack(side='top', fill='x', expand=False,)
+        doctorDropdown.pack(side='left', fill='x', expand=True,)
+
+        # Reassign Button with Icon
+        reassignIconPath = relative_to_assets("reassign-icon.png")
+        reassignIcon = ctk.CTkImage(light_image=Image.open(reassignIconPath), size=(33,33),)
+        reassignButton = ctk.CTkButton(
+            topFrame, text=" Reassign  ", width=140, height=50, 
+            font=("Inter", 22, "bold",), fg_color="#1BC5DC", hover_color="#1695A7", image=reassignIcon,
+            command=reassignDoctor # anchor=ctk.W 
+        )
+        reassignButton.pack(side='left', fill='x', expand=False, padx=(15, 0))
+
+
     
     def searchBy():
         # Connecting to Clinic Admin DB
@@ -427,7 +461,7 @@ def clinicAdminDashboardWindow(email):
     table.pack(side='left', fill='both')
     table['columns'] = (
         'ID', 'Patient Name', 'Doctor Type',
-        "Doctor Name", "Availability", "Confirmation Status"
+        "Doctor Name", "Availability", "Status"
     )
 
     # Placing and Configuring Treeview Scrollbar
@@ -456,7 +490,7 @@ def clinicAdminDashboardWindow(email):
     table.heading('Doctor Type', text='Doctor Type')
     table.heading('Doctor Name', text='Doctor Name')
     table.heading('Availability', text='Availability')
-    table.heading('Confirmation Status', text='Confirmation Status')
+    table.heading('Status', text='Status')
 
     # Treeview Table Columns Details
     table.column("#0", width=0, stretch=ctk.NO)
@@ -465,7 +499,7 @@ def clinicAdminDashboardWindow(email):
     table.column("Doctor Type",width=280, anchor=ctk.CENTER)
     table.column("Doctor Name", width=280, anchor=ctk.CENTER)
     table.column("Availability", width=180, anchor=ctk.CENTER,)
-    table.column("Confirmation Status", width=210, anchor=ctk.CENTER)
+    table.column("Status", width=210, anchor=ctk.CENTER)
 
     # Setting alternating colours for the rows in Treeview
     table.tag_configure("oddrow", background="#F2F5F8")
