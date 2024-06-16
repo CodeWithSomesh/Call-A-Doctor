@@ -1,8 +1,6 @@
 import sys
 from pathlib import Path
 from PIL import Image
-import random
-from random import choice
 import sqlite3
 from datetime import datetime
 
