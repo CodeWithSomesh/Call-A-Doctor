@@ -48,7 +48,7 @@ def clinicAdminDashboardWindow(email):
     def searchbarOutFocus(event):
         print(event)
         searchInputTextBox.delete('0.0', "end")
-        searchInputTextBox.insert('0.0', "Search by Patient Name or Doctor Name ")
+        searchInputTextBox.insert('0.0', "Search by")
         searchInputTextBox.configure(text_color='gray')
 
 
@@ -78,7 +78,7 @@ def clinicAdminDashboardWindow(email):
                     isConfirmed = 'Confirmed'
                 elif appointment[14] == 2:
                     isConfirmed = 'Rejected'
-                else:
+                elif appointment[14] == 3:
                     isConfirmed = 'Doctor Replaced'
 
                 if appointment[6] == 0:
@@ -112,7 +112,7 @@ def clinicAdminDashboardWindow(email):
                     isConfirmed = 'Confirmed'
                 elif appointment[14] == 2:
                     isConfirmed = 'Rejected'
-                else:
+                elif appointment[14] == 3:
                     isConfirmed = 'Doctor Replaced'
 
                 if appointment[6] == 0:
@@ -275,29 +275,45 @@ def clinicAdminDashboardWindow(email):
 
     
     def searchBy():
-        # Connecting to Clinic Admin DB
-        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
-        clinicAdminCursor = clinicAdminConn.cursor()
+        # Connecting to Appointments DB
+        appointmentConn = sqlite3.connect('appointments.db')
+        appointmentCursor = appointmentConn.cursor()
         searchTerm = searchInputTextBox.get('0.0', 'end').strip()
         searchOption = searchByDropdown.get()
 
-        if searchOption == 'Clinic Admin ID':
-            searchOption = "ClinicAdminID"
-        elif searchOption == 'Clinic Name':
-            searchOption = "ClinicName"
-        elif searchOption == 'Clinic Contact':
-            searchOption = "ClinicNumber"
-        elif searchOption == 'Admin Email':
-            searchOption = "Email"
-        elif searchOption == 'Approval Status':
-            searchOption = "IsApproved"
+        searchOptions = [
+        'Search By Option', 'Appointment ID', 'Patient Name', 'Doctor Type', 
+        "Doctor Name", "Doctor Availability","Confirmation Status",
+        ]
 
-            if searchTerm == 'Waiting For Approval':
+        if searchOption == 'Appointment ID':
+            searchOption = "AppointmentID"
+        elif searchOption == 'Patient Name':
+            searchOption = "PatientName"
+        elif searchOption == 'Doctor Type':
+            searchOption = "DoctorType"
+        elif searchOption == 'Doctor Name':
+            searchOption = "DoctorName"
+        elif searchOption == 'Doctor Availability':
+            searchOption = "DoctorAvailability"
+
+            if searchTerm == 'Available':
                 searchTerm = '0'
-            elif searchTerm == 'Approved':
+            elif searchTerm == 'Busy':
+                searchTerm = '1'
+
+        elif searchOption == 'Confirmation Status':
+            searchOption = "IsConfirmed"
+
+            if searchTerm == 'Waiting':
+                searchTerm = '0'
+            elif searchTerm == 'Confirmed':
                 searchTerm = '1'
             elif searchTerm == 'Rejected':
                 searchTerm = '2'
+            elif searchTerm == 'Doctor Replaced':
+                searchTerm = '3'
+
 
 
         if searchTerm == "":
@@ -305,8 +321,8 @@ def clinicAdminDashboardWindow(email):
         elif searchOption == 'Search By Option':
             messagebox.showerror('Error', 'Please select an option.')
         else:
-            clinicAdminCursor.execute(f'SELECT * FROM clinicAdmins WHERE {searchOption}=?', (searchTerm,))
-            result = clinicAdminCursor.fetchall()
+            appointmentCursor.execute(f'SELECT * FROM appointments WHERE {searchOption}=?', (searchTerm,))
+            result = appointmentCursor.fetchall()
             insertTreeview(result)
 
 
@@ -404,16 +420,53 @@ def clinicAdminDashboardWindow(email):
         )
     descLabel.place(x=25, y=182)
 
+    # Search Box Dropdown Menu 
+    searchOptions = [
+        'Search By Option', 'Appointment ID', 'Patient Name', 'Doctor Type', 
+        "Doctor Name", "Doctor Availability","Confirmation Status",
+    ]
+    searchByDropdown = ctk.CTkComboBox(
+        whiteFrame, fg_color="#ffffff", text_color="#000000", width=235, height=50, 
+        font=("Inter", 19), button_color='#1AFF75', button_hover_color='#36D8B7',
+        values=searchOptions, border_color="#000", border_width=1,
+        dropdown_font=("Inter", 20), dropdown_fg_color='#fff',
+        dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+    )
+    searchByDropdown.place(x=25, y=225)
+
     # Search Box field 
     searchInputTextBox = ctk.CTkTextbox(
-            whiteFrame, fg_color="#ffffff", text_color="gray", width=485, height=50, 
-            border_color="#000", font=("Inter", 21), border_spacing=8,
-            scrollbar_button_color="#1AFF75", border_width=2,
-        )
-    searchInputTextBox.insert('insert', "Search by Patient Name or Doctor Name ")
-    searchInputTextBox.place(x=25, y=225)
+        whiteFrame, fg_color="#ffffff", text_color="gray", width=232, height=50, 
+        border_color="#000", font=("Inter", 21), border_spacing=8,
+        scrollbar_button_color="#1AFF75", border_width=2,
+    )
+    searchInputTextBox.insert('insert', "Search by")
+    searchInputTextBox.place(x=275, y=225)
     searchInputTextBox.bind("<FocusIn>", searchbarFocus)
     searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
+    #searchInputTextBox.bind("<KeyRelease>", filterTree)
+
+
+    # Search Button with Icon
+    searchIconPath = relative_to_assets("search-icon-1.png")
+    searchIcon = ctk.CTkImage(light_image=Image.open(searchIconPath), size=(25,25),)
+    searchButton = ctk.CTkButton(
+        whiteFrame, text="", width=49, height=50, 
+        font=("Inter", 22, "bold",), fg_color="#000", hover_color="#333333", image=searchIcon, 
+        corner_radius=4, command=searchBy # anchor=ctk.W 
+    )
+    searchButton.place(x=410, y=225)
+
+
+    # Cancel Search Button with Icon
+    cancelSearchIconPath = relative_to_assets("reject-icon.png")
+    cancelSearchIcon = ctk.CTkImage(light_image=Image.open(cancelSearchIconPath), size=(33,33),)
+    cancelSearchButton = ctk.CTkButton(
+        whiteFrame, text="", width=50, height=50, 
+        font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=cancelSearchIcon, corner_radius=0,
+        command=insertTreeview # anchor=ctk.W 
+    )
+    cancelSearchButton.place(x=457, y=225)
 
 
     # Approve Button with Icon

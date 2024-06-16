@@ -414,38 +414,6 @@ def clinicAdminDoctorWindow(email):
         command=rejectDoctor # anchor=ctk.W 
     )
     rejectButton.place(x=878, y=225)
-    
-    # # Search Box field 
-    # searchInputTextBox = ctk.CTkTextbox(
-    #         whiteFrame, fg_color="#ffffff", text_color="gray", width=660, height=50, 
-    #         border_color="#000", font=("Inter", 21), border_spacing=8,
-    #         scrollbar_button_color="#1AFF75", border_width=2,
-    #     )
-    # searchInputTextBox.insert('insert', "Search Doctors by their Name or Clinic Name")
-    # searchInputTextBox.place(x=25, y=225)
-    # searchInputTextBox.bind("<FocusIn>", searchbarFocus)
-    # searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
-
-
-    # # Approve Button with Icon
-    # approveIconPath = relative_to_assets("approve-icon.png")
-    # approveIcon = ctk.CTkImage(light_image=Image.open(approveIconPath), size=(33,33),)
-    # approveButton = ctk.CTkButton(
-    #     whiteFrame, text=" Approve ", width=140, height=50, 
-    #     font=("Inter", 22, "bold",), fg_color="#00C16A", hover_color="#009B2B", image=approveIcon,
-    #     command=approveDoctor # anchor=ctk.W 
-    # )
-    # approveButton.place(x=700, y=225)
-
-    # # Reject Button with Icon
-    # rejectIconPath = relative_to_assets("reject-icon.png")
-    # rejectIcon = ctk.CTkImage(light_image=Image.open(rejectIconPath), size=(33,33),)
-    # rejectButton = ctk.CTkButton(
-    #     whiteFrame, text=" Reject  ", width=140, height=50, 
-    #     font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=rejectIcon,
-    #     command=rejectDoctor # anchor=ctk.W 
-    # )
-    # rejectButton.place(x=870, y=225)
 
 
     # <<<<<<<<<<<<<<<<<<<< TABLE FRAME STORING TREEVIEW >>>>>>>>>>>>>>>>>>>>> 
