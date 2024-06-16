@@ -424,7 +424,7 @@ def patientDashboardWindow(email):
 
                 appointmentCursor.execute(
                     'INSERT INTO appointments (PatientName, PatientID, DoctorName, DoctorID, DoctorType, DoctorAvailability, ClinicName, ClinicID, AppointmentDate, AppointmentTime, AppointmentDuration, AppointmentCreatedTime, PainDetails, IsConfirmed) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
-                    [patientName, patientID, doctorName, doctorID, doctorAvailability, doctorType, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails, 0])
+                    [patientName, patientID, doctorName, doctorID, doctorType, doctorAvailability, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails, 0])
                 appointmentConn.commit()
 
                 if result:

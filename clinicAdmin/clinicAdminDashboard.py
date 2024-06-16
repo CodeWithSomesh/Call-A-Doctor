@@ -1,8 +1,7 @@
 import sys
 from pathlib import Path
 from PIL import Image
-import random
-from random import choice
+import sqlite3
 
 # Add the parent directory to the system path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -28,7 +27,7 @@ def clinicAdminDashboardWindow(email):
             window.destroy()
             from logInWindow.main import logInWindow
             logInWindow()
-            
+
 
     # Redirect to the Clinic Admin Doctor Window
     def redirectToClinicAdminDoctorWindow():
@@ -51,6 +50,168 @@ def clinicAdminDashboardWindow(email):
         searchInputTextBox.delete('0.0', "end")
         searchInputTextBox.insert('0.0', "Search by Patient Name or Doctor Name ")
         searchInputTextBox.configure(text_color='gray')
+
+
+    global count
+    count = 0
+    def insertTreeview(array=None):
+        global count
+
+        # Connecting to Clinic Admin DB
+        appointmentConn = sqlite3.connect('appointments.db')
+        appointmentCursor = appointmentConn.cursor()
+        appointmentCursor.execute('SELECT * FROM appointments')
+        appointments = appointmentCursor.fetchall()
+        table.delete(*table.get_children())
+
+        # Executed when searchbar is entered
+        if array is None:
+            for appointment in appointments:
+                appointmentID = appointment[0]
+                patientName = appointment[1]
+                doctorType = appointment[5]
+                doctorName = appointment[3]
+                availability = appointment[6]
+                if appointment[14] == 0:
+                    isConfirmed = 'Waiting For Confirmation'
+                elif appointment[14] == 1:
+                    isConfirmed = 'Confirmed'
+                elif appointment[14] == 2:
+                    isConfirmed = 'Rejected'
+                else:
+                    isConfirmed = 'Doctor Replaced'
+
+                data = (appointmentID, patientName, doctorType, doctorName, availability, isConfirmed)
+
+
+                if count % 2 == 0:
+                    table.insert(parent='', index='end', values=data, tags=("evenrow",))
+                    print(appointment)
+                else:
+                    table.insert(parent='', index='end', values=data, tags=("oddrow",))
+
+                count += 1
+        
+        # Executed when Approve Button is clicked
+        else:
+            for appointment in array:
+                appointmentID = appointment[0]
+                patientName = appointment[1]
+                doctorType = appointment[5]
+                doctorName = appointment[3]
+                availability = appointment[6]
+                if appointment[14] == 0:
+                    isConfirmed = 'Waiting For Confirmation'
+                elif appointment[14] == 1:
+                    isConfirmed = 'Confirmed'
+                elif appointment[14] == 2:
+                    isConfirmed = 'Rejected'
+                else:
+                    isConfirmed = 'Doctor Replaced'
+
+                data = (appointmentID, patientName, doctorType, doctorName, availability, isConfirmed)
+
+
+                if count % 2 == 0:
+                    table.insert(parent='', index='end', values=data, tags=("evenrow",))
+                    print(appointment)
+                else:
+                    table.insert(parent='', index='end', values=data, tags=("oddrow",))
+
+                count += 1
+
+
+    def approveClinic():
+        # Connecting to Clinic Admin DB
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
+
+        selectedItem = table.focus()
+        if not selectedItem:
+            messagebox.showerror('Error', 'Select a Clinic first.')
+            return
+
+
+        clinicData = table.item(selectedItem)["values"]
+        clinicAdminID = clinicData[0]
+        clinicName = clinicData[1]
+        isApproveStatus = clinicData[5]
+        
+
+        if isApproveStatus == 'Approved':
+            messagebox.showinfo('Info', f'{clinicName} is already approved.')
+        else:
+            
+            clinicAdminCursor.execute('UPDATE clinicAdmins SET IsApproved=? WHERE ClinicAdminID=?', (1, clinicAdminID))
+            clinicAdminConn.commit()
+            clinicAdminConn.close()
+            insertTreeview()
+            messagebox.showinfo('Success', f'{clinicName} has just been approved successfully. \nTheir Clinic Admin will be notified.')
+
+    
+    def rejectClinic():
+        # Connecting to Clinic Admin DB
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
+
+        selectedItem = table.focus()
+        if not selectedItem:
+            messagebox.showerror('Error', 'Select a Clinic first.')
+            return
+
+
+        clinicData = table.item(selectedItem)["values"]
+        clinicAdminID = clinicData[0]
+        clinicName = clinicData[1]
+        isApproveStatus = clinicData[5]
+        
+
+        if isApproveStatus == 'Rejected':
+            messagebox.showinfo('Info', f'{clinicName} is already rejected.')
+        else:
+            
+            clinicAdminCursor.execute('UPDATE clinicAdmins SET IsApproved=? WHERE ClinicAdminID=?', (2, clinicAdminID))
+            clinicAdminConn.commit()
+            clinicAdminConn.close()
+            insertTreeview()
+            messagebox.showinfo('Success', f'{clinicName} has just been rejected. \nTheir Clinic Admin will be notified.')
+            
+
+    def searchBy():
+        # Connecting to Clinic Admin DB
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
+        searchTerm = searchInputTextBox.get('0.0', 'end').strip()
+        searchOption = searchByDropdown.get()
+
+        if searchOption == 'Clinic Admin ID':
+            searchOption = "ClinicAdminID"
+        elif searchOption == 'Clinic Name':
+            searchOption = "ClinicName"
+        elif searchOption == 'Clinic Contact':
+            searchOption = "ClinicNumber"
+        elif searchOption == 'Admin Email':
+            searchOption = "Email"
+        elif searchOption == 'Approval Status':
+            searchOption = "IsApproved"
+
+            if searchTerm == 'Waiting For Approval':
+                searchTerm = '0'
+            elif searchTerm == 'Approved':
+                searchTerm = '1'
+            elif searchTerm == 'Rejected':
+                searchTerm = '2'
+
+
+        if searchTerm == "":
+            messagebox.showerror('Error', 'Enter value to search.')
+        elif searchOption == 'Search By Option':
+            messagebox.showerror('Error', 'Please select an option.')
+        else:
+            clinicAdminCursor.execute(f'SELECT * FROM clinicAdmins WHERE {searchOption}=?', (searchTerm,))
+            result = clinicAdminCursor.fetchall()
+            insertTreeview(result)
+
 
 
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
@@ -202,8 +363,8 @@ def clinicAdminDashboardWindow(email):
     table = ttk.Treeview(tableFrame, yscrollcommand=tableScrollbar1.set,height=12)
     table.pack(side='left', fill='both')
     table['columns'] = (
-        'No', 'Clinic ID', 'Clinic Name', 'Clinic Contact',
-        "Clinic Admin", "Admin Email"
+        'ID', 'Patient Name', 'Doctor Type',
+        "Doctor Name", "Availability", "Confirmation Status"
     )
 
     # Placing and Configuring Treeview Scrollbar
@@ -227,21 +388,21 @@ def clinicAdminDashboardWindow(email):
     )
 
     # Treeview Table Headings Details
-    table.heading('No', text='No')
-    table.heading('Clinic ID', text='Clinic ID',)
-    table.heading('Clinic Name', text='Clinic Name')
-    table.heading('Clinic Contact', text='Clinic Contact')
-    table.heading('Clinic Admin', text='Clinic Admin')
-    table.heading('Admin Email', text='Admin Email')
+    table.heading('ID', text='ID')
+    table.heading('Patient Name', text='Patient Name')
+    table.heading('Doctor Type', text='Doctor Type')
+    table.heading('Doctor Name', text='Doctor Name')
+    table.heading('Availability', text='Availability')
+    table.heading('Confirmation Status', text='Confirmation Status')
 
     # Treeview Table Columns Details
     table.column("#0", width=0, stretch=ctk.NO)
-    table.column("No", width=43, anchor=ctk.CENTER)
-    table.column("Clinic ID", anchor=ctk.CENTER)
-    table.column("Clinic Name", width=220, anchor=ctk.CENTER)
-    table.column("Clinic Contact", anchor=ctk.CENTER)
-    table.column("Clinic Admin", width=250, anchor=ctk.CENTER)
-    table.column("Admin Email", width=315, anchor=ctk.CENTER,)
+    table.column("ID", width=43, anchor=ctk.CENTER)
+    table.column("Patient Name", width=220, anchor=ctk.CENTER)
+    table.column("Doctor Type", anchor=ctk.CENTER)
+    table.column("Doctor Name", width=250, anchor=ctk.CENTER)
+    table.column("Availability", width=270, anchor=ctk.CENTER,)
+    table.column("Confirmation Status", width=260, anchor=ctk.CENTER)
 
     # Setting alternating colours for the rows in Treeview
     table.tag_configure("oddrow", background="#F2F5F8")
@@ -249,63 +410,63 @@ def clinicAdminDashboardWindow(email):
 
 
     # <<<<<<<<<<<<<<<<<<<< AUTOMATED TESTING >>>>>>>>>>>>>>>>>>>>>
-    global count
-    count = 0
+    # global count
+    # count = 0
+    # #     if count % 2 == 0:
+    # #         table.insert(parent='', index=0, values=data, tags=("evenrow",))
+    # #     else:
+    # #         table.insert(parent='', index=0, values=data, tags=("oddrow",))
+
+    # clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
+    # adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
+
+
+
+    # for i in range(15):
+    #     num = (i+1)
+    #     clinicID = ''.join(random.choices('0123456789', k=12))
+    #     clinicName = choice(clinicNames)
+    #     clinicContact = ''.join(random.choices('0123456789', k=8))
+    #     clinicContact = f'+01{clinicContact}'
+    #     adminName = choice(adminNames)
+    #     adminEmail = f'{(adminName.replace(" ", "")).lower()}@email.com'
+
+    #     data = (num, clinicID, clinicName, clinicContact, adminName, adminEmail)
     #     if count % 2 == 0:
-    #         table.insert(parent='', index=0, values=data, tags=("evenrow",))
+    #         table.insert(parent='', index='end', values=data, tags=("evenrow",))
     #     else:
-    #         table.insert(parent='', index=0, values=data, tags=("oddrow",))
+    #         table.insert(parent='', index='end', values=data, tags=("oddrow",))
 
-    clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
-    adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
+    #     count += 1
 
+    # # Test the insertion in table
+    # def testTableInsertion():
+    #     clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
+    #     clinicAddress = ["Kuala Lumpur", "George Town", "Ipoh", "Johor Bahru", "Kota Kinabalu", "Shah Alam", "Malacca City", "Alor Setar", "Kuantan", "Kuching"]
+    #     adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
 
+    #     for name in adminNames:
+    #         email = name.replace(" ", "")
 
-    for i in range(15):
-        num = (i+1)
-        clinicID = ''.join(random.choices('0123456789', k=12))
-        clinicName = choice(clinicNames)
-        clinicContact = ''.join(random.choices('0123456789', k=8))
-        clinicContact = f'+01{clinicContact}'
-        adminName = choice(adminNames)
-        adminEmail = f'{(adminName.replace(" ", "")).lower()}@email.com'
+    #     for i in range(10):
+    #         num = i
+    #         clinicID = ''.join(random.choices('0123456789', k=12))
+    #         clinicName = choice(clinicNames)
+    #         clinicContact = ''.join(random.choices('0123456789', k=8))
+    #         clinicAddress = choice(clinicAddress)
+    #         adminName = choice(adminNames)
+    #         adminEmail = f'{email}@email.com'
 
-        data = (num, clinicID, clinicName, clinicContact, adminName, adminEmail)
-        if count % 2 == 0:
-            table.insert(parent='', index='end', values=data, tags=("evenrow",))
-        else:
-            table.insert(parent='', index='end', values=data, tags=("oddrow",))
+    #         data = (num, clinicID, clinicName, clinicContact, clinicAddress, adminName, adminEmail)
+    #         if count % 2 == 0:
+    #             table.insert(parent='', index=0, values=data, tags=("evenrow",))
+    #         else:
+    #             table.insert(parent='', index=0, values=data, tags=("oddrow",))
 
-        count += 1
-
-    # Test the insertion in table
-    def testTableInsertion():
-        clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
-        clinicAddress = ["Kuala Lumpur", "George Town", "Ipoh", "Johor Bahru", "Kota Kinabalu", "Shah Alam", "Malacca City", "Alor Setar", "Kuantan", "Kuching"]
-        adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
-
-        for name in adminNames:
-            email = name.replace(" ", "")
-
-        for i in range(10):
-            num = i
-            clinicID = ''.join(random.choices('0123456789', k=12))
-            clinicName = choice(clinicNames)
-            clinicContact = ''.join(random.choices('0123456789', k=8))
-            clinicAddress = choice(clinicAddress)
-            adminName = choice(adminNames)
-            adminEmail = f'{email}@email.com'
-
-            data = (num, clinicID, clinicName, clinicContact, clinicAddress, adminName, adminEmail)
-            if count % 2 == 0:
-                table.insert(parent='', index=0, values=data, tags=("evenrow",))
-            else:
-                table.insert(parent='', index=0, values=data, tags=("oddrow",))
-
-            count += 1
+    #         count += 1
     
 
-
+    insertTreeview()
     window.mainloop()
 
 
