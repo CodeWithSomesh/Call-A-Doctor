@@ -237,6 +237,7 @@ def patientDashboardWindow(email):
         leftFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD", )
         leftFrame.pack(side='left', fill='both', expand=False, padx=65, pady=30)
 
+        # Select Doctor Dropdown
         doctorDropdownLabel = ctk.CTkLabel(leftFrame, text="Select Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         doctorDropdownLabel.pack(side='top', fill='x', expand=False,)
         doctorDropdown = ctk.CTkComboBox(
@@ -422,10 +423,36 @@ def patientDashboardWindow(email):
                 result = patientCursor.fetchone()
                 currentAppointments = result[0]
 
+                # Insert Appoinment into DB
                 appointmentCursor.execute(
                     'INSERT INTO appointments (PatientName, PatientID, DoctorName, DoctorID, DoctorType, DoctorAvailability, ClinicName, ClinicID, AppointmentDate, AppointmentTime, AppointmentDuration, AppointmentCreatedTime, PainDetails, IsConfirmed) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
-                    [patientName, patientID, doctorName, doctorID, doctorAvailability, doctorType, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails, 0])
+                    [patientName, patientID, doctorName, doctorID, doctorType, doctorAvailability, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails, 0])
                 appointmentConn.commit()
+                appointmentID = appointmentCursor.lastrowid # Retrieve the AppointmentID of the newly inserted row
+                print(f"The new appointment ID is: {appointmentID}")
+
+                # Check for appointments with the same clinic name, doctor, date, and time
+                selectQuery = '''
+                    SELECT COUNT(*)
+                    FROM appointments
+                    WHERE ClinicName=? AND DoctorName = ? AND AppointmentDate = ? AND AppointmentTime = ?
+                '''
+                appointmentCursor.execute(selectQuery, (clinicName, doctorName, date, time))
+                count = appointmentCursor.fetchone()[0]
+                print(f"The count of repeated appointments is {count}")
+
+                
+
+                # Update Doctor Availability to 1 for repeated appointments
+                if count > 1:
+                    updateQuery = '''
+                        UPDATE appointments
+                        SET DoctorAvailability = 1
+                        WHERE AppointmentID = ?
+                    '''
+                    appointmentCursor.execute(updateQuery, (appointmentID,))
+                    appointmentConn.commit()
+                    
 
                 if result:
                     newAppointments = currentAppointments + 1

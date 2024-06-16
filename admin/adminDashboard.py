@@ -59,6 +59,7 @@ def adminDashboardWindow(email):
     count = 0
     def insertTreeview(array=None):
         global count
+        
         # Connecting to Clinic Admin DB
         clinicAdminConn = sqlite3.connect('clinicAdmins.db')
         clinicAdminCursor = clinicAdminConn.cursor()

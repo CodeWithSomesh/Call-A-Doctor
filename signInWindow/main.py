@@ -72,7 +72,7 @@ def signInWindow():
             ClinicAddress TEXT NOT NULL,
             ClinicNumber TEXT NOT NULL,
             IsApproved INTEGER DEFAULT 0,
-            NumberOfDoctors INTEGER DEFAULT 0,
+            NumberOfDoctorsApplied INTEGER DEFAULT 0,
             NumberOfApprovedDoctors INTEGER DEFAULT 0
         )          
     """)
