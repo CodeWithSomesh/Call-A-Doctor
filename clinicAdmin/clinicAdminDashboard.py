@@ -71,7 +71,10 @@ def clinicAdminDashboardWindow(email):
                 patientName = appointment[1]
                 doctorType = appointment[5]
                 doctorName = appointment[3]
-                availability = appointment[6]
+                appointmentDate = appointment[9]
+                appointmentTime = appointment[10]
+                clinicName = appointment[7]
+                  
                 if appointment[14] == 0:
                     isConfirmed = 'Waiting For Confirmation'
                 elif appointment[14] == 1:
@@ -80,6 +83,33 @@ def clinicAdminDashboardWindow(email):
                     isConfirmed = 'Rejected'
                 else:
                     isConfirmed = 'Doctor Replaced'
+
+                if appointment[6] == 0:
+                    availability = 'Available'
+                elif appointment[6] == 1:
+                    availability = 'Busy'
+
+                # Check for appointments with the same clinic name, doctor, date, and time
+                selectQuery = '''
+                    SELECT COUNT(*)
+                    FROM appointments
+                    WHERE ClinicName=? AND DoctorName = ? AND AppointmentDate = ? AND AppointmentTime = ?
+                '''
+                appointmentCursor.execute(selectQuery, (clinicName, doctorName, appointmentDate, appointmentTime))
+                count = appointmentCursor.fetchone()[0]
+                print(count)
+
+                # Update Doctor Availability before displaying in table
+                if count > 1:
+                    # Update DoctorAvailability to 1
+                    updateQuery = '''
+                        UPDATE appointments
+                        SET DoctorAvailability = 1
+                        WHERE DoctorName = ? AND AppointmentDate = ? AND AppointmentTime = ?
+                    '''
+                    appointmentCursor.execute(updateQuery, (doctorName, appointmentDate, appointmentTime))
+                    appointmentConn.commit()
+                
 
                 data = (appointmentID, patientName, doctorType, doctorName, availability, isConfirmed)
 
@@ -99,7 +129,7 @@ def clinicAdminDashboardWindow(email):
                 patientName = appointment[1]
                 doctorType = appointment[5]
                 doctorName = appointment[3]
-                availability = appointment[6]
+                  
                 if appointment[14] == 0:
                     isConfirmed = 'Waiting For Confirmation'
                 elif appointment[14] == 1:
@@ -108,6 +138,11 @@ def clinicAdminDashboardWindow(email):
                     isConfirmed = 'Rejected'
                 else:
                     isConfirmed = 'Doctor Replaced'
+
+                if appointment[6] == 0:
+                    availability = 'Available'
+                elif appointment[6] == 1:
+                    availability = 'Busy'
 
                 data = (appointmentID, patientName, doctorType, doctorName, availability, isConfirmed)
 
@@ -398,10 +433,10 @@ def clinicAdminDashboardWindow(email):
     # Treeview Table Columns Details
     table.column("#0", width=0, stretch=ctk.NO)
     table.column("ID", width=43, anchor=ctk.CENTER)
-    table.column("Patient Name", width=220, anchor=ctk.CENTER)
+    table.column("Patient Name", width=235, anchor=ctk.CENTER)
     table.column("Doctor Type", anchor=ctk.CENTER)
-    table.column("Doctor Name", width=250, anchor=ctk.CENTER)
-    table.column("Availability", width=270, anchor=ctk.CENTER,)
+    table.column("Doctor Name", width=280, anchor=ctk.CENTER)
+    table.column("Availability", width=200, anchor=ctk.CENTER,)
     table.column("Confirmation Status", width=260, anchor=ctk.CENTER)
 
     # Setting alternating colours for the rows in Treeview
