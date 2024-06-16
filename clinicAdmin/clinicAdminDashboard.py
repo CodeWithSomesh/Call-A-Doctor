@@ -28,6 +28,7 @@ def clinicAdminDashboardWindow(email):
             window.destroy()
             from logInWindow.main import logInWindow
             logInWindow()
+            
 
     # Redirect to the Clinic Admin Doctor Window
     def redirectToClinicAdminDoctorWindow():
