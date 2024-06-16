@@ -197,7 +197,7 @@ def adminDashboardWindow(email):
                 searchTerm = '0'
             elif searchTerm == 'Approved':
                 searchTerm = '1'
-            else:
+            elif searchTerm == 'Rejected':
                 searchTerm = '2'
 
 
@@ -206,7 +206,7 @@ def adminDashboardWindow(email):
         elif searchOption == 'Search By Option':
             messagebox.showerror('Error', 'Please select an option.')
         else:
-            clinicAdminCursor.execute(f'SELECT * FROM clinicAdmins WHERE {searchOption}=?', searchTerm)
+            clinicAdminCursor.execute(f'SELECT * FROM clinicAdmins WHERE {searchOption}=?', (searchTerm,))
             result = clinicAdminCursor.fetchall()
             insertTreeview(result)
             
@@ -388,7 +388,7 @@ def adminDashboardWindow(email):
     table.pack(side='left', fill='both')
     table['columns'] = (
         'ID', 'Clinic Name', 'Clinic Contact',
-        "Clinic Admin", "Admin Email", 'Approval Status'
+        "Admin Name", "Admin Email", 'Approval Status'
     )
 
     # Placing and Configuring Treeview Scrollbar
@@ -415,7 +415,7 @@ def adminDashboardWindow(email):
     table.heading('ID', text='ID',)
     table.heading('Clinic Name', text='Clinic Name')
     table.heading('Clinic Contact', text='Clinic Contact')
-    table.heading('Clinic Admin', text='Clinic Admin')
+    table.heading('Admin Name', text='Admin Name')
     table.heading('Admin Email', text='Admin Email')
     table.heading('Approval Status', text='Approval Status')
 
@@ -424,7 +424,7 @@ def adminDashboardWindow(email):
     table.column("ID", width=43, anchor=ctk.CENTER)
     table.column("Clinic Name", width=220, anchor=ctk.CENTER)
     table.column("Clinic Contact", anchor=ctk.CENTER)
-    table.column("Clinic Admin", width=250, anchor=ctk.CENTER)
+    table.column("Admin Name", width=250, anchor=ctk.CENTER)
     table.column("Admin Email", width=270, anchor=ctk.CENTER,)
     table.column("Approval Status", width=260, anchor=ctk.CENTER)
 
