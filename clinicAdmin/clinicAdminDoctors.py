@@ -3,19 +3,29 @@ from pathlib import Path
 from PIL import Image
 import random
 from random import choice
+import sqlite3
+from datetime import datetime
 
 # Add the parent directory to the system path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from tkinter import ttk, Tk, Scrollbar, VERTICAL
+from tkinter import ttk, Tk, Scrollbar, VERTICAL, messagebox
 import customtkinter as ctk
 
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\clinicAdmin\assets\frame0")
 
-def clinicAdminDoctorWindow():
-    # Helper function to get the full path of assets
+def clinicAdminDoctorWindow(email):
+    # Connecting to Clinic Admin DB
+    clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+    clinicAdminCursor = clinicAdminConn.cursor()
+    clinicAdminCursor.execute('SELECT * FROM clinicAdmins WHERE Email=?', [email])
+    result = clinicAdminCursor.fetchone()
+    #username = f"{result[1]} {result[2]}" # Getting user's full name to display on top 
+
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ALL FUNCTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    # Get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
 
@@ -122,9 +132,23 @@ def clinicAdminDoctorWindow():
 
 
     # Label with Greeting Message & User's First Name 
-    greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, Someshwar Rao", font=("Inter", 36, "bold",), text_color="#000000")
+
+    now = datetime.now()  # Get the current date and time
+    formatted_date = now.strftime("%B %d, %Y") # Format the date as 'Month Day, Year'
+    current_hour = now.hour # Get the current hour
+    current_time = now.strftime("%H:%M:%S") # Get the current time
+
+    # Generate greeting message based on the current time
+    if current_hour < 12:
+        greeting = "Good Morning!"
+    elif 12 <= current_hour < 18:
+        greeting = "Good Afternoon!"
+    else:
+        greeting = "Good Evening!" 
+
+    greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, {username}", font=("Inter", 36, "bold",), text_color="#000000")
     greetingLabel1.place(x=25, y=25)
-    greetingLabel2 = ctk.CTkLabel(whiteFrame, text="Good Morning!  (January 26, 2024)", font=("Inter", 22,), text_color="#000000")
+    greetingLabel2 = ctk.CTkLabel(whiteFrame, text=f"{greeting}  ({formatted_date})", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
     roleLabel = ctk.CTkLabel(whiteFrame, text="(Clinic Admin)", font=("Inter", 36, "bold",), text_color="#000000")
     roleLabel.place(x=775, y=25)
@@ -205,8 +229,12 @@ def clinicAdminDoctorWindow():
         foreground='#fff', background='#000', hover=False,
     )
     style.configure('Treeview', font=('Inter', 16), rowheight=47, fieldbackground="#DAFFF7")
-    style.map('Treeview', background=[('selected', '#00BE97')])
-
+    style.map(
+        'Treeview', 
+        background=[('selected', '#00BE97',)], 
+        font=[('selected', ('Inter', 16, 'bold'))],
+    )
+    
     # Treeview Table Headings Details
     table.heading('No', text='No')
     table.heading('Clinic ID', text='Clinic ID',)
@@ -292,4 +320,4 @@ def clinicAdminDoctorWindow():
 
 # Only execute the Clinic Admin Doctor Window if this script is run directly
 if __name__ == "__main__":
-    clinicAdminDoctorWindow()
+    clinicAdminDoctorWindow(email=None)

@@ -14,7 +14,7 @@ import customtkinter as ctk
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\clinicAdmin\assets\frame0")
 
-def clinicAdminDashboardWindow():
+def clinicAdminDashboardWindow(email):
     # Helper function to get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
@@ -30,7 +30,7 @@ def clinicAdminDashboardWindow():
     def redirectToClinicAdminDoctorWindow():
         window.destroy()
         from clinicAdmin.clinicAdminDoctors import clinicAdminDoctorWindow
-        clinicAdminDoctorWindow()
+        clinicAdminDoctorWindow(email)
 
 
     # When user is typing remove placeholder
@@ -303,4 +303,4 @@ def clinicAdminDashboardWindow():
 
 # Only execute the Clinic Admin Dashboard Window if this script is run directly
 if __name__ == "__main__":
-    clinicAdminDashboardWindow()
+    clinicAdminDashboardWindow(email=None)
