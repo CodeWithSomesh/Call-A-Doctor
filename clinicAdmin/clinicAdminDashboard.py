@@ -7,7 +7,7 @@ from random import choice
 # Add the parent directory to the system path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from tkinter import ttk, Tk, Scrollbar, VERTICAL
+from tkinter import ttk, Tk, Scrollbar, VERTICAL, messagebox
 import customtkinter as ctk
 
 
@@ -22,9 +22,12 @@ def clinicAdminDashboardWindow(email):
 
     # Function to redirect to the Log In Window
     def redirectToLoginWindow():
-        window.destroy()
-        from logInWindow.main import logInWindow
-        logInWindow()
+        msg = messagebox.askokcancel('Warning', 'Are you sure you want to logout?')
+
+        if msg:
+            window.destroy()
+            from logInWindow.main import logInWindow
+            logInWindow()
 
     # Redirect to the Clinic Admin Doctor Window
     def redirectToClinicAdminDoctorWindow():
@@ -216,7 +219,11 @@ def clinicAdminDashboardWindow(email):
         foreground='#fff', background='#000', hover=False,
     )
     style.configure('Treeview', font=('Inter', 16), rowheight=47, fieldbackground="#DAFFF7")
-    style.map('Treeview', background=[('selected', '#00BE97')])
+    style.map(
+        'Treeview', 
+        background=[('selected', '#00BE97',)], 
+        font=[('selected', ('Inter', 16, 'bold'))],
+    )
 
     # Treeview Table Headings Details
     table.heading('No', text='No')
