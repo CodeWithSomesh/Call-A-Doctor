@@ -57,7 +57,7 @@ def clinicAdminDashboardWindow(email):
     def insertTreeview(array=None):
         global count
 
-        # Connecting to Clinic Admin DB
+        # Connecting to Appointments DB
         appointmentConn = sqlite3.connect('appointments.db')
         appointmentCursor = appointmentConn.cursor()
         appointmentCursor.execute('SELECT * FROM appointments')
@@ -71,12 +71,9 @@ def clinicAdminDashboardWindow(email):
                 patientName = appointment[1]
                 doctorType = appointment[5]
                 doctorName = appointment[3]
-                appointmentDate = appointment[9]
-                appointmentTime = appointment[10]
-                clinicName = appointment[7]
                   
                 if appointment[14] == 0:
-                    isConfirmed = 'Waiting For Confirmation'
+                    isConfirmed = 'Waiting'
                 elif appointment[14] == 1:
                     isConfirmed = 'Confirmed'
                 elif appointment[14] == 2:
@@ -89,27 +86,6 @@ def clinicAdminDashboardWindow(email):
                 elif appointment[6] == 1:
                     availability = 'Busy'
 
-                # Check for appointments with the same clinic name, doctor, date, and time
-                selectQuery = '''
-                    SELECT COUNT(*)
-                    FROM appointments
-                    WHERE ClinicName=? AND DoctorName = ? AND AppointmentDate = ? AND AppointmentTime = ?
-                '''
-                appointmentCursor.execute(selectQuery, (clinicName, doctorName, appointmentDate, appointmentTime))
-                count = appointmentCursor.fetchone()[0]
-                print(count)
-
-                # Update Doctor Availability before displaying in table
-                if count > 1:
-                    # Update DoctorAvailability to 1
-                    updateQuery = '''
-                        UPDATE appointments
-                        SET DoctorAvailability = 1
-                        WHERE DoctorName = ? AND AppointmentDate = ? AND AppointmentTime = ?
-                    '''
-                    appointmentCursor.execute(updateQuery, (doctorName, appointmentDate, appointmentTime))
-                    appointmentConn.commit()
-                
 
                 data = (appointmentID, patientName, doctorType, doctorName, availability, isConfirmed)
 
@@ -131,7 +107,7 @@ def clinicAdminDashboardWindow(email):
                 doctorName = appointment[3]
                   
                 if appointment[14] == 0:
-                    isConfirmed = 'Waiting For Confirmation'
+                    isConfirmed = 'Waiting'
                 elif appointment[14] == 1:
                     isConfirmed = 'Confirmed'
                 elif appointment[14] == 2:
@@ -143,6 +119,7 @@ def clinicAdminDashboardWindow(email):
                     availability = 'Available'
                 elif appointment[6] == 1:
                     availability = 'Busy'
+
 
                 data = (appointmentID, patientName, doctorType, doctorName, availability, isConfirmed)
 
@@ -156,62 +133,113 @@ def clinicAdminDashboardWindow(email):
                 count += 1
 
 
-    def approveClinic():
-        # Connecting to Clinic Admin DB
-        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
-        clinicAdminCursor = clinicAdminConn.cursor()
+    def approveAppointment():
+        # Connecting to Appointments DB
+        appointmentConn = sqlite3.connect('appointments.db')
+        appointmentCursor = appointmentConn.cursor()
 
         selectedItem = table.focus()
         if not selectedItem:
-            messagebox.showerror('Error', 'Select a Clinic first.')
+            messagebox.showerror('Error', 'Select an Appointment first.')
             return
 
 
-        clinicData = table.item(selectedItem)["values"]
-        clinicAdminID = clinicData[0]
-        clinicName = clinicData[1]
-        isApproveStatus = clinicData[5]
+        appointmentData = table.item(selectedItem)["values"]
+        appointmentID = appointmentData[0]
+        isConfirmedStatus = appointmentData[5]
         
 
-        if isApproveStatus == 'Approved':
-            messagebox.showinfo('Info', f'{clinicName} is already approved.')
+        if isConfirmedStatus == 'Approved':
+            messagebox.showinfo('Info', f'This Appointment (ID: {appointmentID}) is already approved.')
         else:
             
-            clinicAdminCursor.execute('UPDATE clinicAdmins SET IsApproved=? WHERE ClinicAdminID=?', (1, clinicAdminID))
-            clinicAdminConn.commit()
-            clinicAdminConn.close()
+            appointmentCursor.execute('UPDATE appointments SET IsConfirmed=? WHERE AppointmentID=?', (1, appointmentID))
+            appointmentConn.commit()
+            appointmentConn.close()
             insertTreeview()
-            messagebox.showinfo('Success', f'{clinicName} has just been approved successfully. \nTheir Clinic Admin will be notified.')
+            messagebox.showinfo('Success', f'This Appointment (ID: {appointmentID}) has just been approved successfully. \nThe Patient will be notified.')
 
     
-    def rejectClinic():
-        # Connecting to Clinic Admin DB
-        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
-        clinicAdminCursor = clinicAdminConn.cursor()
+    def rejectAppointment():
+        # Connecting to Appointments DB
+        appointmentConn = sqlite3.connect('appointments.db')
+        appointmentCursor = appointmentConn.cursor()
 
         selectedItem = table.focus()
         if not selectedItem:
-            messagebox.showerror('Error', 'Select a Clinic first.')
+            messagebox.showerror('Error', 'Select an Appointment first.')
             return
 
 
-        clinicData = table.item(selectedItem)["values"]
-        clinicAdminID = clinicData[0]
-        clinicName = clinicData[1]
-        isApproveStatus = clinicData[5]
+        appointmentData = table.item(selectedItem)["values"]
+        appointmentID = appointmentData[0]
+        isConfirmedStatus = appointmentData[5]
         
 
-        if isApproveStatus == 'Rejected':
-            messagebox.showinfo('Info', f'{clinicName} is already rejected.')
+        if isConfirmedStatus == 'Rejected':
+            messagebox.showinfo('Info', f'This Appointment (ID: {appointmentID}) is already rejected.')
         else:
             
-            clinicAdminCursor.execute('UPDATE clinicAdmins SET IsApproved=? WHERE ClinicAdminID=?', (2, clinicAdminID))
-            clinicAdminConn.commit()
-            clinicAdminConn.close()
+            appointmentCursor.execute('UPDATE appointments SET IsConfirmed=? WHERE AppointmentID=?', (2, appointmentID))
+            appointmentConn.commit()
+            appointmentConn.close()
             insertTreeview()
-            messagebox.showinfo('Success', f'{clinicName} has just been rejected. \nTheir Clinic Admin will be notified.')
-            
+            messagebox.showinfo('Success', f'This Appointment (ID: {appointmentID}) has just been rejected. \nThe Patient will be notified.')
 
+
+
+    def reassignDoctor():
+        # Connecting to Appointments DB
+        appointmentConn = sqlite3.connect('appointments.db')
+        appointmentCursor = appointmentConn.cursor()
+
+        selectedItem = table.focus()
+        if not selectedItem:
+            messagebox.showerror('Error', 'Select an Appointment first.')
+            return
+
+
+        appointmentData = table.item(selectedItem)["values"]
+        appointmentID = appointmentData[0]
+        doctorName = appointmentData[3]
+        doctorAvailability = appointmentData[4]
+        
+
+        if doctorAvailability == 'Available':
+            messagebox.showinfo('Info', f'Doctor {doctorName}) is Available for this appointment schedule.\nThis appointment cannot be reassigned.')
+        else:
+            reassignToplevel()
+            # appointmentCursor.execute('UPDATE appointments SET IsConfirmed=? WHERE AppointmentID=?', (3, appointmentID))
+            # appointmentConn.commit()
+            # appointmentConn.close()
+            # insertTreeview()
+            # messagebox.showinfo('Success', f'This Appointment (ID: {appointmentID}) has just been rejected. \nThe Patient will be notified.')        
+
+    
+    def reassignToplevel():
+        toplevel = ctk.CTkToplevel(window)
+        toplevel.title("Reassign Appointment")
+        toplevel.geometry("600x200+600+300")
+        toplevel.resizable(False, False)
+        toplevel.attributes("-topmost",True)
+        toplevel.configure(fg_color = "#fff")
+
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< TOP FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        topFrame = ctk.CTkFrame(toplevel, width=650, height=500, fg_color="#FFFDFD" )
+        topFrame.pack(side='top', fill='x', expand=False, padx=(65, 65), pady=(50,0))
+
+        # Select Doctor Dropdown
+        doctorDropdownLabel = ctk.CTkLabel(topFrame, text="Select New Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+        doctorDropdownLabel.pack(side='top', fill='x', expand=False,)
+        doctorDropdown = ctk.CTkComboBox(
+            topFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+            font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+            values=['Select Doctor', 'Maisarah Majdi', 'Someshwar Rao', 'Karen Khor Siew Li'], border_color="#b5b3b3", border_width=1,
+            dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+        )
+        doctorDropdown.pack(side='top', fill='x', expand=False,)
+    
     def searchBy():
         # Connecting to Clinic Admin DB
         clinicAdminConn = sqlite3.connect('clinicAdmins.db')
@@ -360,7 +388,7 @@ def clinicAdminDashboardWindow(email):
     approveButton = ctk.CTkButton(
         whiteFrame, text=" Approve ", width=140, height=50, 
         font=("Inter", 22, "bold",), fg_color="#00C16A", hover_color="#009B2B", image=approveIcon,
-        # anchor=ctk.W 
+        command=approveAppointment # anchor=ctk.W 
     )
     approveButton.place(x=525, y=225)
 
@@ -370,7 +398,7 @@ def clinicAdminDashboardWindow(email):
     rejectButton = ctk.CTkButton(
         whiteFrame, text=" Reject  ", width=140, height=50, 
         font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=rejectIcon,
-        # anchor=ctk.W 
+        command=rejectAppointment # anchor=ctk.W 
     )
     rejectButton.place(x=695, y=225)
 
@@ -381,7 +409,7 @@ def clinicAdminDashboardWindow(email):
     reassignButton = ctk.CTkButton(
         whiteFrame, text=" Reassign  ", width=140, height=50, 
         font=("Inter", 22, "bold",), fg_color="#1BC5DC", hover_color="#1695A7", image=reassignIcon,
-        # anchor=ctk.W 
+        command=reassignToplevel # anchor=ctk.W 
     )
     reassignButton.place(x=850, y=225)
 
@@ -434,10 +462,10 @@ def clinicAdminDashboardWindow(email):
     table.column("#0", width=0, stretch=ctk.NO)
     table.column("ID", width=43, anchor=ctk.CENTER)
     table.column("Patient Name", width=235, anchor=ctk.CENTER)
-    table.column("Doctor Type", anchor=ctk.CENTER)
+    table.column("Doctor Type",width=280, anchor=ctk.CENTER)
     table.column("Doctor Name", width=280, anchor=ctk.CENTER)
-    table.column("Availability", width=200, anchor=ctk.CENTER,)
-    table.column("Confirmation Status", width=260, anchor=ctk.CENTER)
+    table.column("Availability", width=180, anchor=ctk.CENTER,)
+    table.column("Confirmation Status", width=210, anchor=ctk.CENTER)
 
     # Setting alternating colours for the rows in Treeview
     table.tag_configure("oddrow", background="#F2F5F8")

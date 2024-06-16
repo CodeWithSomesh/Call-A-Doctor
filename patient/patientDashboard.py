@@ -237,6 +237,7 @@ def patientDashboardWindow(email):
         leftFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD", )
         leftFrame.pack(side='left', fill='both', expand=False, padx=65, pady=30)
 
+        # Select Doctor Dropdown
         doctorDropdownLabel = ctk.CTkLabel(leftFrame, text="Select Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         doctorDropdownLabel.pack(side='top', fill='x', expand=False,)
         doctorDropdown = ctk.CTkComboBox(
