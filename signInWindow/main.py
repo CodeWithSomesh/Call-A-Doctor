@@ -71,7 +71,9 @@ def signInWindow():
             ClinicName TEXT NOT NULL,
             ClinicAddress TEXT NOT NULL,
             ClinicNumber TEXT NOT NULL,
-            IsApproved INTEGER DEFAULT 0
+            IsApproved INTEGER DEFAULT 0,
+            NumberOfDoctors INTEGER DEFAULT 0,
+            NumberOfApprovedDoctors INTEGER DEFAULT 0
         )          
     """)
 
@@ -360,13 +362,17 @@ def signInWindow():
                 messagebox.showerror('Error', 'Email already exist')
             else:
                 encodedPassword = password.encode('utf-8')
-                hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
+                hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt()) #Hashing the password
                 print(hashedPassword)
+
+
                 clinicAdminCursor.execute(
-                    'INSERT INTO clinicAdmins (FirstName, LastName, Email, Password, NRIC, Role, ClinicName, ClinicAddress, ClinicNumber, IsApproved) VALUES (?,?,?,?,?,?,?,?,?,?)', 
-                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, clinicAddress, clinicContact, 0]
+                    'INSERT INTO clinicAdmins (FirstName, LastName, Email, Password, NRIC, Role, ClinicName, ClinicAddress, ClinicNumber, IsApproved, NumberOfDoctorsApplied, NumberOfApprovedDoctors) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', 
+                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, clinicAddress, clinicContact, 0, 0, 0]
                 )
                 clinicAdminConn.commit()
+
+
                 messagebox.showinfo('Success', "Clinic Admin Account has been created successfully. \nWaiting for CAD Admin's approval. \nYou can login after their approval.")
         
         else:
