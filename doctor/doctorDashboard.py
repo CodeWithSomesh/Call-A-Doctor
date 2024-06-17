@@ -59,41 +59,33 @@ def doctorDashboardWindow(email):
         result = doctorCursor.fetchone()
         doctorName = f"{result[1]} {result[2]}" # Getting Doctor's Name
         clinicName = result[7]
-        isApprovedStatus = result[10]
-        #numOfAppointments = result[8] # Getting Doctor's number of appointments
         
 
         # Connecting to Appointments DB
         appointmentConn = sqlite3.connect('appointments.db')
         appointmentCursor = appointmentConn.cursor()
-        appointmentCursor.execute('SELECT * FROM appointments WHERE DoctorName=? AND CinicName=? AND IsConfirmed=?', [doctorName, clinicName, 1])
+        appointmentCursor.execute('SELECT * FROM appointments WHERE DoctorName=? AND ClinicName=? AND IsConfirmed=?', [doctorName, clinicName, 1])
         appointments = appointmentCursor.fetchall()
         print(appointments)
         table.delete(*table.get_children())
 
-
         # Executed when searchbar is entered
         if array is None:
-            for appointment in appointments:
+            for num, appointment in enumerate(appointments, start=1):
                 appointmentID = appointment[0]
-                clinicName = appointment[7]
-                doctorType = appointment[5]
-                doctorName = appointment[3]
+                patientName = appointment[1]
                 date = appointment[9]
                 time = appointment[10]
                 dateAndTime = f'{date} ({time})'
                 duration = appointment[11]
-                if appointment[14] == 0:
-                    isConfirmed = 'Waiting For Confirmation'
-                elif appointment[14] == 1:
-                    isConfirmed = 'Confirmed'
-                elif appointment[14] == 2:
-                    isConfirmed = 'Rejected'
+                painDetails = appointment[13]
+                if appointment[15] == 'Empty':
+                    prescriptions = 'Not Given'
                 else:
-                    isConfirmed = 'Doctor Replaced'
+                    prescriptions = 'Given'
                 
 
-                data = (numOfAppointments, clinicName, doctorName, dateAndTime, duration, isConfirmed, appointmentID)
+                data = (num, patientName, dateAndTime, duration, painDetails, prescriptions)
 
 
                 if count % 2 == 0:
@@ -106,26 +98,21 @@ def doctorDashboardWindow(email):
         
         # Executed when Approve Button is clicked
         else:
-            for appointment in array:
+            for num, appointment in enumerate(array, start=1):
                 appointmentID = appointment[0]
-                clinicName = appointment[7]
-                doctorType = appointment[5]
-                doctorName = appointment[3]
+                patientName = appointment[1]
                 date = appointment[9]
                 time = appointment[10]
-                dateAndTime = f'{date} {time}'
+                dateAndTime = f'{date} ({time})'
                 duration = appointment[11]
-                if appointment[14] == 0:
-                    isConfirmed = 'Waiting For Confirmation'
-                elif appointment[14] == 1:
-                    isConfirmed = 'Confirmed'
-                elif appointment[14] == 2:
-                    isConfirmed = 'Rejected'
+                painDetails = appointment[13]
+                if appointment[15] == 'Empty':
+                    prescriptions = 'Not Given'
                 else:
-                    isConfirmed = 'Doctor Replaced'
+                    prescriptions = 'Given'
                 
 
-                data = (numOfAppointments, clinicName, doctorName, dateAndTime, duration, isConfirmed, appointmentID)
+                data = (num, patientName, dateAndTime, duration, painDetails, prescriptions)
 
 
                 if count % 2 == 0:
@@ -133,7 +120,6 @@ def doctorDashboardWindow(email):
                     print(appointment)
                 else:
                     table.insert(parent='', index='end', values=data, tags=("oddrow",))
-
 
                 count += 1
 
@@ -304,62 +290,62 @@ def doctorDashboardWindow(email):
 
     # <<<<<<<<<<<<<<<<<<<< AUTOMATED TESTING >>>>>>>>>>>>>>>>>>>>>
     # global count
-    count = 0
+    # count = 0
+    # #     if count % 2 == 0:
+    # #         table.insert(parent='', index=0, values=data, tags=("evenrow",))
+    # #     else:
+    # #         table.insert(parent='', index=0, values=data, tags=("oddrow",))
+
+    # clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
+    # adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
+
+
+
+    # for i in range(15):
+    #     num = (i+1)
+    #     clinicID = ''.join(random.choices('0123456789', k=12))
+    #     clinicName = choice(clinicNames)
+    #     clinicContact = ''.join(random.choices('0123456789', k=8))
+    #     clinicContact = f'+01{clinicContact}'
+    #     adminName = choice(adminNames)
+    #     adminEmail = f'{(adminName.replace(" ", "")).lower()}@email.com'
+
+    #     data = (num, clinicID, clinicName, clinicContact, adminName, adminEmail)
     #     if count % 2 == 0:
-    #         table.insert(parent='', index=0, values=data, tags=("evenrow",))
+    #         table.insert(parent='', index='end', values=data, tags=("evenrow",))
     #     else:
-    #         table.insert(parent='', index=0, values=data, tags=("oddrow",))
+    #         table.insert(parent='', index='end', values=data, tags=("oddrow",))
 
-    clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
-    adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
+    #     count += 1
 
+    # # Test the insertion in table
+    # def testTableInsertion():
+    #     clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
+    #     clinicAddress = ["Kuala Lumpur", "George Town", "Ipoh", "Johor Bahru", "Kota Kinabalu", "Shah Alam", "Malacca City", "Alor Setar", "Kuantan", "Kuching"]
+    #     adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
 
+    #     for name in adminNames:
+    #         email = name.replace(" ", "")
 
-    for i in range(15):
-        num = (i+1)
-        clinicID = ''.join(random.choices('0123456789', k=12))
-        clinicName = choice(clinicNames)
-        clinicContact = ''.join(random.choices('0123456789', k=8))
-        clinicContact = f'+01{clinicContact}'
-        adminName = choice(adminNames)
-        adminEmail = f'{(adminName.replace(" ", "")).lower()}@email.com'
+    #     for i in range(10):
+    #         num = i
+    #         clinicID = ''.join(random.choices('0123456789', k=12))
+    #         clinicName = choice(clinicNames)
+    #         clinicContact = ''.join(random.choices('0123456789', k=8))
+    #         clinicAddress = choice(clinicAddress)
+    #         adminName = choice(adminNames)
+    #         adminEmail = f'{email}@email.com'
 
-        data = (num, clinicID, clinicName, clinicContact, adminName, adminEmail)
-        if count % 2 == 0:
-            table.insert(parent='', index='end', values=data, tags=("evenrow",))
-        else:
-            table.insert(parent='', index='end', values=data, tags=("oddrow",))
+    #         data = (num, clinicID, clinicName, clinicContact, clinicAddress, adminName, adminEmail)
+    #         if count % 2 == 0:
+    #             table.insert(parent='', index=0, values=data, tags=("evenrow",))
+    #         else:
+    #             table.insert(parent='', index=0, values=data, tags=("oddrow",))
 
-        count += 1
-
-    # Test the insertion in table
-    def testTableInsertion():
-        clinicNames = ["Health First Clinic", "Wellness Center", "Care Plus Clinic", "Family Health Clinic", "City Medical Center", "Sunrise Clinic", "Harmony Health", "Downtown Clinic", "Healing Hands Clinic", "Prime Care Clinic"]
-        clinicAddress = ["Kuala Lumpur", "George Town", "Ipoh", "Johor Bahru", "Kota Kinabalu", "Shah Alam", "Malacca City", "Alor Setar", "Kuantan", "Kuching"]
-        adminNames = ['James Smith', 'Mary Johnson', 'John Williams', 'Patricia Brown', 'Robert Jones', 'Jennifer Garcia', 'Michael Miller', 'Linda Davis', 'William Rodriguez', 'Elizabeth Martinez']
-
-        for name in adminNames:
-            email = name.replace(" ", "")
-
-        for i in range(10):
-            num = i
-            clinicID = ''.join(random.choices('0123456789', k=12))
-            clinicName = choice(clinicNames)
-            clinicContact = ''.join(random.choices('0123456789', k=8))
-            clinicAddress = choice(clinicAddress)
-            adminName = choice(adminNames)
-            adminEmail = f'{email}@email.com'
-
-            data = (num, clinicID, clinicName, clinicContact, clinicAddress, adminName, adminEmail)
-            if count % 2 == 0:
-                table.insert(parent='', index=0, values=data, tags=("evenrow",))
-            else:
-                table.insert(parent='', index=0, values=data, tags=("oddrow",))
-
-            count += 1
+    #         count += 1
     
 
-
+    insertTreeview()
     window.mainloop()
 
 

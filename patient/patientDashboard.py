@@ -377,7 +377,7 @@ def patientDashboardWindow(email):
         print(result)
 
         clinicName = clinicNameDropdown.set(result[7])
-        doctorType = doctorTypeDropdown.set(result[6])
+        doctorType = doctorTypeDropdown.set(result[5])
         painDetails = painDetailsTextBox.insert('insert', result[13])
         doctorName = doctorDropdown.set(result[3])
         date = calendar.selection_set(result[9])
@@ -423,6 +423,7 @@ def patientDashboardWindow(email):
             doctorType = doctorTypeDropdown.get()
             painDetails = painDetailsTextBox.get(0.0, 'end').strip()
             doctorName = doctorDropdown.get()
+            doctorFirstName = doctorName.split()[0]
             date = calendar.get_date()
             time = consultationTimeDropdown.get()
             duration = consultationDurationDropdown.get()
@@ -436,21 +437,19 @@ def patientDashboardWindow(email):
             patientID = patientResult[0]
 
             # Connecting to Doctor DB to get Doctor ID
-            doctorID = 1
-            # doctorConn = sqlite3.connect('doctors.db')
-            # doctorCursor = doctorConn.cursor()
-            # doctorCursor.execute('SELECT * FROM doctors WHERE FirstName=?', [doctorFirstName])
-            # doctorResult = doctorCursor.fetchone()
-            # doctorID = doctorResult[0]
+            doctorConn = sqlite3.connect('doctors.db')
+            doctorCursor = doctorConn.cursor()
+            doctorCursor.execute('SELECT * FROM doctors WHERE FirstName=?', [doctorFirstName])
+            doctorResult = doctorCursor.fetchone()
+            doctorID = doctorResult[0]
             doctorAvailability = 0
 
             # Connecting to Doctor DB to get Doctor ID
-            # clinicAdminConn = sqlite3.connect('clinicAdmins.db')
-            # clinicAdminCursor = clinicAdminConn.cursor()
-            # clinicAdminCursor.execute('SELECT * FROM clinicAdmins WHERE ClinicName=?', [clinicName])
-            # clinicAdminResult = clinicAdminCursor.fetchone()
-            # clinicAdminID = clinicAdminResult[0]
-            clinicAdminID = 1
+            clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+            clinicAdminCursor = clinicAdminConn.cursor()
+            clinicAdminCursor.execute('SELECT * FROM clinicAdmins WHERE ClinicName=?', [clinicName])
+            clinicAdminResult = clinicAdminCursor.fetchone()
+            clinicAdminID = clinicAdminResult[0]
 
             currentDateTime = datetime.now()
             appointmentCreatedAt = currentDateTime.strftime('%Y-%m-%d %H:%M:%S')
@@ -513,7 +512,7 @@ def patientDashboardWindow(email):
                     SELECT COUNT(*)
                     FROM appointments
                     WHERE ClinicName=? AND DoctorName = ? AND AppointmentDate = ? AND AppointmentTime = ?
-                '''
+                ''' 
                 appointmentCursor.execute(selectQuery, (clinicName, doctorName, date, time))
                 count = appointmentCursor.fetchone()[0]
                 print(f"The count of repeated appointments is {count}")
@@ -755,7 +754,7 @@ def patientDashboardWindow(email):
 
         # Executed when searchbar is entered
         if array is None:
-            for appointment in appointments:
+            for num, appointment in enumerate(appointments, start=1):
                 appointmentID = appointment[0]
                 clinicName = appointment[7]
                 doctorType = appointment[5]
@@ -774,7 +773,7 @@ def patientDashboardWindow(email):
                     isConfirmed = 'Doctor Replaced'
                 
 
-                data = (numOfAppointments, clinicName, doctorName, dateAndTime, duration, isConfirmed, appointmentID)
+                data = (num, clinicName, doctorName, dateAndTime, duration, isConfirmed, appointmentID)
 
 
                 if count % 2 == 0:
@@ -787,14 +786,14 @@ def patientDashboardWindow(email):
         
         # Executed when Approve Button is clicked
         else:
-            for appointment in array:
+            for num, appointment in enumerate(array, start=1):
                 appointmentID = appointment[0]
                 clinicName = appointment[7]
                 doctorType = appointment[5]
                 doctorName = appointment[3]
                 date = appointment[9]
                 time = appointment[10]
-                dateAndTime = f'{date} {time}'
+                dateAndTime = f'{date} ({time})'
                 duration = appointment[11]
                 if appointment[14] == 0:
                     isConfirmed = 'Waiting For Confirmation'
@@ -806,7 +805,7 @@ def patientDashboardWindow(email):
                     isConfirmed = 'Doctor Replaced'
                 
 
-                data = (numOfAppointments, clinicName, doctorName, dateAndTime, duration, isConfirmed, appointmentID)
+                data = (num, clinicName, doctorName, dateAndTime, duration, isConfirmed, appointmentID)
 
 
                 if count % 2 == 0:

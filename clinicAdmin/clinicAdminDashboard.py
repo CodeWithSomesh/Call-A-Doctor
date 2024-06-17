@@ -85,7 +85,7 @@ def clinicAdminDashboardWindow(email):
                 if appointment[14] == 0:
                     isConfirmed = 'Waiting'
                 elif appointment[14] == 1:
-                    isConfirmed = 'Confirmed'
+                    isConfirmed = 'Approved'
                 elif appointment[14] == 2:
                     isConfirmed = 'Rejected'
                 elif appointment[14] == 3:
@@ -144,14 +144,6 @@ def clinicAdminDashboardWindow(email):
 
 
     def approveAppointment():
-        # Connecting to Appointments DB
-        appointmentConn = sqlite3.connect('appointments.db')
-        appointmentCursor = appointmentConn.cursor()
-
-        # Connecting to Doctors DB
-        doctorConn = sqlite3.connect('doctors.db')
-        doctorCursor = doctorConn.cursor()
-
         selectedItem = table.focus()
         if not selectedItem:
             messagebox.showerror('Error', 'Select an Appointment first.')
@@ -161,17 +153,47 @@ def clinicAdminDashboardWindow(email):
         appointmentData = table.item(selectedItem)["values"]
         appointmentID = appointmentData[0]
         isConfirmedStatus = appointmentData[5]
+        availability = appointmentData[4]
+        doctorName = appointmentData[3]
+
+
+        # Connecting to Appointments DB
+        appointmentConn = sqlite3.connect('appointments.db')
+        appointmentCursor = appointmentConn.cursor()
+        appointmentCursor.execute('SELECT DoctorID FROM appointments WHERE AppointmentID=?', [appointmentID])
+        appointmentResult = appointmentCursor.fetchone()
+        doctorID = appointmentResult[0]
+
+        # Connecting to Doctors DB to retrieve Number Of Appointments
+        doctorConn = sqlite3.connect('doctors.db')
+        doctorCursor = doctorConn.cursor()
+        doctorCursor.execute('SELECT NumberOfAppointments FROM doctors WHERE DoctorID=?', [doctorID])
+        doctorResult = doctorCursor.fetchone()
+        currentNumOfAppointments = doctorResult[0]
+        newNumber = currentNumOfAppointments + 1
+
+        
         
 
         if isConfirmedStatus == 'Approved':
             messagebox.showinfo('Info', f'This Appointment (ID: {appointmentID}) is already approved.')
+        
+        elif availability == 'Busy': # Add validation so cannot approve appointments where doctor is busy
+            messagebox.showerror('Error', f'Doctor {doctorName} is busy with another appointment at this Consultation Time.\nThis appointment cannot be approved, it needs to be reassigned to another available doctor first.')
+        
         else:
-            
+            # Update the Confirmation Status of the appointment
             appointmentCursor.execute('UPDATE appointments SET IsConfirmed=? WHERE AppointmentID=?', (1, appointmentID))
             appointmentConn.commit()
             appointmentConn.close()
+
+            # Update the Number Of Appointments of the Doctor 
+            doctorCursor.execute('UPDATE doctors SET NumberOfAppointments=? WHERE DoctorID=?', (newNumber, doctorID))
+            doctorConn.commit()
+            doctorConn.close()
+
             insertTreeview()
-            messagebox.showinfo('Success', f'This Appointment (ID: {appointmentID}) has just been approved successfully. \nThe Patient will be notified.')
+            messagebox.showinfo('Success', f'This Appointment (ID: {appointmentID}) has just been approved successfully. \nThe Patient and Doctor will be notified.')
 
     
     def rejectAppointment():
@@ -205,6 +227,8 @@ def clinicAdminDashboardWindow(email):
     def reassignToplevel():
 
         def reassignDoctor():
+            
+
             # Validate dropdown option 
             newDoctorName = doctorDropdown.get()
             if newDoctorName == 'Select Doctor':
@@ -245,11 +269,12 @@ def clinicAdminDashboardWindow(email):
         appointmentData = table.item(selectedItem)["values"]
         appointmentID = appointmentData[0]
         doctorName = appointmentData[3]
+        doctorType = appointmentData[2]
         doctorAvailability = appointmentData[4]
         
 
         if doctorAvailability == 'Available':
-            messagebox.showerror('Error', f'Doctor {doctorName}) is Available for this appointment schedule.\nThis appointment cannot be reassigned.')
+            messagebox.showerror('Error', f'Doctor {doctorName} is Available for this appointment schedule.\nThis appointment cannot be reassigned.')
             return
 
 
@@ -264,17 +289,35 @@ def clinicAdminDashboardWindow(email):
         topFrame = ctk.CTkFrame(toplevel, width=650, height=500, fg_color="#FFFDFD" )
         topFrame.pack(side='top', fill='x', expand=False, padx=(65, 65), pady=(50,0))
 
+        # Connecting to Doctor DB
+        doctorConn = sqlite3.connect('doctors.db')
+        doctorCursor = doctorConn.cursor()
+
+        # Getting Doctors who are approved and under the selected specialization
+        doctorCursor.execute('SELECT FirstName, LastName FROM doctors WHERE IsApproved=? AND Specialization=?', (1, doctorType))
+        doctors = doctorCursor.fetchall()
+
+        # Combine FirstName and LastName to create full names
+        doctorNames = [f"{doctor[0]} {doctor[1]}" for doctor in doctors]
+
+        # Insert a placeholder at the start of the list
+        doctorNames.insert(0, 'Select Doctor')
+        print(f"Approved Doctor Names Array: {doctorNames}") #Testing 
+
+        
+
         # Select Doctor Dropdown
         doctorDropdownLabel = ctk.CTkLabel(topFrame, text="Select New Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         doctorDropdownLabel.pack(side='top', fill='x', expand=False,)
         doctorDropdown = ctk.CTkComboBox(
             topFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            values=['Select Doctor', 'Maisarah Majdi', 'Someshwar Rao', 'Karen Khor Siew Li'], border_color="#b5b3b3", border_width=1,
+            border_color="#b5b3b3", border_width=1, values=['Select Doctor'],
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
             dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
         )
         doctorDropdown.pack(side='left', fill='x', expand=True,)
+        doctorDropdown.configure(values=doctorNames)
 
         # Reassign Button with Icon
         reassignIconPath = relative_to_assets("reassign-icon.png")
