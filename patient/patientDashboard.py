@@ -44,7 +44,7 @@ def patientDashboardWindow(email):
         )          
     """)
 
-    # Connecting to Patient Admin DB
+    # Connecting to Patient DB
     patientConn = sqlite3.connect('patients.db')
     patientCursor = patientConn.cursor()
     patientCursor.execute('SELECT * FROM patients WHERE Email=?', [email])

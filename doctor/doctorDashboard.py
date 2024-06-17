@@ -17,6 +17,16 @@ OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\doctor\assets\frame0")
 
 def doctorDashboardWindow(email):
+
+    # Connecting to Doctor DB
+    doctorConn = sqlite3.connect('doctors.db')
+    doctorCursor = doctorConn.cursor()
+    doctorCursor.execute('SELECT * FROM doctors WHERE Email=?', [email])
+    result = doctorCursor.fetchone()
+    username = f"{result[1]} {result[2]}" # Getting user's full name to display on top 
+    clinicName = result[7]
+
+
     # Helper function to get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
@@ -187,10 +197,31 @@ def doctorDashboardWindow(email):
 
 
     # Label with Greeting Message & User's Full Name 
-    greetingLabel1 = ctk.CTkLabel(whiteFrame, text="Welcome, Someshwar Rao", font=("Inter", 36, "bold",), text_color="#000000")
+
+    now = datetime.now()  # Get the current date and time
+    todayInt = now.day # Get the current date in integer
+    thisMonth = now.month # Get the current month in integer
+    thisYear = now.year # Get the current year in integer
+    formatted_date = now.strftime("%B %d, %Y") # Format the date as 'Month Day, Year'
+    current_hour = now.hour # Get the current hour
+    current_time = now.strftime("%H:%M:%S") # Get the current time
+
+    # Generate greeting message based on the current time
+    if current_hour < 12:
+        greeting = "Good Morning!"
+    elif 12 <= current_hour < 18:
+        greeting = "Good Afternoon!"
+    else:
+        greeting = "Good Evening!" 
+
+
+    greetingLabel1 = ctk.CTkLabel(whiteFrame, text=f"Welcome, {username}", font=("Inter", 36, "bold",), text_color="#000000")
     greetingLabel1.place(x=25, y=25)
-    greetingLabel2 = ctk.CTkLabel(whiteFrame, text="Good Morning!  (January 26, 2024)", font=("Inter", 22,), text_color="#000000")
+    greetingLabel2 = ctk.CTkLabel(whiteFrame, text=f"{greeting}  ({formatted_date})", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
+    clinicName = ctk.CTkLabel(whiteFrame, text=f"({clinicName})", font=("Inter", 22,), text_color="#000000")
+    clinicName.place(x=348, y=72)
+
     roleLabel = ctk.CTkLabel(whiteFrame, text="(Doctor)", font=("Inter", 36, "bold",), text_color="#000000")
     roleLabel.place(x=875, y=25)
 
