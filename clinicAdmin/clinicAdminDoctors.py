@@ -156,7 +156,7 @@ def clinicAdminDoctorWindow(email):
         
 
         if isApproveStatus == 'Approved':
-            messagebox.showinfo(f"Info", "Doctor {doctorName}'s access is already approved.")
+            messagebox.showinfo("Info", f"Doctor {doctorName}'s access is already approved.")
         else:
             
             doctorCursor.execute('UPDATE doctors SET IsApproved=? WHERE DoctorID=?', (1, doctorID))
@@ -184,7 +184,7 @@ def clinicAdminDoctorWindow(email):
         
 
         if isApproveStatus == 'Rejected':
-            messagebox.showinfo(f"Info", "Doctor {doctorName}'s access is already rejected.")
+            messagebox.showinfo("Info", f"Doctor {doctorName}'s access is already rejected.")
         else:
             
             doctorCursor.execute('UPDATE doctors SET IsApproved=? WHERE DoctorID=?', (2, doctorID))

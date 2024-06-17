@@ -190,7 +190,7 @@ def patientDashboardWindow(email):
         # Convert the list of tuples to a list of strings
         clinicNames = [clinic[0] for clinic in clinicAdmins]
         clinicNames.insert(0, 'Select Your Clinic')
-        print(f"Approved Clinic Names Array: {clinicNames}")
+        #print(f"Approved Clinic Names Array: {clinicNames}")
         
         # Select Clinic Dropdown Menu
         clinicNameLabel = ctk.CTkLabel(topFrame, text="Select Clinic", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
@@ -214,21 +214,27 @@ def patientDashboardWindow(email):
         # gMapsWidget.set_tile_server("https://mt0.google.com/vt/lyrs=s&hl=e...{x}&y={y}&z={z}&s=Ga", max_zoom=22)  # google satellite
         # gMapsWidget.set_tile_server("http://c.tile.stamen.com/watercolor/{z}/{x}/{y}.png")  # painting style
         # marker.set_text("Select A Clinic")
+
+
+        # Connecting to Doctor DB
+        doctorConn = sqlite3.connect('doctors.db')
+        doctorCursor = doctorConn.cursor()
+        doctorCursor.execute('SELECT Specialization FROM doctors WHERE IsApproved=?', (1,))
+        doctors = doctorCursor.fetchall()
+
+        
+        specializations = list(set([specialization[0] for specialization in doctors]))
+        specializations.insert(0, 'Select Type')
+        print(specializations)
+        print(f"Approved Docotrs Specializations Array: {specializations}")
         
 
         doctorTypeLabel = ctk.CTkLabel(topFrame, text="Select Type Of Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         doctorTypeLabel.pack(side='top', fill='x', expand=False, pady=(30,0))
-        doctorTypes = [
-            "Select Type","Allergist", "Cardiologist", "Dermatologist", "Endocrinologist", 
-            "Gastroenterologist", "Geriatrician", "Internist", "Nephrologist", "Neurologist", 
-            "Obstetrician/Gynecologist", "Oncologist", "Ophthalmologist", "Orthopedic Surgeon", 
-            "Pediatrician", "Podiatrist", "Psychiatrist", "Pulmonologist", "Rheumatologist", 
-            "General Practitioner", "Family Medicine Doctor", "Home Health Care Doctor", 
-            "Emergency Medicine Specialist"]
         doctorTypeDropdown = ctk.CTkComboBox(
             topFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            values=doctorTypes, border_color="#b5b3b3", border_width=1,
+            values=specializations, border_color="#b5b3b3", border_width=1,
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
             dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
         )
@@ -248,13 +254,26 @@ def patientDashboardWindow(email):
         leftFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD", )
         leftFrame.pack(side='left', fill='both', expand=False, padx=65, pady=30)
 
+        # Connecting to Doctor DB
+        doctorConn = sqlite3.connect('doctors.db')
+        doctorCursor = doctorConn.cursor()
+        doctorCursor.execute('SELECT FirstName, LastName FROM doctors WHERE IsApproved=?', (1,))
+        doctors = doctorCursor.fetchall()
+
+        # Combine FirstName and LastName to create full names
+        doctorNames = [f"{doctor[0]} {doctor[1]}" for doctor in doctors]
+
+        # Insert a placeholder at the start of the list
+        doctorNames.insert(0, 'Select Your Doctor')
+        print(f"Approved Doctor Names Array: {doctorNames}")
+
         # Select Doctor Dropdown
         doctorDropdownLabel = ctk.CTkLabel(leftFrame, text="Select Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         doctorDropdownLabel.pack(side='top', fill='x', expand=False,)
         doctorDropdown = ctk.CTkComboBox(
             leftFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            values=['Select Doctor', 'Maisarah Majdi', 'Someshwar Rao', 'Karen Khor Siew Li'], border_color="#b5b3b3", border_width=1,
+            values=doctorNames, border_color="#b5b3b3", border_width=1,
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
             dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
         )
@@ -516,6 +535,17 @@ def patientDashboardWindow(email):
         clinicNames = [clinic[0] for clinic in clinicAdmins]
         clinicNames.insert(0, 'Select Your Clinic')
         print(f"Approved Clinic Names Array: {clinicNames}")
+
+        def displayMap(location):
+            # Connecting to Clinic Admin DB
+            clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+            clinicAdminCursor = clinicAdminConn.cursor()
+            clinicAdminCursor.execute('SELECT ClinicAddress FROM clinicAdmins WHERE ClinicName=?', [location])
+            clinicLocation = clinicAdminCursor.fetchone()
+
+
+            gMapsWidget.set_address(clinicLocation, marker=True)
+            print(clinicLocation)
         
         # Select Clinic Dropdown Menu
         clinicNameLabel = ctk.CTkLabel(topFrame, text="Select Clinic", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
@@ -525,9 +555,11 @@ def patientDashboardWindow(email):
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
             values=clinicNames, border_color="#b5b3b3", border_width=1,
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
-            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True, command=displayMap
         )
         clinicNameDropdown.pack(side='top', fill='x', expand=False,)
+
+        
 
         gMapsWidget = TkinterMapView(topFrame, width=650, height=400)
         gMapsWidget.pack(side='top', fill='x', expand=True, pady=(10,0), padx=(0,5))
@@ -539,25 +571,48 @@ def patientDashboardWindow(email):
         # gMapsWidget.set_tile_server("https://mt0.google.com/vt/lyrs=s&hl=e...{x}&y={y}&z={z}&s=Ga", max_zoom=22)  # google satellite
         # gMapsWidget.set_tile_server("http://c.tile.stamen.com/watercolor/{z}/{x}/{y}.png")  # painting style
         # marker.set_text("Select A Clinic")
-        
 
+        # Connecting to Doctor DB
+        doctorConn = sqlite3.connect('doctors.db')
+        doctorCursor = doctorConn.cursor()
+        doctorCursor.execute('SELECT Specialization FROM doctors WHERE IsApproved=?', (1,))
+        doctors = doctorCursor.fetchall()
+
+        # Making sure the available Specializations are all unique 
+        specializations = list(set([specialization[0] for specialization in doctors]))
+        specializations.insert(0, 'Select Type')
+        print(f"Approved Doctors Specializations Array: {specializations}")
+
+        def renderDoctorName(doctorType):
+            # Connecting to Doctor DB
+            doctorConn = sqlite3.connect('doctors.db')
+            doctorCursor = doctorConn.cursor()
+
+            # Getting Doctors who are approved and under the selected specialization
+            doctorCursor.execute('SELECT FirstName, LastName FROM doctors WHERE IsApproved=? AND Specialization=?', (1, doctorType))
+            doctors = doctorCursor.fetchall()
+
+            # Combine FirstName and LastName to create full names
+            doctorNames = [f"{doctor[0]} {doctor[1]}" for doctor in doctors]
+
+            # Insert a placeholder at the start of the list
+            doctorNames.insert(0, 'Select Doctor')
+            print(f"Approved Doctor Names Array: {doctorNames}")
+
+            doctorDropdown.configure(values=doctorNames)
+
+        
         doctorTypeLabel = ctk.CTkLabel(topFrame, text="Select Type Of Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         doctorTypeLabel.pack(side='top', fill='x', expand=False, pady=(30,0))
-        doctorTypes = [
-            "Select Type","Allergist", "Cardiologist", "Dermatologist", "Endocrinologist", 
-            "Gastroenterologist", "Geriatrician", "Internist", "Nephrologist", "Neurologist", 
-            "Obstetrician/Gynecologist", "Oncologist", "Ophthalmologist", "Orthopedic Surgeon", 
-            "Pediatrician", "Podiatrist", "Psychiatrist", "Pulmonologist", "Rheumatologist", 
-            "General Practitioner", "Family Medicine Doctor", "Home Health Care Doctor", 
-            "Emergency Medicine Specialist"]
         doctorTypeDropdown = ctk.CTkComboBox(
             topFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            values=doctorTypes, border_color="#b5b3b3", border_width=1,
+            values=specializations, border_color="#b5b3b3", border_width=1,
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
-            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True, command=renderDoctorName
         )
         doctorTypeDropdown.pack(side='top', fill='x', expand=False, pady=(0,0), padx=(0,5))
+
 
         painDetailsLabel = ctk.CTkLabel(topFrame, text="Explain Pain Details", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         painDetailsLabel.pack(side='top', fill='x', expand=False, pady=(30,0))
@@ -573,24 +628,18 @@ def patientDashboardWindow(email):
         leftFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD", )
         leftFrame.pack(side='left', fill='both', expand=False, padx=65, pady=30)
 
-        # Connecting to Doctor DB
-        doctorConn = sqlite3.connect('doctors.db')
-        doctorCursor = doctorConn.cursor()
-        doctorCursor.execute('SELECT * FROM doctors WHERE IsApproved=?', [1])
-        doctors = doctorCursor.fetchall()
-        # Convert the list of tuples to a list of strings
-        doctorNames = [doctor[0] for doctor in doctors]
-        doctorNames.insert(0, 'Select Doctor')
-        print(f"Approved Clinic Names Array: {doctorNames}")
         
 
+        
+
+        
 
         doctorDropdownLabel = ctk.CTkLabel(leftFrame, text="Select Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         doctorDropdownLabel.pack(side='top', fill='x', expand=False,)
         doctorDropdown = ctk.CTkComboBox(
             leftFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            values=['Select Doctor', 'Maisarah Majdi', 'Someshwar Rao', 'Karen Khor Siew Li'], border_color="#b5b3b3", border_width=1,
+            border_color="#b5b3b3", border_width=1, values=['Select Doctor'],
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
             dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
         )
