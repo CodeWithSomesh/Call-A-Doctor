@@ -52,7 +52,8 @@ def signInWindow():
             ClinicName TEXT NOT NULL,
             Specialization TEXT NOT NULL,
             YearsOfExperience TEXT NOT NULL,
-            IsApproved INTEGER DEFAULT 0
+            IsApproved INTEGER DEFAULT 0,
+            NumberOfAppointments INTEGER DEFAULT 0
         )          
     """)
 
@@ -317,6 +318,10 @@ def signInWindow():
             if validateCredentials(email, password) is False:
                 return
             
+            if clinicName == 'Select Your Clinic':
+                messagebox.showerror('Error', 'Please select your Clinic.')
+                return
+            
             if doctorSpecialization == 'Select Type':
                 messagebox.showerror('Error', 'Please select your Specialization.')
                 return
@@ -329,8 +334,8 @@ def signInWindow():
                 hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
                 print(hashedPassword)
                 doctorCursor.execute(
-                    'INSERT INTO doctors (FirstName, LastName, Email, Password, NRIC, Role, ClinicName, Specialization, YearsOfExperience, IsApproved) VALUES (?,?,?,?,?,?,?,?,?,?)', 
-                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, doctorSpecialization, yearsOfExp, 0]
+                    'INSERT INTO doctors (FirstName, LastName, Email, Password, NRIC, Role, ClinicName, Specialization, YearsOfExperience, IsApproved, NumberOfAppointments) VALUES (?,?,?,?,?,?,?,?,?,?,?)', 
+                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, doctorSpecialization, yearsOfExp, 0, 0]
                 )
                 doctorConn.commit()
                 messagebox.showinfo('Success', "Doctor Account has been created successfully. \nWaiting for your Clinic Admin's approval. \nYou can login after their approval.")
@@ -631,12 +636,21 @@ def signInWindow():
 
     doctorBottomFrame = ctk.CTkFrame(scrollable_frame, width=341, height=500, fg_color="#FFFDFD",)
 
+    # Connecting to Clinic Admin DB
+    clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+    clinicAdminCursor = clinicAdminConn.cursor()
+    clinicAdminCursor.execute('SELECT ClinicName FROM clinicAdmins WHERE IsApproved=?', [1])
+    clinicAdmins = clinicAdminCursor.fetchall()
+    # Convert the list of tuples to a list of strings
+    clinicNames = [clinic[0] for clinic in clinicAdmins]
+    clinicNames.insert(0, 'Select Your Clinic')
+    print(f"Approved Clinic Names Array: {clinicNames}")
 
     doctorClinicNameLabel = ctk.CTkLabel(doctorBottomFrame, text="Clinic Name", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
     doctorClinicNameDropdown = ctk.CTkComboBox(
         doctorBottomFrame, fg_color="#ffffff", text_color="#000000", width=620, height=48, 
         font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-        values=['Clinic Panmedic', 'Clinic Sungai Nibong', 'Clinic Medicare', 'Clinic HealthSync'], border_color="#b5b3b3", border_width=1,
+        values=clinicNames, border_color="#b5b3b3", border_width=1,
         dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
         dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
     )
@@ -664,7 +678,19 @@ def signInWindow():
     logInLabel2.pack(side='left', fill='x', expand=False, padx=(0, 0), pady=(10, 40))
 
 
+    # Connecting to Doctor DB
+    doctorConn = sqlite3.connect('doctors.db')
+    doctorCursor = doctorConn.cursor()
+    doctorCursor.execute('SELECT * FROM doctors WHERE IsApproved=?', [0])
+    doctors = doctorCursor.fetchall()
+    print(doctors)
+    # Convert the list of tuples to a list of strings
+    # doctorNames = [doctor[0] for doctor in doctors]
+    # doctorNames.insert(0, 'Select Doctor')
+    # print(f"Approved Doctor Names Array: {doctorNames}")
+
     window.mainloop()
+
 
 
 

@@ -325,7 +325,7 @@ def clinicAdminDoctorWindow(email):
     greetingLabel2 = ctk.CTkLabel(whiteFrame, text=f"{greeting}  ({formatted_date})", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
     clinicName = ctk.CTkLabel(whiteFrame, text=f"({clinicName})", font=("Inter", 22,), text_color="#000000")
-    clinicName.place(x=350, y=72)
+    clinicName.place(x=348, y=72)
 
     roleLabel = ctk.CTkLabel(whiteFrame, text="(Clinic Admin)", font=("Inter", 36, "bold",), text_color="#000000")
     roleLabel.place(x=775, y=25)

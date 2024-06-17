@@ -39,7 +39,8 @@ def patientDashboardWindow(email):
             AppointmentDuration TEXT NOT NULL,
             AppointmentCreatedTime TEXT NOT NULL,
             PainDetails TEXT NOT NULL,
-            IsConfirmed INTEGER DEFAULT 0
+            IsConfirmed INTEGER DEFAULT 0,
+            Prescriptions TEXT NOT NULL               
         )          
     """)
 
@@ -180,6 +181,16 @@ def patientDashboardWindow(email):
         # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< TOP FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         topFrame = ctk.CTkFrame(parentFrame, width=650, height=500, fg_color="#FFFDFD" )
         topFrame.pack(side='top', fill='x', expand=False, padx=(65, 80), pady=(20,0))
+
+        # Connecting to Clinic Admin DB
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
+        clinicAdminCursor.execute('SELECT ClinicName FROM clinicAdmins WHERE IsApproved=?', [1])
+        clinicAdmins = clinicAdminCursor.fetchall()
+        # Convert the list of tuples to a list of strings
+        clinicNames = [clinic[0] for clinic in clinicAdmins]
+        clinicNames.insert(0, 'Select Your Clinic')
+        print(f"Approved Clinic Names Array: {clinicNames}")
         
         # Select Clinic Dropdown Menu
         clinicNameLabel = ctk.CTkLabel(topFrame, text="Select Clinic", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
@@ -187,7 +198,7 @@ def patientDashboardWindow(email):
         clinicNameDropdown = ctk.CTkComboBox(
             topFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            values=['Clinic Name', 'Panmedic', 'Health Sync', 'Clinic Sungai Ara'], border_color="#b5b3b3", border_width=1,
+            values=clinicNames, border_color="#b5b3b3", border_width=1,
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
             dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
         )
@@ -425,8 +436,8 @@ def patientDashboardWindow(email):
 
                 # Insert Appoinment into DB
                 appointmentCursor.execute(
-                    'INSERT INTO appointments (PatientName, PatientID, DoctorName, DoctorID, DoctorType, DoctorAvailability, ClinicName, ClinicID, AppointmentDate, AppointmentTime, AppointmentDuration, AppointmentCreatedTime, PainDetails, IsConfirmed) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
-                    [patientName, patientID, doctorName, doctorID, doctorType, doctorAvailability, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails, 0])
+                    'INSERT INTO appointments (PatientName, PatientID, DoctorName, DoctorID, DoctorType, DoctorAvailability, ClinicName, ClinicID, AppointmentDate, AppointmentTime, AppointmentDuration, AppointmentCreatedTime, PainDetails, IsConfirmed, Prescriptions) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
+                    [patientName, patientID, doctorName, doctorID, doctorType, doctorAvailability, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails, 0, "Empty"])
                 appointmentConn.commit()
                 appointmentID = appointmentCursor.lastrowid # Retrieve the AppointmentID of the newly inserted row
                 print(f"The new appointment ID is: {appointmentID}")
@@ -496,13 +507,23 @@ def patientDashboardWindow(email):
         topFrame = ctk.CTkFrame(parentFrame, width=650, height=500, fg_color="#FFFDFD" )
         topFrame.pack(side='top', fill='x', expand=False, padx=(65, 80), pady=(20,0))
         
+        # Connecting to Clinic Admin DB
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
+        clinicAdminCursor.execute('SELECT ClinicName FROM clinicAdmins WHERE IsApproved=?', [1])
+        clinicAdmins = clinicAdminCursor.fetchall()
+        # Convert the list of tuples to a list of strings
+        clinicNames = [clinic[0] for clinic in clinicAdmins]
+        clinicNames.insert(0, 'Select Your Clinic')
+        print(f"Approved Clinic Names Array: {clinicNames}")
+        
         # Select Clinic Dropdown Menu
         clinicNameLabel = ctk.CTkLabel(topFrame, text="Select Clinic", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         clinicNameLabel.pack(side='top', fill='x', expand=False)
         clinicNameDropdown = ctk.CTkComboBox(
             topFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            values=['Clinic Name', 'Panmedic', 'Health Sync', 'Clinic Sungai Ara'], border_color="#b5b3b3", border_width=1,
+            values=clinicNames, border_color="#b5b3b3", border_width=1,
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
             dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
         )
@@ -551,6 +572,18 @@ def patientDashboardWindow(email):
         # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< LEFT FRAME INSDIE PARENT SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         leftFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD", )
         leftFrame.pack(side='left', fill='both', expand=False, padx=65, pady=30)
+
+        # Connecting to Doctor DB
+        doctorConn = sqlite3.connect('doctors.db')
+        doctorCursor = doctorConn.cursor()
+        doctorCursor.execute('SELECT * FROM doctors WHERE IsApproved=?', [1])
+        doctors = doctorCursor.fetchall()
+        # Convert the list of tuples to a list of strings
+        doctorNames = [doctor[0] for doctor in doctors]
+        doctorNames.insert(0, 'Select Doctor')
+        print(f"Approved Clinic Names Array: {doctorNames}")
+        
+
 
         doctorDropdownLabel = ctk.CTkLabel(leftFrame, text="Select Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         doctorDropdownLabel.pack(side='top', fill='x', expand=False,)

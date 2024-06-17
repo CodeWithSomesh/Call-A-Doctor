@@ -16,7 +16,7 @@ import customtkinter as ctk
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Somesh\Documents\Desktop App (Software Engineering Module)\Call-A-Doctor\doctor\assets\frame0")
 
-def doctorDashboardWindow():
+def doctorDashboardWindow(email):
     # Helper function to get the full path of assets
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
@@ -46,6 +46,97 @@ def doctorDashboardWindow():
         searchInputTextBox.delete('0.0', "end")
         searchInputTextBox.insert('0.0', "Search Patients by Name or Address")
         searchInputTextBox.configure(text_color='gray')
+
+    global count
+    count = 0
+    def insertTreeview(array=None):
+        global count
+
+        # Connecting to Doctors DB
+        doctorConn = sqlite3.connect('doctors.db')
+        doctorCursor = doctorConn.cursor()
+        doctorCursor.execute('SELECT * FROM doctors WHERE Email=?', [email])
+        result = doctorCursor.fetchone()
+        doctorName = f"{result[1]} {result[2]}" # Getting Doctor's Name
+        clinicName = result[7]
+        isApprovedStatus = result[10]
+        #numOfAppointments = result[8] # Getting Doctor's number of appointments
+        
+
+        # Connecting to Appointments DB
+        appointmentConn = sqlite3.connect('appointments.db')
+        appointmentCursor = appointmentConn.cursor()
+        appointmentCursor.execute('SELECT * FROM appointments WHERE DoctorName=? AND CinicName=? AND IsConfirmed=?', [doctorName, clinicName, 1])
+        appointments = appointmentCursor.fetchall()
+        print(appointments)
+        table.delete(*table.get_children())
+
+
+        # Executed when searchbar is entered
+        if array is None:
+            for appointment in appointments:
+                appointmentID = appointment[0]
+                clinicName = appointment[7]
+                doctorType = appointment[5]
+                doctorName = appointment[3]
+                date = appointment[9]
+                time = appointment[10]
+                dateAndTime = f'{date} ({time})'
+                duration = appointment[11]
+                if appointment[14] == 0:
+                    isConfirmed = 'Waiting For Confirmation'
+                elif appointment[14] == 1:
+                    isConfirmed = 'Confirmed'
+                elif appointment[14] == 2:
+                    isConfirmed = 'Rejected'
+                else:
+                    isConfirmed = 'Doctor Replaced'
+                
+
+                data = (numOfAppointments, clinicName, doctorName, dateAndTime, duration, isConfirmed, appointmentID)
+
+
+                if count % 2 == 0:
+                    table.insert(parent='', index='end', values=data, tags=("evenrow",))
+                    print(appointment)
+                else:
+                    table.insert(parent='', index='end', values=data, tags=("oddrow",))
+
+                count += 1
+        
+        # Executed when Approve Button is clicked
+        else:
+            for appointment in array:
+                appointmentID = appointment[0]
+                clinicName = appointment[7]
+                doctorType = appointment[5]
+                doctorName = appointment[3]
+                date = appointment[9]
+                time = appointment[10]
+                dateAndTime = f'{date} {time}'
+                duration = appointment[11]
+                if appointment[14] == 0:
+                    isConfirmed = 'Waiting For Confirmation'
+                elif appointment[14] == 1:
+                    isConfirmed = 'Confirmed'
+                elif appointment[14] == 2:
+                    isConfirmed = 'Rejected'
+                else:
+                    isConfirmed = 'Doctor Replaced'
+                
+
+                data = (numOfAppointments, clinicName, doctorName, dateAndTime, duration, isConfirmed, appointmentID)
+
+
+                if count % 2 == 0:
+                    table.insert(parent='', index='end', values=data, tags=("evenrow",))
+                    print(appointment)
+                else:
+                    table.insert(parent='', index='end', values=data, tags=("oddrow",))
+
+
+                count += 1
+
 
 
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
@@ -165,8 +256,8 @@ def doctorDashboardWindow():
     table = ttk.Treeview(tableFrame, yscrollcommand=tableScrollbar1.set,height=12)
     table.pack(side='left', fill='both')
     table['columns'] = (
-        'No', 'Clinic ID', 'Clinic Name', 'Clinic Contact',
-        "Clinic Admin", "Admin Email"
+        'No', 'Patient Name', 'Date & Time', 'Duration',
+        "Pain Details", "Prescriptions",
     )
 
     # Placing and Configuring Treeview Scrollbar
@@ -191,20 +282,20 @@ def doctorDashboardWindow():
 
     # Treeview Table Headings Details
     table.heading('No', text='No')
-    table.heading('Clinic ID', text='Clinic ID',)
-    table.heading('Clinic Name', text='Clinic Name')
-    table.heading('Clinic Contact', text='Clinic Contact')
-    table.heading('Clinic Admin', text='Clinic Admin')
-    table.heading('Admin Email', text='Admin Email')
+    table.heading('Patient Name', text='Patient Name',)
+    table.heading('Date & Time', text='Date & Time')
+    table.heading('Duration', text='Duration')
+    table.heading('Pain Details', text='Pain Details')
+    table.heading('Prescriptions', text='Prescriptions')
 
     # Treeview Table Columns Details
     table.column("#0", width=0, stretch=ctk.NO)
     table.column("No", width=43, anchor=ctk.CENTER)
-    table.column("Clinic ID", anchor=ctk.CENTER)
-    table.column("Clinic Name", width=220, anchor=ctk.CENTER)
-    table.column("Clinic Contact", anchor=ctk.CENTER)
-    table.column("Clinic Admin", width=250, anchor=ctk.CENTER)
-    table.column("Admin Email", width=315, anchor=ctk.CENTER,)
+    table.column("Patient Name", width=250, anchor=ctk.CENTER)
+    table.column("Date & Time", width=200, anchor=ctk.CENTER)
+    table.column("Duration", width=200, anchor=ctk.CENTER)
+    table.column("Pain Details", width=380, anchor=ctk.CENTER)
+    table.column("Prescriptions", width=160, anchor=ctk.CENTER)
 
     # Setting alternating colours for the rows in Treeview
     table.tag_configure("oddrow", background="#F2F5F8")
@@ -212,7 +303,7 @@ def doctorDashboardWindow():
 
 
     # <<<<<<<<<<<<<<<<<<<< AUTOMATED TESTING >>>>>>>>>>>>>>>>>>>>>
-    global count
+    # global count
     count = 0
     #     if count % 2 == 0:
     #         table.insert(parent='', index=0, values=data, tags=("evenrow",))
@@ -274,4 +365,4 @@ def doctorDashboardWindow():
 
 # Only execute the Doctor Dashboard Window if this script is run directly
 if __name__ == "__main__":
-    doctorDashboardWindow()
+    doctorDashboardWindow(email=None)
