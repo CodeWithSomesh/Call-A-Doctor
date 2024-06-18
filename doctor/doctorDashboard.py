@@ -54,7 +54,7 @@ def doctorDashboardWindow(email):
     def searchbarOutFocus(event):
         print(event)
         searchInputTextBox.delete('0.0', "end")
-        searchInputTextBox.insert('0.0', "Search Patients by Name or Address")
+        searchInputTextBox.insert('0.0', "Search by Appointment Details")
         searchInputTextBox.configure(text_color='gray')
 
     global count
@@ -300,7 +300,7 @@ def doctorDashboardWindow(email):
         border_color="#000", font=("Inter", 21), border_spacing=8,
         scrollbar_button_color="#1AFF75", border_width=2,
     )
-    searchInputTextBox.insert('insert', "Search by Doctor Details")
+    searchInputTextBox.insert('insert', "Search by Appointment Details")
     searchInputTextBox.place(x=293, y=225)
     searchInputTextBox.bind("<FocusIn>", searchbarFocus)
     searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
