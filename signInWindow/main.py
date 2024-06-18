@@ -237,7 +237,7 @@ def signInWindow():
         logInLabel2.pack(side='left', fill='x', expand=False, padx=(0, 0), pady=(10, 40))
 
     # Validating user's email and password for increased security
-    def validateCredentials(email, password):
+    def validateCredentials(email, password, nric):
         if "@" not in email:
             messagebox.showerror('Error', 'Enter a valid email address.')
             return False
@@ -245,6 +245,10 @@ def signInWindow():
         if ".com" not in email:
             messagebox.showerror('Error', 'Enter a valid email address.')
             return False 
+        
+        if any(char.isupper() for char in email):
+            messagebox.showerror('Error', "Email should not contain capital letters. Please try again.")
+            return False
         
         if len(password) <= 8:
             messagebox.showerror('Error', 'Password must be more than 8 characters')
@@ -261,6 +265,31 @@ def signInWindow():
         if not re.search(r'[\W_]', password):  # \W matches any non-word character, _ is included to catch underscore as a symbol
             messagebox.showerror('Error', 'Password must contain at least 1 symbol.')
             return False
+        
+        if len(nric) != 12 or not nric.isdigit():
+            messagebox.showerror('Error', "NRIC must be exactly 12 digits long and contain only numbers. Please try again.")
+            return False
+
+        # Extract year, month, and day parts
+        year_part = nric[:2]
+        month_part = nric[2:4]
+        day_part = nric[4:6]
+        
+        # Validate year part
+        if not (0 <= int(year_part) <= 99):
+            messagebox.showerror('Error', "Invalid year part in NRIC. Please try again.")
+            return False
+        
+        # Validate month part
+        if not (1 <= int(month_part) <= 12):
+            messagebox.showerror('Error', "Invalid month part in NRIC. Please try again.")
+            return False
+        
+        # Validate day part
+        if not (1 <= int(day_part) <= 31):
+            messagebox.showerror('Error', "Invalid day part in NRIC. Please try again.")
+            return False
+        
         
         return True
 
@@ -279,7 +308,7 @@ def signInWindow():
         if (firstName != '' and lastName != '' and email != '' and password != '' and nric != '' and 
             role != '' and address != ''):
 
-            if validateCredentials(email, password) is False:
+            if validateCredentials(email, password, nric) is False:
                 return
 
             patientCursor.execute('SELECT Email FROM patients WHERE Email=?', [email])
@@ -315,7 +344,7 @@ def signInWindow():
         if (firstName != '' and lastName != '' and email != '' and password != '' and nric != '' and 
             role != '' and clinicName != '' and doctorSpecialization != '' and yearsOfExp != '' ):
 
-            if validateCredentials(email, password) is False:
+            if validateCredentials(email, password, nric) is False:
                 return
             
             if clinicName == 'Select Your Clinic':
@@ -338,6 +367,8 @@ def signInWindow():
                     [firstName, lastName, email, hashedPassword, nric, role, clinicName, doctorSpecialization, yearsOfExp, 0, 0]
                 )
                 doctorConn.commit()
+
+                
                 messagebox.showinfo('Success', "Doctor Account has been created successfully. \nWaiting for your Clinic Admin's approval. \nYou can login after their approval.")
         else:
             messagebox.showerror('Error',"Please fill up all the fields.")
@@ -358,7 +389,7 @@ def signInWindow():
         if (firstName != '' and lastName != '' and email != '' and password != '' and nric != '' and 
             role != '' and clinicName != '' and clinicAddress != '' and clinicContact != '' ):
 
-            if validateCredentials(email, password) is False:
+            if validateCredentials(email, password, nric) is False:
                 return
         
 
@@ -369,6 +400,8 @@ def signInWindow():
                 encodedPassword = password.encode('utf-8')
                 hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt()) #Hashing the password
                 print(hashedPassword)
+
+                
 
 
                 clinicAdminCursor.execute(
@@ -398,7 +431,7 @@ def signInWindow():
         if (firstName != '' and lastName != '' and email != '' and password != '' and nric != '' and 
             role != '' and adminSecretKey != ''):
 
-            if validateCredentials(email, password) is False:
+            if validateCredentials(email, password, nric) is False:
                 return
             
             if adminSecretKey != 'a1b2c3Z9Y8X7a1b2c3Z9Y8X7a1b2c3Z9Y8X7':

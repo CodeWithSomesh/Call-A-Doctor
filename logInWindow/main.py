@@ -60,6 +60,10 @@ def logInWindow():
         if ".com" not in email:
             messagebox.showerror('Error', 'Enter a valid email address.')
             return False 
+
+        if any(char.isupper() for char in email):
+            messagebox.showerror('Error', "Email should not contain capital letters. Please try again.")
+            return False 
         
         if len(password) <= 8:
             messagebox.showerror('Error', 'Password must be more than 8 characters')
@@ -76,6 +80,8 @@ def logInWindow():
         if not re.search(r'[\W_]', password):  # \W matches any non-word character, _ is included to catch underscore as a symbol
             messagebox.showerror('Error', 'Password must contain at least 1 symbol.')
             return False
+        
+        
         
         return True
     

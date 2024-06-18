@@ -174,6 +174,58 @@ def doctorDashboardWindow(email):
             result = appointmentCursor.fetchall()
             insertTreeview(result)
 
+    def topLevel():
+        toplevel = ctk.CTkToplevel(window)
+        toplevel.title("Reassign Appointment")
+        toplevel.geometry("750x600+600+300")
+        toplevel.resizable(False, False)
+        toplevel.attributes("-topmost",True)
+        toplevel.configure(fg_color = "#fff")
+
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< TOP FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        topFrame = ctk.CTkFrame(toplevel, width=650, height=500, fg_color="#FFFDFD" )
+        topFrame.pack(side='top', fill='x', expand=False, padx=(65, 65), pady=(50,0))
+
+        # Connecting to Doctor DB
+        doctorConn = sqlite3.connect('doctors.db')
+        doctorCursor = doctorConn.cursor()
+
+        # Getting Doctors who are approved and under the selected specialization
+        doctorCursor.execute('SELECT FirstName, LastName FROM doctors WHERE IsApproved=? AND Specialization=?', (1, doctorType))
+        doctors = doctorCursor.fetchall()
+
+        # Combine FirstName and LastName to create full names
+        doctorNames = [f"{doctor[0]} {doctor[1]}" for doctor in doctors]
+
+        # Insert a placeholder at the start of the list
+        doctorNames.insert(0, 'Select Doctor')
+        print(f"Approved Doctor Names Array: {doctorNames}") #Testing 
+
+        
+
+        # Select Doctor Dropdown
+        doctorDropdownLabel = ctk.CTkLabel(topFrame, text="Select New Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
+        doctorDropdownLabel.pack(side='top', fill='x', expand=False,)
+        doctorDropdown = ctk.CTkComboBox(
+            topFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
+            font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+            border_color="#b5b3b3", border_width=1, values=['Select Doctor'],
+            dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
+            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+        )
+        doctorDropdown.pack(side='left', fill='x', expand=True,)
+        doctorDropdown.configure(values=doctorNames)
+
+        # Reassign Button with Icon
+        reassignIconPath = relative_to_assets("reassign-icon.png")
+        reassignIcon = ctk.CTkImage(light_image=Image.open(reassignIconPath), size=(33,33),)
+        reassignButton = ctk.CTkButton(
+            topFrame, text=" Reassign  ", width=140, height=50, 
+            font=("Inter", 22, "bold",), fg_color="#1BC5DC", hover_color="#1695A7", image=reassignIcon,
+            command=reassignDoctor # anchor=ctk.W 
+        )
+        reassignButton.pack(side='left', fill='x', expand=False, padx=(15, 0))
+
 
 
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
