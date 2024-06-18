@@ -85,7 +85,7 @@ def clinicAdminDoctorWindow(email):
 
         # Executed when searchbar is entered
         if array is None:
-            for doctor in doctors:
+            for num, doctor in enumerate(doctors, start=1):
                 doctorID = doctor[0]
                 doctorName = f"{doctor[1]} {doctor[2]}"
                 doctorEmail = doctor[3]
@@ -99,7 +99,7 @@ def clinicAdminDoctorWindow(email):
                 else:
                     isApproved = 'Rejected'
 
-                data = (numOfDoctors, doctorName, doctorEmail, specialization, yearsOfExp, isApproved,doctorID)
+                data = (num, doctorName, doctorEmail, specialization, yearsOfExp, isApproved,doctorID)
 
 
                 if count % 2 == 0:
@@ -112,7 +112,7 @@ def clinicAdminDoctorWindow(email):
         
         # Executed when Approve Button is clicked
         else:
-            for doctor in doctors:
+            for num, doctor in enumerate(array, start=1):
                 doctorID = doctor[0]
                 doctorName = f"{doctor[1]} {doctor[2]}"
                 doctorEmail = doctor[3]
@@ -126,7 +126,7 @@ def clinicAdminDoctorWindow(email):
                 else:
                     isApproved = 'Rejected'
 
-                data = (numOfDoctors, doctorName, doctorEmail, specialization, yearsOfExp, isApproved, doctorID)
+                data = (num, doctorName, doctorEmail, specialization, yearsOfExp, isApproved, doctorID)
 
 
                 if count % 2 == 0:
@@ -226,12 +226,7 @@ def clinicAdminDoctorWindow(email):
         else:
             doctorCursor.execute(f'SELECT * FROM doctors WHERE {searchOption}=?', (searchTerm,))
             result = doctorCursor.fetchall()
-            print(result)
-            if result:
-                print('Valid search term')
-                insertTreeview(result)
-            else:
-                table.delete(*table.get_children())
+            insertTreeview(result)
 
 
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>

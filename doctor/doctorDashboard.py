@@ -70,13 +70,12 @@ def doctorDashboardWindow(email):
         doctorName = f"{result[1]} {result[2]}" # Getting Doctor's Name
         clinicName = result[7]
         
-
         # Connecting to Appointments DB
         appointmentConn = sqlite3.connect('appointments.db')
         appointmentCursor = appointmentConn.cursor()
         appointmentCursor.execute('SELECT * FROM appointments WHERE DoctorName=? AND ClinicName=? AND IsConfirmed=?', [doctorName, clinicName, 1])
         appointments = appointmentCursor.fetchall()
-        print(appointments)
+
         table.delete(*table.get_children())
 
         # Executed when searchbar is entered
@@ -132,6 +131,48 @@ def doctorDashboardWindow(email):
                     table.insert(parent='', index='end', values=data, tags=("oddrow",))
 
                 count += 1
+
+    def searchBy():
+        # Connecting to Doctor DB
+        appointmentConn = sqlite3.connect('appointments.db')
+        appointmentCursor = appointmentConn.cursor()
+
+        searchTerm = searchInputTextBox.get('0.0', 'end').strip()
+        searchOption = searchByDropdown.get()
+
+        # Connecting to Doctors DB
+        doctorConn = sqlite3.connect('doctors.db')
+        doctorCursor = doctorConn.cursor()
+        doctorCursor.execute('SELECT * FROM doctors WHERE Email=?', [email])
+        result = doctorCursor.fetchone()
+        doctorName = f"{result[1]} {result[2]}" # Getting Doctor's Name
+        clinicName = result[7]
+        
+        
+        if searchOption == 'Patient Name':
+            searchOption = "PatientName"
+        elif searchOption == 'Date & Time':
+            searchOption = "AppointmentDate"
+        elif searchOption == 'Duration':
+            searchOption = "AppointmentDuration"
+        elif searchOption == 'Pain Details':
+            searchOption = "PainDetails"
+        elif searchOption == 'Prescriptions':
+            searchOption = "Prescriptions"
+
+            if searchTerm == 'Not Given':
+                searchTerm = 'Empty'
+
+
+
+        if searchTerm == "":
+            messagebox.showerror('Error', 'Enter value to search.')
+        elif searchOption == 'Search By Option':
+            messagebox.showerror('Error', 'Please select an option.')
+        else:
+            appointmentCursor.execute(f'SELECT * FROM appointments WHERE {searchOption}=? AND DoctorName=? AND ClinicName=? AND IsConfirmed=?', (searchTerm, doctorName, clinicName, 1))
+            result = appointmentCursor.fetchall()
+            insertTreeview(result)
 
 
 
@@ -220,7 +261,7 @@ def doctorDashboardWindow(email):
     greetingLabel2 = ctk.CTkLabel(whiteFrame, text=f"{greeting}  ({formatted_date})", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
     clinicName = ctk.CTkLabel(whiteFrame, text=f"({clinicName})", font=("Inter", 22,), text_color="#000000")
-    clinicName.place(x=348, y=72)
+    clinicName.place(x=352, y=72)
 
     roleLabel = ctk.CTkLabel(whiteFrame, text="(Doctor)", font=("Inter", 36, "bold",), text_color="#000000")
     roleLabel.place(x=875, y=25)
@@ -238,27 +279,65 @@ def doctorDashboardWindow(email):
         )
     descLabel.place(x=25, y=182)
 
+    
+    # Search Box Dropdown Menu 
+    searchOptions = [
+        'Search By Option', 'Patient Name', 'Date & Time', 
+        "Duration", "Pain Details", "Prescriptions"
+    ]
+    searchByDropdown = ctk.CTkComboBox(
+        whiteFrame, fg_color="#ffffff", text_color="#000000", width=252, height=50, 
+        font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
+        values=searchOptions, border_color="#000", border_width=1,
+        dropdown_font=("Inter", 20), dropdown_fg_color='#fff',
+        dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+    )
+    searchByDropdown.place(x=25, y=225)
+
     # Search Box field 
     searchInputTextBox = ctk.CTkTextbox(
-            whiteFrame, fg_color="#ffffff", text_color="gray", width=660, height=50, 
-            border_color="#000", font=("Inter", 21), border_spacing=8,
-            scrollbar_button_color="#1AFF75", border_width=2,
-        )
-    searchInputTextBox.insert('insert', "Search Patients by Name or Address")
-    searchInputTextBox.place(x=25, y=225)
+        whiteFrame, fg_color="#ffffff", text_color="gray", width=473, height=50, 
+        border_color="#000", font=("Inter", 21), border_spacing=8,
+        scrollbar_button_color="#1AFF75", border_width=2,
+    )
+    searchInputTextBox.insert('insert', "Search by Doctor Details")
+    searchInputTextBox.place(x=293, y=225)
     searchInputTextBox.bind("<FocusIn>", searchbarFocus)
     searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
+    #searchInputTextBox.bind("<KeyRelease>", filterTree)
+
+
+    # Search Button with Icon
+    searchIconPath = relative_to_assets("search-icon-1.png")
+    searchIcon = ctk.CTkImage(light_image=Image.open(searchIconPath), size=(25,25),)
+    searchButton = ctk.CTkButton(
+        whiteFrame, text="", width=49, height=50, 
+        font=("Inter", 22, "bold",), fg_color="#000", hover_color="#333333", image=searchIcon, 
+        corner_radius=4, command=searchBy # anchor=ctk.W 
+    )
+    searchButton.place(x=668, y=225)
+
+
+    # Cancel Search Button with Icon
+    cancelSearchIconPath = relative_to_assets("reject-icon.png")
+    cancelSearchIcon = ctk.CTkImage(light_image=Image.open(cancelSearchIconPath), size=(33,33),)
+    cancelSearchButton = ctk.CTkButton(
+        whiteFrame, text="", width=50, height=50, 
+        font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=cancelSearchIcon, corner_radius=2,
+        command=insertTreeview # anchor=ctk.W 
+    )
+    cancelSearchButton.place(x=715, y=225)
 
 
     # Generate Prescriptions Button with Icon
     pillIconPath = relative_to_assets("pill-icon.png")
     pillIcon = ctk.CTkImage(light_image=Image.open(pillIconPath), size=(33,33),)
     generateMedicineButton = ctk.CTkButton(
-        whiteFrame, text=" Generate Prescriptions ", width=310, height=50, 
+        whiteFrame, text=" Prescriptions ", width=240, height=50, 
         font=("Inter", 22, "bold",), fg_color="#00C16A", hover_color="#009B2B", image=pillIcon,
         # anchor=ctk.W 
     )
-    generateMedicineButton.place(x=700, y=225)
+    generateMedicineButton.place(x=782, y=225)
 
 
     # <<<<<<<<<<<<<<<<<<<< TABLE FRAME STORING TREEVIEW >>>>>>>>>>>>>>>>>>>>> 
