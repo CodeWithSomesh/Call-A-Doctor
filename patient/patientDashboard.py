@@ -186,7 +186,7 @@ def patientDashboardWindow(email):
                     toplevel.attributes("-topmost",True)
 
 
-
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<< RETRIEVING APPOINTMENT DETAILS FROM TREEVIEW >>>>>>>>>>>>>>>>>
         selectedItem = table.focus()
         if not selectedItem:
             messagebox.showerror('Error', 'Select an Appointment first.')
@@ -197,7 +197,7 @@ def patientDashboardWindow(email):
         appointmentID = appointmentData[6]
         print(appointmentID)
 
-
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<< TOPLEVEL >>>>>>>>>>>>>>>>>>>>>>>>>
         toplevel = ctk.CTkToplevel(window)
         toplevel.title("Update Appointment")
         toplevel.geometry("800x600+460+100")

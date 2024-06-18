@@ -94,7 +94,7 @@ def doctorDashboardWindow(email):
                     prescriptions = 'Given'
                 
 
-                data = (num, patientName, dateAndTime, duration, painDetails, prescriptions)
+                data = (num, patientName, dateAndTime, duration, painDetails, prescriptions, appointmentID)
 
 
                 if count % 2 == 0:
@@ -121,7 +121,7 @@ def doctorDashboardWindow(email):
                     prescriptions = 'Given'
                 
 
-                data = (num, patientName, dateAndTime, duration, painDetails, prescriptions)
+                data = (num, patientName, dateAndTime, duration, painDetails, prescriptions, appointmentID)
 
 
                 if count % 2 == 0:
@@ -175,56 +175,161 @@ def doctorDashboardWindow(email):
             insertTreeview(result)
 
     def topLevel():
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<< RETRIEVING APPOINTMENT DETAILS FROM TREEVIEW >>>>>>>>>>>>>>>>>
+        selectedItem = table.focus()
+        if not selectedItem:
+            messagebox.showerror('Error', 'Select an Appointment first.')
+            return
+        
+        appointmentData = table.item(selectedItem)["values"]
+        print(appointmentData)
+        appointmentID = appointmentData[6]
+        print(appointmentID)
+
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<< RETRIEVING APPOINTMENT DETAILS FROM DATABASE >>>>>>>>>>>>>>>>>
+        # Connecting to Appointment DB
+        appointmentConn = sqlite3.connect('appointments.db')
+        appointmentCursor = appointmentConn.cursor()
+        appointmentCursor.execute('SELECT * FROM appointments WHERE AppointmentID=?', [appointmentID])
+        result = appointmentCursor.fetchone()
+        patientName = result[1]
+        patientID = result[2] 
+        doctorName = result[3] 
+        doctorID = result[4] 
+        doctorType = result[5] 
+        clinicName = result[7] 
+        clinicID = result[8] 
+        appointmentDate = result[9] 
+        appointmentTime = result[10] 
+        appointmentDuration = result[11] 
+        appointmentCreatedTime = result[12]
+        painDetails = result[13]
+        prescriptions = result[14]  
+
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<< TOPLEVEL >>>>>>>>>>>>>>>>>>>>>>>>>
         toplevel = ctk.CTkToplevel(window)
         toplevel.title("Reassign Appointment")
-        toplevel.geometry("750x600+600+300")
+        toplevel.geometry("780x600+600+300")
         toplevel.resizable(False, False)
         toplevel.attributes("-topmost",True)
         toplevel.configure(fg_color = "#fff")
 
-        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< TOP FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        topFrame = ctk.CTkFrame(toplevel, width=650, height=500, fg_color="#FFFDFD" )
-        topFrame.pack(side='top', fill='x', expand=False, padx=(65, 65), pady=(50,0))
 
-        # Connecting to Doctor DB
-        doctorConn = sqlite3.connect('doctors.db')
-        doctorCursor = doctorConn.cursor()
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< PARENT SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        parentFrame = ctk.CTkScrollableFrame(toplevel, width=800, height=600, fg_color="#fff", scrollbar_fg_color="#000", scrollbar_button_color="#000",)
+        parentFrame.place(x=0, y=0)
 
-        # Getting Doctors who are approved and under the selected specialization
-        doctorCursor.execute('SELECT FirstName, LastName FROM doctors WHERE IsApproved=? AND Specialization=?', (1, doctorType))
-        doctors = doctorCursor.fetchall()
 
-        # Combine FirstName and LastName to create full names
-        doctorNames = [f"{doctor[0]} {doctor[1]}" for doctor in doctors]
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< LEFT FRAME INSDIE PARENT SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        leftFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD", )
+        leftFrame.pack(side='left', fill='both', expand=False, padx=(75, 85), pady=30)
 
-        # Insert a placeholder at the start of the list
-        doctorNames.insert(0, 'Select Doctor')
-        print(f"Approved Doctor Names Array: {doctorNames}") #Testing 
+        # Patient Name 
+        patientNameLabel = ctk.CTkLabel(leftFrame, text="Patient Name", font=("Inter", 22, "bold",), anchor=ctk.W, text_color="#000000",)
+        patientNameLabel.pack(side='top', fill='x', expand=False,)
+        patientNameDisplay = ctk.CTkLabel(leftFrame, text=patientName, font=("Inter", 20,), anchor=ctk.W, text_color="#000000",)
+        patientNameDisplay.pack(side='top', fill='x', expand=False, pady=(0, 25))
+
+        # Doctor Name 
+        doctorNameLabel = ctk.CTkLabel(leftFrame, text="Doctor Name", font=("Inter", 22, "bold",), anchor=ctk.W, text_color="#000000",)
+        doctorNameLabel.pack(side='top', fill='x', expand=False,)
+        doctorNameDisplay = ctk.CTkLabel(leftFrame, text=f"{doctorName} ({doctorType})", font=("Inter", 20,), anchor=ctk.W, text_color="#000000",)
+        doctorNameDisplay.pack(side='top', fill='x', expand=False, pady=(0, 25))
+
+        # Clinic Name 
+        clinicNameLabel = ctk.CTkLabel(leftFrame, text="Clinic Name", font=("Inter", 22, "bold",), anchor=ctk.W, text_color="#000000",)
+        clinicNameLabel.pack(side='top', fill='x', expand=False,)
+        clinicNameDisplay = ctk.CTkLabel(leftFrame, text=clinicName, font=("Inter", 20,), anchor=ctk.W, text_color="#000000",)
+        clinicNameDisplay.pack(side='top', fill='x', expand=False, pady=(0, 25))
+
+        # Appointment Date
+        appointmentDateLabel = ctk.CTkLabel(leftFrame, text="Appointment Date", font=("Inter", 22, "bold",), anchor=ctk.W, text_color="#000000",)
+        appointmentDateLabel.pack(side='top', fill='x', expand=False,)
+        appointmentDateDisplay = ctk.CTkLabel(leftFrame, text=appointmentDate, font=("Inter", 20,), anchor=ctk.W, text_color="#000000",)
+        appointmentDateDisplay.pack(side='top', fill='x', expand=False, pady=(0, 25))
+
+        # Appointment Duration
+        appointmentDurationLabel = ctk.CTkLabel(leftFrame, text="Appointment Duration", font=("Inter", 22, "bold",), anchor=ctk.W, text_color="#000000",)
+        appointmentDurationLabel.pack(side='top', fill='x', expand=False,)
+        appointmentDurationDisplay = ctk.CTkLabel(leftFrame, text=appointmentDuration, font=("Inter", 20,), anchor=ctk.W, text_color="#000000",)
+        appointmentDurationDisplay.pack(side='top', fill='x', expand=False, pady=(0, 25))
+
+        # Appointment Created At Time
+        appointmentCreatedTimeLabel = ctk.CTkLabel(leftFrame, text="Appointment Booked At", font=("Inter", 22, "bold",), anchor=ctk.W, text_color="#000000",)
+        appointmentCreatedTimeLabel.pack(side='top', fill='x', expand=False,)
+        appointmentCreatedTimeDisplay = ctk.CTkLabel(leftFrame, text=appointmentCreatedTime, font=("Inter", 20,), anchor=ctk.W, text_color="#000000",)
+        appointmentCreatedTimeDisplay.pack(side='top', fill='x', expand=False, pady=(0, 25))
+
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< RIGHT FRAME INSIDE PARENT SCROLLABLE FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        rightFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD",)
+        rightFrame.pack(side='left', fill='both', expand=False, padx=(0,0), pady=30)
+        
+        # Patient ID
+        patientIDLabel = ctk.CTkLabel(rightFrame, text="Patient ID", font=("Inter", 22, "bold",), anchor=ctk.W, text_color="#000000",)
+        patientIDLabel.pack(side='top', fill='x', expand=False,)
+        patientIDDisplay = ctk.CTkLabel(rightFrame, text=patientID, font=("Inter", 20,), anchor=ctk.W, text_color="#000000",)
+        patientIDDisplay.pack(side='top', fill='x', expand=False, pady=(0, 25))
+
+        # Doctor ID 
+        doctorIDLabel = ctk.CTkLabel(rightFrame, text="Doctor ID", font=("Inter", 22, "bold",), anchor=ctk.W, text_color="#000000",)
+        doctorIDLabel.pack(side='top', fill='x', expand=False,)
+        doctorIDDisplay = ctk.CTkLabel(rightFrame, text=f"{doctorID} ({doctorType})", font=("Inter", 20,), anchor=ctk.W, text_color="#000000",)
+        doctorIDDisplay.pack(side='top', fill='x', expand=False, pady=(0, 25))
+
+        # Clinic ID 
+        clinicIDLabel = ctk.CTkLabel(rightFrame, text="Clinic ID", font=("Inter", 22, "bold",), anchor=ctk.W, text_color="#000000",)
+        clinicIDLabel.pack(side='top', fill='x', expand=False,)
+        clinicIDDisplay = ctk.CTkLabel(rightFrame, text=clinicID, font=("Inter", 20,), anchor=ctk.W, text_color="#000000",)
+        clinicIDDisplay.pack(side='top', fill='x', expand=False, pady=(0, 25))
+
+        # Appointment Time
+        appointmentTimeLabel = ctk.CTkLabel(rightFrame, text="Appointment Time", font=("Inter", 22, "bold",), anchor=ctk.W, text_color="#000000",)
+        appointmentTimeLabel.pack(side='top', fill='x', expand=False,)
+        appointmentTimeDisplay = ctk.CTkLabel(rightFrame, text=appointmentTime, font=("Inter", 20,), anchor=ctk.W, text_color="#000000",)
+        appointmentTimeDisplay.pack(side='top', fill='x', expand=False, pady=(0, 25))
+
+        # Appointment ID
+        appointmentIDLabel = ctk.CTkLabel(rightFrame, text="Appointment ID", font=("Inter", 22, "bold",), anchor=ctk.W, text_color="#000000",)
+        appointmentIDLabel.pack(side='top', fill='x', expand=False,)
+        appointmentIDDisplay = ctk.CTkLabel(rightFrame, text=appointmentID, font=("Inter", 20,), anchor=ctk.W, text_color="#000000",)
+        appointmentIDDisplay.pack(side='top', fill='x', expand=False, pady=(0, 25))
+
+        # Pain Details
+        painDetailsLabel = ctk.CTkLabel(rightFrame, text="Pain Details", font=("Inter", 22, "bold",), anchor=ctk.W, text_color="#000000",)
+        painDetailsLabel.pack(side='top', fill='x', expand=False,)
+        painDetailsDisplay = ctk.CTkLabel(rightFrame, text=painDetails, font=("Inter", 20,), anchor=ctk.W, text_color="#000000",)
+        painDetailsDisplay.pack(side='top', fill='x', expand=False, pady=(0, 25))
+
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< BOTTOM FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        bottomFrame = ctk.CTkFrame(parentFrame, width=650, height=500, fg_color="#FFFDFD" )
+        bottomFrame.pack(side='top', fill='x', expand=False, padx=(65, 80), pady=(20,0))
 
         
-
-        # Select Doctor Dropdown
-        doctorDropdownLabel = ctk.CTkLabel(topFrame, text="Select New Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
-        doctorDropdownLabel.pack(side='top', fill='x', expand=False,)
-        doctorDropdown = ctk.CTkComboBox(
-            topFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
-            font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            border_color="#b5b3b3", border_width=1, values=['Select Doctor'],
-            dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
-            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+        # Uodate Button with Icon
+        updateIconPath = relative_to_assets("update-icon.png")
+        updateIcon = ctk.CTkImage(light_image=Image.open(updateIconPath), size=(33,33),)
+        updateButton = ctk.CTkButton(
+            bottomFrame, text=" Update Appointment Details", height=48, width=378,
+            font=("Inter", 22, "bold",), fg_color="#1BC5DC", hover_color="#1695A7", image=updateIcon,
+            #command=updateAppointment # anchor=ctk.W 
         )
-        doctorDropdown.pack(side='left', fill='x', expand=True,)
-        doctorDropdown.configure(values=doctorNames)
+        updateButton.pack(side='top', fill='x', expand=False,pady=(40,15))
 
-        # Reassign Button with Icon
-        reassignIconPath = relative_to_assets("reassign-icon.png")
-        reassignIcon = ctk.CTkImage(light_image=Image.open(reassignIconPath), size=(33,33),)
-        reassignButton = ctk.CTkButton(
-            topFrame, text=" Reassign  ", width=140, height=50, 
-            font=("Inter", 22, "bold",), fg_color="#1BC5DC", hover_color="#1695A7", image=reassignIcon,
-            command=reassignDoctor # anchor=ctk.W 
-        )
-        reassignButton.pack(side='left', fill='x', expand=False, padx=(15, 0))
+        # Connecting to Appointment DB
+        # appointmentConn = sqlite3.connect('appointments.db')
+        # appointmentCursor = appointmentConn.cursor()
+
+        # appointmentCursor.execute('SELECT * FROM appointments WHERE AppointmentID=?', [appointmentID])
+        # result = appointmentCursor.fetchone()
+        # print(result)
+
+        # clinicName = clinicNameDropdown.set(result[7])
+        # doctorType = doctorTypeDropdown.set(result[5])
+        # painDetails = painDetailsTextBox.insert('insert', result[13])
+        # doctorName = doctorDropdown.set(result[3])
+        # date = calendar.selection_set(result[9])
+        # time = consultationTimeDropdown.set(result[10])
+        # duration = consultationDurationDropdown.set(result[11])
 
 
 
@@ -327,7 +432,7 @@ def doctorDashboardWindow(email):
     h1Label.place(x=25, y=135)
     descLabel = ctk.CTkLabel(
             whiteFrame, font=("Inter", 22,), text_color="#000000",
-            text="View patient info, their medical records and generate suitable prescriptions for them ", 
+            text="View patient appointments, their medical records and generate suitable prescriptions for them ", 
         )
     descLabel.place(x=25, y=182)
 
@@ -387,7 +492,7 @@ def doctorDashboardWindow(email):
     generateMedicineButton = ctk.CTkButton(
         whiteFrame, text=" Prescriptions ", width=240, height=50, 
         font=("Inter", 22, "bold",), fg_color="#00C16A", hover_color="#009B2B", image=pillIcon,
-        # anchor=ctk.W 
+        command=topLevel # anchor=ctk.W 
     )
     generateMedicineButton.place(x=782, y=225)
 
@@ -405,7 +510,7 @@ def doctorDashboardWindow(email):
     table.pack(side='left', fill='both')
     table['columns'] = (
         'No', 'Patient Name', 'Date & Time', 'Duration',
-        "Pain Details", "Prescriptions",
+        "Pain Details", "Prescriptions", "Appointment ID"
     )
 
     # Placing and Configuring Treeview Scrollbar
@@ -444,6 +549,7 @@ def doctorDashboardWindow(email):
     table.column("Duration", width=200, anchor=ctk.CENTER)
     table.column("Pain Details", width=380, anchor=ctk.CENTER)
     table.column("Prescriptions", width=160, anchor=ctk.CENTER)
+    table.column("Appointment ID", width=0, stretch=ctk.NO)
 
     # Setting alternating colours for the rows in Treeview
     table.tag_configure("oddrow", background="#F2F5F8")
