@@ -259,7 +259,7 @@ def patientDashboardWindow(email):
         print(specializations)
         print(f"Approved Docotrs Specializations Array: {specializations}")
         
-
+        # Select Doctor Type Dropdown
         doctorTypeLabel = ctk.CTkLabel(topFrame, text="Select Type Of Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         doctorTypeLabel.pack(side='top', fill='x', expand=False, pady=(30,0))
         doctorTypeDropdown = ctk.CTkComboBox(
@@ -270,7 +270,8 @@ def patientDashboardWindow(email):
             dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True, command=renderDoctorName
         )
         doctorTypeDropdown.pack(side='top', fill='x', expand=False, pady=(0,0), padx=(0,5))
-
+        
+        # Pain Details Field
         painDetailsLabel = ctk.CTkLabel(topFrame, text="Explain Pain Details", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         painDetailsLabel.pack(side='top', fill='x', expand=False, pady=(30,0))
         painDetailsTextBox = ctk.CTkTextbox(
