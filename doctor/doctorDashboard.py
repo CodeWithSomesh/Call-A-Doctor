@@ -358,6 +358,9 @@ def doctorDashboardWindow(email):
         )
         prescriptionsTextBox.pack(side='top', fill='none', expand=False, pady=(0, 0), anchor="w")
 
+        if prescriptions != "Empty":
+            prescriptionsTextBox.insert(0.0, prescriptions)
+
         if prescriptions == "Empty":
             # Generate prescriptions Button with Icon
             pillIconPath = relative_to_assets("give-pill-icon.png")
