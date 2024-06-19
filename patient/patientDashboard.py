@@ -39,11 +39,12 @@ def patientDashboardWindow(email):
             AppointmentDuration TEXT NOT NULL,
             AppointmentCreatedTime TEXT NOT NULL,
             PainDetails TEXT NOT NULL,
-            IsConfirmed INTEGER DEFAULT 0
+            IsConfirmed INTEGER DEFAULT 0,
+            Prescriptions TEXT NOT NULL               
         )          
     """)
 
-    # Connecting to Patient Admin DB
+    # Connecting to Patient DB
     patientConn = sqlite3.connect('patients.db')
     patientCursor = patientConn.cursor()
     patientCursor.execute('SELECT * FROM patients WHERE Email=?', [email])
@@ -82,7 +83,38 @@ def patientDashboardWindow(email):
         searchInputTextBox.insert('0.0', "Search by Appointment Details")
         searchInputTextBox.configure(text_color='gray')
 
+    
+
     def updateAppointmentTopLevel():
+
+        def displayMap(location):
+            # Connecting to Clinic Admin DB
+            clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+            clinicAdminCursor = clinicAdminConn.cursor()
+            clinicAdminCursor.execute('SELECT ClinicAddress FROM clinicAdmins WHERE ClinicName=?', [location])
+            clinicLocation = clinicAdminCursor.fetchone()
+
+
+            gMapsWidget.set_address(clinicLocation, marker=True)
+            print(clinicLocation)
+
+        def renderDoctorName(doctorType):
+            # Connecting to Doctor DB
+            doctorConn = sqlite3.connect('doctors.db')
+            doctorCursor = doctorConn.cursor()
+
+            # Getting Doctors who are approved and under the selected specialization
+            doctorCursor.execute('SELECT FirstName, LastName FROM doctors WHERE IsApproved=? AND Specialization=?', (1, doctorType))
+            doctors = doctorCursor.fetchall()
+
+            # Combine FirstName and LastName to create full names
+            doctorNames = [f"{doctor[0]} {doctor[1]}" for doctor in doctors]
+
+            # Insert a placeholder at the start of the list
+            doctorNames.insert(0, 'Select Doctor')
+            print(f"Approved Doctor Names Array: {doctorNames}")
+
+            doctorDropdown.configure(values=doctorNames)
 
         def updateAppointment():  
             clinicName = clinicNameDropdown.get()
@@ -154,7 +186,7 @@ def patientDashboardWindow(email):
                     toplevel.attributes("-topmost",True)
 
 
-
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<< RETRIEVING APPOINTMENT DETAILS FROM TREEVIEW >>>>>>>>>>>>>>>>>
         selectedItem = table.focus()
         if not selectedItem:
             messagebox.showerror('Error', 'Select an Appointment first.')
@@ -165,7 +197,7 @@ def patientDashboardWindow(email):
         appointmentID = appointmentData[6]
         print(appointmentID)
 
-
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<< TOPLEVEL >>>>>>>>>>>>>>>>>>>>>>>>>
         toplevel = ctk.CTkToplevel(window)
         toplevel.title("Update Appointment")
         toplevel.geometry("800x600+460+100")
@@ -180,6 +212,16 @@ def patientDashboardWindow(email):
         # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< TOP FRAME >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         topFrame = ctk.CTkFrame(parentFrame, width=650, height=500, fg_color="#FFFDFD" )
         topFrame.pack(side='top', fill='x', expand=False, padx=(65, 80), pady=(20,0))
+
+        # Connecting to Clinic Admin DB
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
+        clinicAdminCursor.execute('SELECT ClinicName FROM clinicAdmins WHERE IsApproved=?', [1])
+        clinicAdmins = clinicAdminCursor.fetchall()
+        # Convert the list of tuples to a list of strings
+        clinicNames = [clinic[0] for clinic in clinicAdmins]
+        clinicNames.insert(0, 'Select Your Clinic')
+        #print(f"Approved Clinic Names Array: {clinicNames}")
         
         # Select Clinic Dropdown Menu
         clinicNameLabel = ctk.CTkLabel(topFrame, text="Select Clinic", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
@@ -187,9 +229,9 @@ def patientDashboardWindow(email):
         clinicNameDropdown = ctk.CTkComboBox(
             topFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            values=['Clinic Name', 'Panmedic', 'Health Sync', 'Clinic Sungai Ara'], border_color="#b5b3b3", border_width=1,
+            values=clinicNames, border_color="#b5b3b3", border_width=1,
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
-            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True, command=displayMap
         )
         clinicNameDropdown.pack(side='top', fill='x', expand=False,)
 
@@ -203,26 +245,33 @@ def patientDashboardWindow(email):
         # gMapsWidget.set_tile_server("https://mt0.google.com/vt/lyrs=s&hl=e...{x}&y={y}&z={z}&s=Ga", max_zoom=22)  # google satellite
         # gMapsWidget.set_tile_server("http://c.tile.stamen.com/watercolor/{z}/{x}/{y}.png")  # painting style
         # marker.set_text("Select A Clinic")
-        
 
+
+        # Connecting to Doctor DB
+        doctorConn = sqlite3.connect('doctors.db')
+        doctorCursor = doctorConn.cursor()
+        doctorCursor.execute('SELECT Specialization FROM doctors WHERE IsApproved=?', (1,))
+        doctors = doctorCursor.fetchall()
+
+        
+        specializations = list(set([specialization[0] for specialization in doctors]))
+        specializations.insert(0, 'Select Type')
+        print(specializations)
+        print(f"Approved Docotrs Specializations Array: {specializations}")
+        
+        # Select Doctor Type Dropdown
         doctorTypeLabel = ctk.CTkLabel(topFrame, text="Select Type Of Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         doctorTypeLabel.pack(side='top', fill='x', expand=False, pady=(30,0))
-        doctorTypes = [
-            "Select Type","Allergist", "Cardiologist", "Dermatologist", "Endocrinologist", 
-            "Gastroenterologist", "Geriatrician", "Internist", "Nephrologist", "Neurologist", 
-            "Obstetrician/Gynecologist", "Oncologist", "Ophthalmologist", "Orthopedic Surgeon", 
-            "Pediatrician", "Podiatrist", "Psychiatrist", "Pulmonologist", "Rheumatologist", 
-            "General Practitioner", "Family Medicine Doctor", "Home Health Care Doctor", 
-            "Emergency Medicine Specialist"]
         doctorTypeDropdown = ctk.CTkComboBox(
             topFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            values=doctorTypes, border_color="#b5b3b3", border_width=1,
+            values=specializations, border_color="#b5b3b3", border_width=1,
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
-            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True, command=renderDoctorName
         )
         doctorTypeDropdown.pack(side='top', fill='x', expand=False, pady=(0,0), padx=(0,5))
-
+        
+        # Pain Details Field
         painDetailsLabel = ctk.CTkLabel(topFrame, text="Explain Pain Details", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         painDetailsLabel.pack(side='top', fill='x', expand=False, pady=(30,0))
         painDetailsTextBox = ctk.CTkTextbox(
@@ -243,7 +292,7 @@ def patientDashboardWindow(email):
         doctorDropdown = ctk.CTkComboBox(
             leftFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            values=['Select Doctor', 'Maisarah Majdi', 'Someshwar Rao', 'Karen Khor Siew Li'], border_color="#b5b3b3", border_width=1,
+            values=['Select Doctor'], border_color="#b5b3b3", border_width=1,
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
             dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
         )
@@ -329,7 +378,7 @@ def patientDashboardWindow(email):
         print(result)
 
         clinicName = clinicNameDropdown.set(result[7])
-        doctorType = doctorTypeDropdown.set(result[6])
+        doctorType = doctorTypeDropdown.set(result[5])
         painDetails = painDetailsTextBox.insert('insert', result[13])
         doctorName = doctorDropdown.set(result[3])
         date = calendar.selection_set(result[9])
@@ -341,11 +390,41 @@ def patientDashboardWindow(email):
     
     def bookAppointmentTopLevel():
 
+        def displayMap(location):
+            # Connecting to Clinic Admin DB
+            clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+            clinicAdminCursor = clinicAdminConn.cursor()
+            clinicAdminCursor.execute('SELECT ClinicAddress FROM clinicAdmins WHERE ClinicName=?', [location])
+            clinicLocation = clinicAdminCursor.fetchone()
+
+
+            gMapsWidget.set_address(clinicLocation, marker=True)
+            print(clinicLocation)
+
+        def renderDoctorName(doctorType):
+            # Connecting to Doctor DB
+            doctorConn = sqlite3.connect('doctors.db')
+            doctorCursor = doctorConn.cursor()
+
+            # Getting Doctors who are approved and under the selected specialization
+            doctorCursor.execute('SELECT FirstName, LastName FROM doctors WHERE IsApproved=? AND Specialization=?', (1, doctorType))
+            doctors = doctorCursor.fetchall()
+
+            # Combine FirstName and LastName to create full names
+            doctorNames = [f"{doctor[0]} {doctor[1]}" for doctor in doctors]
+
+            # Insert a placeholder at the start of the list
+            doctorNames.insert(0, 'Select Doctor')
+            print(f"Approved Doctor Names Array: {doctorNames}")
+
+            doctorDropdown.configure(values=doctorNames)
+
         def bookAppointment():
             clinicName = clinicNameDropdown.get()
             doctorType = doctorTypeDropdown.get()
             painDetails = painDetailsTextBox.get(0.0, 'end').strip()
             doctorName = doctorDropdown.get()
+            doctorFirstName = doctorName.split()[0]
             date = calendar.get_date()
             time = consultationTimeDropdown.get()
             duration = consultationDurationDropdown.get()
@@ -359,21 +438,19 @@ def patientDashboardWindow(email):
             patientID = patientResult[0]
 
             # Connecting to Doctor DB to get Doctor ID
-            doctorID = 1
-            # doctorConn = sqlite3.connect('doctors.db')
-            # doctorCursor = doctorConn.cursor()
-            # doctorCursor.execute('SELECT * FROM doctors WHERE FirstName=?', [doctorFirstName])
-            # doctorResult = doctorCursor.fetchone()
-            # doctorID = doctorResult[0]
+            doctorConn = sqlite3.connect('doctors.db')
+            doctorCursor = doctorConn.cursor()
+            doctorCursor.execute('SELECT * FROM doctors WHERE FirstName=?', [doctorFirstName])
+            doctorResult = doctorCursor.fetchone()
+            doctorID = doctorResult[0]
             doctorAvailability = 0
 
             # Connecting to Doctor DB to get Doctor ID
-            # clinicAdminConn = sqlite3.connect('clinicAdmins.db')
-            # clinicAdminCursor = clinicAdminConn.cursor()
-            # clinicAdminCursor.execute('SELECT * FROM clinicAdmins WHERE ClinicName=?', [clinicName])
-            # clinicAdminResult = clinicAdminCursor.fetchone()
-            # clinicAdminID = clinicAdminResult[0]
-            clinicAdminID = 1
+            clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+            clinicAdminCursor = clinicAdminConn.cursor()
+            clinicAdminCursor.execute('SELECT * FROM clinicAdmins WHERE ClinicName=?', [clinicName])
+            clinicAdminResult = clinicAdminCursor.fetchone()
+            clinicAdminID = clinicAdminResult[0]
 
             currentDateTime = datetime.now()
             appointmentCreatedAt = currentDateTime.strftime('%Y-%m-%d %H:%M:%S')
@@ -425,8 +502,8 @@ def patientDashboardWindow(email):
 
                 # Insert Appoinment into DB
                 appointmentCursor.execute(
-                    'INSERT INTO appointments (PatientName, PatientID, DoctorName, DoctorID, DoctorType, DoctorAvailability, ClinicName, ClinicID, AppointmentDate, AppointmentTime, AppointmentDuration, AppointmentCreatedTime, PainDetails, IsConfirmed) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
-                    [patientName, patientID, doctorName, doctorID, doctorType, doctorAvailability, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails, 0])
+                    'INSERT INTO appointments (PatientName, PatientID, DoctorName, DoctorID, DoctorType, DoctorAvailability, ClinicName, ClinicID, AppointmentDate, AppointmentTime, AppointmentDuration, AppointmentCreatedTime, PainDetails, IsConfirmed, Prescriptions) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
+                    [patientName, patientID, doctorName, doctorID, doctorType, doctorAvailability, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails, 0, "Empty"])
                 appointmentConn.commit()
                 appointmentID = appointmentCursor.lastrowid # Retrieve the AppointmentID of the newly inserted row
                 print(f"The new appointment ID is: {appointmentID}")
@@ -436,7 +513,7 @@ def patientDashboardWindow(email):
                     SELECT COUNT(*)
                     FROM appointments
                     WHERE ClinicName=? AND DoctorName = ? AND AppointmentDate = ? AND AppointmentTime = ?
-                '''
+                ''' 
                 appointmentCursor.execute(selectQuery, (clinicName, doctorName, date, time))
                 count = appointmentCursor.fetchone()[0]
                 print(f"The count of repeated appointments is {count}")
@@ -476,9 +553,6 @@ def patientDashboardWindow(email):
                 if messagebox:
                     toplevel.attributes("-topmost",True)
 
-        
-
-
 
 
         toplevel = ctk.CTkToplevel(window)
@@ -496,18 +570,31 @@ def patientDashboardWindow(email):
         topFrame = ctk.CTkFrame(parentFrame, width=650, height=500, fg_color="#FFFDFD" )
         topFrame.pack(side='top', fill='x', expand=False, padx=(65, 80), pady=(20,0))
         
+        # Connecting to Clinic Admin DB
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
+        clinicAdminCursor.execute('SELECT ClinicName FROM clinicAdmins WHERE IsApproved=?', [1])
+        clinicAdmins = clinicAdminCursor.fetchall()
+        # Convert the list of tuples to a list of strings
+        clinicNames = [clinic[0] for clinic in clinicAdmins]
+        clinicNames.insert(0, 'Select Your Clinic')
+        print(f"Approved Clinic Names Array: {clinicNames}")
+
+        
         # Select Clinic Dropdown Menu
         clinicNameLabel = ctk.CTkLabel(topFrame, text="Select Clinic", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         clinicNameLabel.pack(side='top', fill='x', expand=False)
         clinicNameDropdown = ctk.CTkComboBox(
             topFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            values=['Clinic Name', 'Panmedic', 'Health Sync', 'Clinic Sungai Ara'], border_color="#b5b3b3", border_width=1,
+            values=clinicNames, border_color="#b5b3b3", border_width=1,
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
-            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True, command=displayMap
         )
         clinicNameDropdown.pack(side='top', fill='x', expand=False,)
 
+        
+        # Google Maps Widget
         gMapsWidget = TkinterMapView(topFrame, width=650, height=400)
         gMapsWidget.pack(side='top', fill='x', expand=True, pady=(10,0), padx=(0,5))
         gMapsWidget.set_tile_server("https://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", max_zoom=22)  # google normal
@@ -518,26 +605,33 @@ def patientDashboardWindow(email):
         # gMapsWidget.set_tile_server("https://mt0.google.com/vt/lyrs=s&hl=e...{x}&y={y}&z={z}&s=Ga", max_zoom=22)  # google satellite
         # gMapsWidget.set_tile_server("http://c.tile.stamen.com/watercolor/{z}/{x}/{y}.png")  # painting style
         # marker.set_text("Select A Clinic")
-        
 
+
+
+        # Connecting to Doctor DB
+        doctorConn = sqlite3.connect('doctors.db')
+        doctorCursor = doctorConn.cursor()
+        doctorCursor.execute('SELECT Specialization FROM doctors WHERE IsApproved=?', (1,))
+        doctors = doctorCursor.fetchall()
+
+        # Making sure the available Specializations are all unique 
+        specializations = list(set([specialization[0] for specialization in doctors]))
+        specializations.insert(0, 'Select Type')
+        print(f"Approved Doctors Specializations Array: {specializations}")
+
+        # Doctor Specialization Dropdown
         doctorTypeLabel = ctk.CTkLabel(topFrame, text="Select Type Of Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         doctorTypeLabel.pack(side='top', fill='x', expand=False, pady=(30,0))
-        doctorTypes = [
-            "Select Type","Allergist", "Cardiologist", "Dermatologist", "Endocrinologist", 
-            "Gastroenterologist", "Geriatrician", "Internist", "Nephrologist", "Neurologist", 
-            "Obstetrician/Gynecologist", "Oncologist", "Ophthalmologist", "Orthopedic Surgeon", 
-            "Pediatrician", "Podiatrist", "Psychiatrist", "Pulmonologist", "Rheumatologist", 
-            "General Practitioner", "Family Medicine Doctor", "Home Health Care Doctor", 
-            "Emergency Medicine Specialist"]
         doctorTypeDropdown = ctk.CTkComboBox(
             topFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            values=doctorTypes, border_color="#b5b3b3", border_width=1,
+            values=specializations, border_color="#b5b3b3", border_width=1,
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
-            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
+            dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True, command=renderDoctorName
         )
         doctorTypeDropdown.pack(side='top', fill='x', expand=False, pady=(0,0), padx=(0,5))
 
+        # Pain Details Text Field
         painDetailsLabel = ctk.CTkLabel(topFrame, text="Explain Pain Details", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         painDetailsLabel.pack(side='top', fill='x', expand=False, pady=(30,0))
         painDetailsTextBox = ctk.CTkTextbox(
@@ -552,12 +646,13 @@ def patientDashboardWindow(email):
         leftFrame = ctk.CTkFrame(parentFrame, width=341, height=500, fg_color="#FFFDFD", )
         leftFrame.pack(side='left', fill='both', expand=False, padx=65, pady=30)
 
+        # Aproed Doctor Names with the Selected Specialization
         doctorDropdownLabel = ctk.CTkLabel(leftFrame, text="Select Doctor", font=("Inter", 16, "bold",), anchor=ctk.W, text_color="#000000",)
         doctorDropdownLabel.pack(side='top', fill='x', expand=False,)
         doctorDropdown = ctk.CTkComboBox(
             leftFrame, fg_color="#ffffff", text_color="#000000", width=295, height=48, 
             font=("Inter", 20), button_color='#1AFF75', button_hover_color='#36D8B7',
-            values=['Select Doctor', 'Maisarah Majdi', 'Someshwar Rao', 'Karen Khor Siew Li'], border_color="#b5b3b3", border_width=1,
+            border_color="#b5b3b3", border_width=1, values=['Select Doctor'],
             dropdown_font=("Inter", 20), dropdown_fg_color='#fff', 
             dropdown_text_color='#000', dropdown_hover_color='#1AFF75', hover=True,
         )
@@ -660,7 +755,7 @@ def patientDashboardWindow(email):
 
         # Executed when searchbar is entered
         if array is None:
-            for appointment in appointments:
+            for num, appointment in enumerate(appointments, start=1):
                 appointmentID = appointment[0]
                 clinicName = appointment[7]
                 doctorType = appointment[5]
@@ -679,7 +774,7 @@ def patientDashboardWindow(email):
                     isConfirmed = 'Doctor Replaced'
                 
 
-                data = (numOfAppointments, clinicName, doctorName, dateAndTime, duration, isConfirmed, appointmentID)
+                data = (num, clinicName, doctorName, dateAndTime, duration, isConfirmed, appointmentID)
 
 
                 if count % 2 == 0:
@@ -692,14 +787,14 @@ def patientDashboardWindow(email):
         
         # Executed when Approve Button is clicked
         else:
-            for appointment in array:
+            for num, appointment in enumerate(array, start=1):
                 appointmentID = appointment[0]
                 clinicName = appointment[7]
                 doctorType = appointment[5]
                 doctorName = appointment[3]
                 date = appointment[9]
                 time = appointment[10]
-                dateAndTime = f'{date} {time}'
+                dateAndTime = f'{date} ({time})'
                 duration = appointment[11]
                 if appointment[14] == 0:
                     isConfirmed = 'Waiting For Confirmation'
@@ -711,7 +806,7 @@ def patientDashboardWindow(email):
                     isConfirmed = 'Doctor Replaced'
                 
 
-                data = (numOfAppointments, clinicName, doctorName, dateAndTime, duration, isConfirmed, appointmentID)
+                data = (num, clinicName, doctorName, dateAndTime, duration, isConfirmed, appointmentID)
 
 
                 if count % 2 == 0:

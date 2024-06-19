@@ -60,6 +60,10 @@ def logInWindow():
         if ".com" not in email:
             messagebox.showerror('Error', 'Enter a valid email address.')
             return False 
+
+        if any(char.isupper() for char in email):
+            messagebox.showerror('Error', "Email should not contain capital letters. Please try again.")
+            return False 
         
         if len(password) <= 8:
             messagebox.showerror('Error', 'Password must be more than 8 characters')
@@ -76,6 +80,8 @@ def logInWindow():
         if not re.search(r'[\W_]', password):  # \W matches any non-word character, _ is included to catch underscore as a symbol
             messagebox.showerror('Error', 'Password must contain at least 1 symbol.')
             return False
+        
+        
         
         return True
     
@@ -124,8 +130,16 @@ def logInWindow():
 
             if result:
                 if bcrypt.checkpw(password.encode('utf-8'), result[0]): # Check whether the user entered password matched the password in DB
-                    messagebox.showinfo('Success', 'Logged in successfully as Doctor.')
-                    return True
+                    doctorCursor.execute('SELECT IsApproved FROM doctors WHERE Email=?', [email])
+                    result = doctorCursor.fetchone()
+
+                    if result[0] == 1:
+                        messagebox.showinfo('Success', 'Logged in successfully as Doctor.')
+                        return True
+                    else:
+                        messagebox.showerror('Error', 'Your Clinic Admin has not approved your access yet.\nPlease contact them and try again later.')
+                        return False
+
                 else:
                     messagebox.showerror('Error', 'Password does not match. Please try again.')
                     return False
@@ -153,8 +167,15 @@ def logInWindow():
 
             if result:
                 if bcrypt.checkpw(password.encode('utf-8'), result[0]): # Check whether the user entered password matched the password in DB
-                    messagebox.showinfo('Success', 'Logged in successfully as Clinic Admin.')
-                    return True
+                    clinicAdminCursor.execute('SELECT IsApproved FROM clinicAdmins WHERE Email=?', [email])
+                    result = clinicAdminCursor.fetchone()
+
+                    if result[0] == 1:
+                        messagebox.showinfo('Success', 'Logged in successfully as Clinic Admin.')
+                        return True
+                    else:
+                        messagebox.showerror('Error', 'The Call A Doctor Admin has not approved your access yet.\nPlease contact them and try again later.')
+                        return False
                 else:
                     messagebox.showerror('Error', 'Password does not match. Please try again.')
                     return False

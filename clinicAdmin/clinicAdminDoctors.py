@@ -85,7 +85,7 @@ def clinicAdminDoctorWindow(email):
 
         # Executed when searchbar is entered
         if array is None:
-            for doctor in doctors:
+            for num, doctor in enumerate(doctors, start=1):
                 doctorID = doctor[0]
                 doctorName = f"{doctor[1]} {doctor[2]}"
                 doctorEmail = doctor[3]
@@ -99,7 +99,7 @@ def clinicAdminDoctorWindow(email):
                 else:
                     isApproved = 'Rejected'
 
-                data = (numOfDoctors, doctorName, doctorEmail, specialization, yearsOfExp, isApproved,doctorID)
+                data = (num, doctorName, doctorEmail, specialization, yearsOfExp, isApproved,doctorID)
 
 
                 if count % 2 == 0:
@@ -112,7 +112,7 @@ def clinicAdminDoctorWindow(email):
         
         # Executed when Approve Button is clicked
         else:
-            for doctor in doctors:
+            for num, doctor in enumerate(array, start=1):
                 doctorID = doctor[0]
                 doctorName = f"{doctor[1]} {doctor[2]}"
                 doctorEmail = doctor[3]
@@ -126,7 +126,7 @@ def clinicAdminDoctorWindow(email):
                 else:
                     isApproved = 'Rejected'
 
-                data = (numOfDoctors, doctorName, doctorEmail, specialization, yearsOfExp, isApproved, doctorID)
+                data = (num, doctorName, doctorEmail, specialization, yearsOfExp, isApproved, doctorID)
 
 
                 if count % 2 == 0:
@@ -156,7 +156,7 @@ def clinicAdminDoctorWindow(email):
         
 
         if isApproveStatus == 'Approved':
-            messagebox.showinfo(f"Info", "Doctor {doctorName}'s access is already approved.")
+            messagebox.showinfo("Info", f"Doctor {doctorName}'s access is already approved.")
         else:
             
             doctorCursor.execute('UPDATE doctors SET IsApproved=? WHERE DoctorID=?', (1, doctorID))
@@ -184,7 +184,7 @@ def clinicAdminDoctorWindow(email):
         
 
         if isApproveStatus == 'Rejected':
-            messagebox.showinfo(f"Info", "Doctor {doctorName}'s access is already rejected.")
+            messagebox.showinfo("Info", f"Doctor {doctorName}'s access is already rejected.")
         else:
             
             doctorCursor.execute('UPDATE doctors SET IsApproved=? WHERE DoctorID=?', (2, doctorID))
@@ -226,12 +226,7 @@ def clinicAdminDoctorWindow(email):
         else:
             doctorCursor.execute(f'SELECT * FROM doctors WHERE {searchOption}=?', (searchTerm,))
             result = doctorCursor.fetchall()
-            print(result)
-            if result:
-                print('Valid search term')
-                insertTreeview(result)
-            else:
-                table.delete(*table.get_children())
+            insertTreeview(result)
 
 
     # <<<<<<<<<<<<<<<<<<<< MAIN WINDOW >>>>>>>>>>>>>>>>>>>>>
@@ -325,7 +320,7 @@ def clinicAdminDoctorWindow(email):
     greetingLabel2 = ctk.CTkLabel(whiteFrame, text=f"{greeting}  ({formatted_date})", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
     clinicName = ctk.CTkLabel(whiteFrame, text=f"({clinicName})", font=("Inter", 22,), text_color="#000000")
-    clinicName.place(x=350, y=72)
+    clinicName.place(x=348, y=72)
 
     roleLabel = ctk.CTkLabel(whiteFrame, text="(Clinic Admin)", font=("Inter", 36, "bold",), text_color="#000000")
     roleLabel.place(x=775, y=25)
