@@ -164,6 +164,8 @@ def patientDashboardWindow(email):
                     return
                 
 
+                
+
                 updateQuery = '''
                     UPDATE appointments
                     SET DoctorName = ?, DoctorType = ?, ClinicName = ?, AppointmentDate = ?, AppointmentTime = ?, AppointmentDuration = ?, PainDetails = ?
@@ -195,7 +197,20 @@ def patientDashboardWindow(email):
         appointmentData = table.item(selectedItem)["values"]
         print(appointmentData)
         appointmentID = appointmentData[6]
-        print(appointmentID)
+        isConfirmedStatus = appointmentData[5]
+        clinicName = appointmentData[1]
+        
+        if isConfirmedStatus == "Confirmed":
+            messagebox.showerror('Error',f"This Appointment is already Confirmed by the Clinic Admin, hence you cannot update it anymore. Any inconvenience caused is regretted. You can contact {clinicName} directly to make changes with your appointment.")
+            return
+
+        # appointmentConn = sqlite3.connect('appointments.db')
+        # appointmentCursor = appointmentConn.cursor()
+        # appointmentCursor.execute('SELECT IsConfirmed FROM appointments WHERE AppointmentID=?', [appointmentID])
+        # appointmentResult = appointmentCursor.fetchone()
+        # isConfirmedStatus = appointmentResult[0]
+
+        
 
         # <<<<<<<<<<<<<<<<<<<<<<<<<<< TOPLEVEL >>>>>>>>>>>>>>>>>>>>>>>>>
         toplevel = ctk.CTkToplevel(window)
@@ -419,6 +434,42 @@ def patientDashboardWindow(email):
 
             doctorDropdown.configure(values=doctorNames)
 
+        def validateAppointmentDate(selectedDate):
+            # Convert the selected date string to a datetime object
+            selected_date = datetime.strptime(selectedDate, '%m/%d/%y')
+            
+            current_date = datetime.now() # Get the current date
+            current_year = current_date.year # Get the current year
+
+
+            # Check if the selected date is the same day as the current date
+            if selected_date.date() == current_date.date():
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',"Appointments cannot be on the same day. Please select a date from tomorrow onwards.")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                return False
+    
+            
+            # Check if the selected date is in the past
+            if selected_date < current_date:
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',"The selected date is in the past. Please select a future date.")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                return False
+            
+            # Check if the selected date is within the current year
+            if selected_date.year > current_year:
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',"The selected date is next year or onwards. Please select a date within the current year.")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                return False
+            
+            return True
+
+
         def bookAppointment():
             clinicName = clinicNameDropdown.get()
             doctorType = doctorTypeDropdown.get()
@@ -429,6 +480,63 @@ def patientDashboardWindow(email):
             time = consultationTimeDropdown.get()
             duration = consultationDurationDropdown.get()
             
+            
+            if (clinicName == 'Select Your Clinic'):
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',"Please select a Clinic.")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                    return
+
+            elif (doctorType == 'Select Type'):
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',"Please select the type of Doctor you need.")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                    return
+
+            elif (painDetails == ''):
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',"Please explain briefly about your pain details so the Doctor can prepare Prescriptions accordingly.")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                    return
+
+            elif (doctorName == 'Select Doctor'):
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',"Please select a Doctor.")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                    return
+                
+            elif (date == ""):
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',"Please select a Date for your Appointment")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                    return
+                
+            elif (date):
+                validDate = validateAppointmentDate(date)
+                if validDate is not True:
+                    return
+
+            elif (time == 'Select Time'):
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',"Please select your Appointment Time.")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                    return
+
+            elif (duration == 'Select Duration'):
+                toplevel.attributes("-topmost",False)
+                messagebox.showerror('Error',"Please select your desired Appointment Duration.")
+                if messagebox:
+                    toplevel.attributes("-topmost",True)
+                    return
+                
+
+           
             # Connecting to Patient DB to get Patient Name & ID
             patientConn = sqlite3.connect('patients.db')
             patientCursor = patientConn.cursor()
@@ -455,103 +563,59 @@ def patientDashboardWindow(email):
             currentDateTime = datetime.now()
             appointmentCreatedAt = currentDateTime.strftime('%Y-%m-%d %H:%M:%S')
 
-            if (clinicName != '' and doctorType != '' and painDetails != '' and doctorName != '' and date != '' and 
-                time != '' and duration != ''):
 
-                if clinicName == 'Clinic Name':
-                    toplevel.attributes("-topmost",False)
-                    messagebox.showerror('Error',"Please select a Clinic.")
-                    if messagebox:
-                        toplevel.attributes("-topmost",True)
-                    return
-                
-                if doctorType == 'Select Type':
-                    toplevel.attributes("-topmost",False)
-                    messagebox.showerror('Error',"Please select the Type of Doctor.")
-                    if messagebox:
-                        toplevel.attributes("-topmost",True)
-                    return
-                
-                if doctorName == 'Select Doctor':
-                    toplevel.attributes("-topmost",False)
-                    messagebox.showerror('Error',"Please select a Doctor.")
-                    if messagebox:
-                        toplevel.attributes("-topmost",True)
-                    return
-                
-                if time == 'Select Time':
-                    toplevel.attributes("-topmost",False)
-                    messagebox.showerror('Error',"Please select the Consultaion Time.")
-                    if messagebox:
-                        toplevel.attributes("-topmost",True)
-                    return
-                
-                if duration == 'Select Duration':
-                    toplevel.attributes("-topmost",False)
-                    messagebox.showerror('Error',"Please select the Consultaion Duration.")
-                    if messagebox:
-                        toplevel.attributes("-topmost",True)
-                    return
+            # Connecting to Patients DB to retrieve Number Of Appointments
+            patientConn = sqlite3.connect('patients.db')
+            patientCursor = patientConn.cursor()
+            patientCursor.execute('SELECT NumberOfAppointments FROM patients WHERE Email=?', [email])
+            result = patientCursor.fetchone()
+            currentAppointments = result[0]
 
-                # Connecting to Patients DB to retrieve Number Of Appointments
-                patientConn = sqlite3.connect('patients.db')
-                patientCursor = patientConn.cursor()
-                patientCursor.execute('SELECT NumberOfAppointments FROM patients WHERE Email=?', [email])
-                result = patientCursor.fetchone()
-                currentAppointments = result[0]
+            # Insert Appoinment into DB
+            appointmentCursor.execute(
+                'INSERT INTO appointments (PatientName, PatientID, DoctorName, DoctorID, DoctorType, DoctorAvailability, ClinicName, ClinicID, AppointmentDate, AppointmentTime, AppointmentDuration, AppointmentCreatedTime, PainDetails, IsConfirmed, Prescriptions) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
+                [patientName, patientID, doctorName, doctorID, doctorType, doctorAvailability, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails, 0, "Empty"])
+            appointmentConn.commit()
+            appointmentID = appointmentCursor.lastrowid # Retrieve the AppointmentID of the newly inserted row
+            print(f"The new appointment ID is: {appointmentID}")
 
-                # Insert Appoinment into DB
-                appointmentCursor.execute(
-                    'INSERT INTO appointments (PatientName, PatientID, DoctorName, DoctorID, DoctorType, DoctorAvailability, ClinicName, ClinicID, AppointmentDate, AppointmentTime, AppointmentDuration, AppointmentCreatedTime, PainDetails, IsConfirmed, Prescriptions) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
-                    [patientName, patientID, doctorName, doctorID, doctorType, doctorAvailability, clinicName, clinicAdminID, date, time, duration, appointmentCreatedAt, painDetails, 0, "Empty"])
-                appointmentConn.commit()
-                appointmentID = appointmentCursor.lastrowid # Retrieve the AppointmentID of the newly inserted row
-                print(f"The new appointment ID is: {appointmentID}")
+            # Check for appointments with the same clinic name, doctor, date, and time
+            selectQuery = '''
+                SELECT COUNT(*)
+                FROM appointments
+                WHERE ClinicName=? AND DoctorName = ? AND AppointmentDate = ? AND AppointmentTime = ?
+            ''' 
+            appointmentCursor.execute(selectQuery, (clinicName, doctorName, date, time))
+            count = appointmentCursor.fetchone()[0]
+            print(f"The count of repeated appointments is {count}")
 
-                # Check for appointments with the same clinic name, doctor, date, and time
-                selectQuery = '''
-                    SELECT COUNT(*)
-                    FROM appointments
-                    WHERE ClinicName=? AND DoctorName = ? AND AppointmentDate = ? AND AppointmentTime = ?
-                ''' 
-                appointmentCursor.execute(selectQuery, (clinicName, doctorName, date, time))
-                count = appointmentCursor.fetchone()[0]
-                print(f"The count of repeated appointments is {count}")
-
-                
-
-                # Update Doctor Availability to 1 for repeated appointments
-                if count > 1:
-                    updateQuery = '''
-                        UPDATE appointments
-                        SET DoctorAvailability = 1
-                        WHERE AppointmentID = ?
-                    '''
-                    appointmentCursor.execute(updateQuery, (appointmentID,))
-                    appointmentConn.commit()
-                    
-
-                if result:
-                    newAppointments = currentAppointments + 1
-
-                    # Update the number of appointments
-                    patientCursor.execute('UPDATE patients SET NumberOfAppointments = ? WHERE Email= ?', (newAppointments, email))
-                    patientConn.commit()
-
-                patientConn.close()
-                
-
-                toplevel.attributes("-topmost",False)
-                messagebox.showinfo('Success', 'Appointment successfully added.')
-                toplevel.destroy()
-                insertTreeview()
-                
             
-            else:
-                toplevel.attributes("-topmost",False)
-                messagebox.showerror('Error',"Please fill up all the fields.")
-                if messagebox:
-                    toplevel.attributes("-topmost",True)
+
+            # Update Doctor Availability to 1 for repeated appointments
+            if count > 1:
+                updateQuery = '''
+                    UPDATE appointments
+                    SET DoctorAvailability = 1
+                    WHERE AppointmentID = ?
+                '''
+                appointmentCursor.execute(updateQuery, (appointmentID,))
+                appointmentConn.commit()
+                
+
+            if result:
+                newAppointments = currentAppointments + 1
+
+                # Update the number of appointments
+                patientCursor.execute('UPDATE patients SET NumberOfAppointments = ? WHERE Email= ?', (newAppointments, email))
+                patientConn.commit()
+
+            patientConn.close()
+            
+
+            toplevel.attributes("-topmost",False)
+            messagebox.showinfo('Success', 'Appointment successfully added.')
+            toplevel.destroy()
+            insertTreeview()
 
 
 
