@@ -53,7 +53,8 @@ def signInWindow():
             Specialization TEXT NOT NULL,
             YearsOfExperience TEXT NOT NULL,
             IsApproved INTEGER DEFAULT 0,
-            NumberOfAppointments INTEGER DEFAULT 0
+            NumberOfAppointments INTEGER DEFAULT 0,
+            IsOffline INTEGER DEFAULT 0
         )          
     """)
 
@@ -78,7 +79,7 @@ def signInWindow():
         )          
     """)
 
-    # Creating Clinic Admin DB
+    # Creating CAD Admin DB
     adminConn = sqlite3.connect('admins.db')
     adminCursor = adminConn.cursor()
     adminCursor.execute("""
@@ -363,8 +364,8 @@ def signInWindow():
                 hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
                 print(hashedPassword)
                 doctorCursor.execute(
-                    'INSERT INTO doctors (FirstName, LastName, Email, Password, NRIC, Role, ClinicName, Specialization, YearsOfExperience, IsApproved, NumberOfAppointments) VALUES (?,?,?,?,?,?,?,?,?,?,?)', 
-                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, doctorSpecialization, yearsOfExp, 0, 0]
+                    'INSERT INTO doctors (FirstName, LastName, Email, Password, NRIC, Role, ClinicName, Specialization, YearsOfExperience, IsApproved, NumberOfAppointments, IsOffline) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', 
+                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, doctorSpecialization, yearsOfExp, 0, 0, 0]
                 )
                 doctorConn.commit()
 

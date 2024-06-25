@@ -54,7 +54,7 @@ def doctorDashboardWindow(email):
     def searchbarOutFocus(event):
         print(event)
         searchInputTextBox.delete('0.0', "end")
-        searchInputTextBox.insert('0.0', "Search by Appointment Details")
+        searchInputTextBox.insert('0.0', "Search")
         searchInputTextBox.configure(text_color='gray')
 
     global count
@@ -90,11 +90,13 @@ def doctorDashboardWindow(email):
                 painDetails = appointment[13]
                 if appointment[15] == 'Empty':
                     prescriptions = 'Not Given'
+                    completionStatus = "Waiting"
                 else:
                     prescriptions = 'Given'
-                
+                    completionStatus = "Completed"
+                 
 
-                data = (num, patientName, dateAndTime, duration, painDetails, prescriptions, appointmentID)
+                data = (num, patientName, dateAndTime, duration, painDetails, prescriptions, completionStatus, appointmentID)
 
 
                 if count % 2 == 0:
@@ -179,6 +181,7 @@ def doctorDashboardWindow(email):
         def handleSubmit():
             newPrescriptions = prescriptionsTextBox.get(0.0, 'end').strip()
 
+            # , IsCompleted = ? {Need to update before Viva}
             if (newPrescriptions != ''):
                 updateQuery = '''
                     UPDATE appointments
@@ -214,7 +217,7 @@ def doctorDashboardWindow(email):
         
         appointmentData = table.item(selectedItem)["values"]
         print(appointmentData)
-        appointmentID = appointmentData[6]
+        appointmentID = appointmentData[7]
         tablePrescriptions = appointmentData[5]
 
         if tablePrescriptions == "Given":
@@ -470,7 +473,7 @@ def doctorDashboardWindow(email):
     greetingLabel2 = ctk.CTkLabel(whiteFrame, text=f"{greeting}  ({formatted_date})", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
     clinicName = ctk.CTkLabel(whiteFrame, text=f"({clinicName})", font=("Inter", 22,), text_color="#000000")
-    clinicName.place(x=352, y=72)
+    clinicName.place(x=372, y=72)
 
     roleLabel = ctk.CTkLabel(whiteFrame, text="(Doctor)", font=("Inter", 36, "bold",), text_color="#000000")
     roleLabel.place(x=875, y=25)
@@ -505,11 +508,11 @@ def doctorDashboardWindow(email):
 
     # Search Box field 
     searchInputTextBox = ctk.CTkTextbox(
-        whiteFrame, fg_color="#ffffff", text_color="gray", width=473, height=50, 
+        whiteFrame, fg_color="#ffffff", text_color="gray", width=240, height=50, 
         border_color="#000", font=("Inter", 21), border_spacing=8,
         scrollbar_button_color="#1AFF75", border_width=2,
     )
-    searchInputTextBox.insert('insert', "Search by Appointment Details")
+    searchInputTextBox.insert('insert', "Search")
     searchInputTextBox.place(x=293, y=225)
     searchInputTextBox.bind("<FocusIn>", searchbarFocus)
     searchInputTextBox.bind("<FocusOut>", searchbarOutFocus)
@@ -524,7 +527,7 @@ def doctorDashboardWindow(email):
         font=("Inter", 22, "bold",), fg_color="#000", hover_color="#333333", image=searchIcon, 
         corner_radius=4, command=searchBy # anchor=ctk.W 
     )
-    searchButton.place(x=668, y=225)
+    searchButton.place(x=465, y=225)
 
 
     # Cancel Search Button with Icon
@@ -535,7 +538,26 @@ def doctorDashboardWindow(email):
         font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=cancelSearchIcon, corner_radius=2,
         command=insertTreeview # anchor=ctk.W 
     )
-    cancelSearchButton.place(x=715, y=225)
+    cancelSearchButton.place(x=510, y=225)
+
+    def goOffline():
+        msg = messagebox.askokcancel('Warning', "You are about to go offline. When you go offline, you will not receive any new appointments.\nAre you sure you want to proceed?")
+
+        if msg:
+            goOfflineButton.configure(text=" Go Online ", fg_color="#1BC5DC", hover_color="#1695A7", image=onlineIcon)
+            
+
+    # Go Offline Button with Icon {Need to update before Viva}
+    offlineIconPath = relative_to_assets("offline-icon.png")
+    onlineIconPath = relative_to_assets("online-icon.png")
+    offlineIcon = ctk.CTkImage(light_image=Image.open(offlineIconPath), size=(33,33),)
+    onlineIcon = ctk.CTkImage(light_image=Image.open(onlineIconPath), size=(33,33),)
+    goOfflineButton = ctk.CTkButton(
+        whiteFrame, text=" Go Offline ", width=200, height=50, 
+        font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=offlineIcon,
+        command=goOffline # anchor=ctk.W 
+    )
+    goOfflineButton.place(x=571, y=225)
 
 
     # Generate Prescriptions Button with Icon
@@ -562,7 +584,7 @@ def doctorDashboardWindow(email):
     table.pack(side='left', fill='both')
     table['columns'] = (
         'No', 'Patient Name', 'Date & Time', 'Duration',
-        "Pain Details", "Prescriptions", "Appointment ID"
+        "Pain Details", "Prescriptions", "Status", "Appointment ID"
     )
 
     # Placing and Configuring Treeview Scrollbar
@@ -592,6 +614,7 @@ def doctorDashboardWindow(email):
     table.heading('Duration', text='Duration')
     table.heading('Pain Details', text='Pain Details')
     table.heading('Prescriptions', text='Prescriptions')
+    table.heading('Status', text='Status')
 
     # Treeview Table Columns Details
     table.column("#0", width=0, stretch=ctk.NO)
@@ -599,8 +622,9 @@ def doctorDashboardWindow(email):
     table.column("Patient Name", width=250, anchor=ctk.CENTER)
     table.column("Date & Time", width=200, anchor=ctk.CENTER)
     table.column("Duration", width=200, anchor=ctk.CENTER)
-    table.column("Pain Details", width=380, anchor=ctk.CENTER)
+    table.column("Pain Details", width=220, anchor=ctk.CENTER)
     table.column("Prescriptions", width=160, anchor=ctk.CENTER)
+    table.column("Status", width=160, anchor=ctk.CENTER)
     table.column("Appointment ID", width=0, stretch=ctk.NO)
 
     # Setting alternating colours for the rows in Treeview

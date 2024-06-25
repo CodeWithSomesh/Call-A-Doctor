@@ -99,7 +99,7 @@ def clinicAdminDoctorWindow(email):
                 else:
                     isApproved = 'Rejected'
 
-                data = (num, doctorName, doctorEmail, specialization, yearsOfExp, isApproved,doctorID)
+                data = (num, doctorName, doctorEmail, specialization, "Online", isApproved,doctorID)
 
 
                 if count % 2 == 0:
@@ -126,7 +126,7 @@ def clinicAdminDoctorWindow(email):
                 else:
                     isApproved = 'Rejected'
 
-                data = (num, doctorName, doctorEmail, specialization, yearsOfExp, isApproved, doctorID)
+                data = (num, doctorName, doctorEmail, specialization, "Offline", isApproved, doctorID)
 
 
                 if count % 2 == 0:
@@ -320,7 +320,7 @@ def clinicAdminDoctorWindow(email):
     greetingLabel2 = ctk.CTkLabel(whiteFrame, text=f"{greeting}  ({formatted_date})", font=("Inter", 22,), text_color="#000000")
     greetingLabel2.place(x=25, y=72)
     clinicName = ctk.CTkLabel(whiteFrame, text=f"({clinicName})", font=("Inter", 22,), text_color="#000000")
-    clinicName.place(x=348, y=72)
+    clinicName.place(x=353, y=72)
 
     roleLabel = ctk.CTkLabel(whiteFrame, text="(Clinic Admin)", font=("Inter", 36, "bold",), text_color="#000000")
     roleLabel.place(x=775, y=25)
@@ -422,7 +422,7 @@ def clinicAdminDoctorWindow(email):
     table.pack(side='left', fill='both')
     table['columns'] = (
         'No', 'Doctor Name', 'Doctor Email', 'Specialization',
-        "Experience", "Approval Status", "Doctor ID"
+        "Availability", "Approval Status", "Doctor ID"
     )
 
     # Placing and Configuring Treeview Scrollbar
@@ -450,7 +450,7 @@ def clinicAdminDoctorWindow(email):
     table.heading('Doctor Name', text='Doctor Name',)
     table.heading('Doctor Email', text='Doctor Email')
     table.heading('Specialization', text='Specialization')
-    table.heading('Experience', text='Experience')
+    table.heading('Availability', text='Availability')
     table.heading('Approval Status', text='Approval Status')
 
     # Treeview Table Columns Details
@@ -459,7 +459,7 @@ def clinicAdminDoctorWindow(email):
     table.column("Doctor Name", width=280, anchor=ctk.CENTER)
     table.column("Doctor Email", width=270, anchor=ctk.CENTER)
     table.column("Specialization", width=280, anchor=ctk.CENTER)
-    table.column("Experience", width=150, anchor=ctk.CENTER,)
+    table.column("Availability", width=150, anchor=ctk.CENTER,)
     table.column("Approval Status", width=220, anchor=ctk.CENTER)
     table.column("Doctor ID", width=0, stretch=ctk.NO)
 
