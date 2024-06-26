@@ -1,10 +1,7 @@
+# Call a Doctor (CaD) Appointment Booking System
 <p align="center">
   <img src="https://github.com/CodeWithSomesh/Call-A-Doctor/assets/123357802/35f74a8a-0157-4f6d-9980-c96947586e61" alt="Call a Doctor Logo">
 </p>
-
-
-# Call a Doctor (CaD) Appointment Booking System
-
 <br>
 
 ## Description
