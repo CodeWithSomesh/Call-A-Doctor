@@ -62,10 +62,22 @@ The "Call a Doctor (CaD)" project is a comprehensive desktop application designe
 - pip (Python package installer)
 
 ### Dependencies
+
 The project requires the following Python libraries:
-- `tkinter`
-- `customtkinter`
+- `sys`
+- `pathlib`
+- `PIL`
 - `sqlite3`
+- `datetime`
+- `tkinter`
+- `tkinter.ttk`
+- `tkinter.messagebox`
+- `tkcalendar`
+- `tkintermapview`
+- `customtkinter`
+- `bcrypt`
+- `re`
+- `random`
 
 ### Installation Steps
 
@@ -75,17 +87,15 @@ The project requires the following Python libraries:
    cd CaD-Appointment-Booking-System
    ```
 
-2. **Create a Virtual Environment (Optional but recommended)**:
+2. **Install Dependencies**:
    ```sh
-   python -m venv venv
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   pip install pillow
+   pip install customtkinter
+   pip install tkcalendar
+   pip install tkintermapview
+   pip install bcrypt
    ```
 
-3. **Install Dependencies**:
-   ```sh
-   pip install tk
-   pip install customtkinter
-   ```
 
 <br>
 
@@ -107,6 +117,14 @@ This will start the CaD Appointment Booking System, allowing you to interact wit
 After running the above command, the databases will be created in the project folder. You can verify the data using any online SQLite viewer. Here are some recommended viewers:
 - [SQLite Viewer by Inloop](https://inloop.github.io/sqlite-viewer/)
 - [SQLite Viewer App](https://sqliteviewer.app)
+  
+<br>
+
+### Note on Password Security
+
+Please note that the passwords stored in the database will appear different from the ones entered by the users. This is because bcrypt is used to hash the passwords for increased security. Bcrypt applies a one-way hash function to the passwords, making it impossible to reverse-engineer the original passwords from the stored hashes. This ensures that user passwords are securely stored and protected against unauthorized access.
+
+
 
 <br>
 
