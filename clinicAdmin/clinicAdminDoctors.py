@@ -91,6 +91,7 @@ def clinicAdminDoctorWindow(email):
                 doctorEmail = doctor[3]
                 specialization = doctor[8]
                 yearsOfExp = f"{doctor[9]} years"
+                
 
                 if doctor[10] == 0:
                     isApproved = 'Waiting For Approval'
@@ -99,7 +100,12 @@ def clinicAdminDoctorWindow(email):
                 else:
                     isApproved = 'Rejected'
 
-                data = (num, doctorName, doctorEmail, specialization, "Online", isApproved,doctorID)
+                if doctor[12] == 0:
+                    onlineStatus = "Offline"
+                elif doctor[12] == 1:
+                    onlineStatus = "Online"
+
+                data = (num, doctorName, doctorEmail, specialization, onlineStatus, isApproved,doctorID)
 
 
                 if count % 2 == 0:
@@ -126,7 +132,12 @@ def clinicAdminDoctorWindow(email):
                 else:
                     isApproved = 'Rejected'
 
-                data = (num, doctorName, doctorEmail, specialization, "Offline", isApproved, doctorID)
+                if doctor[12] == 0:
+                    onlineStatus = "Offline"
+                elif doctor[12] == 1:
+                    onlineStatus = "Online"
+
+                data = (num, doctorName, doctorEmail, specialization, onlineStatus, isApproved, doctorID)
 
 
                 if count % 2 == 0:
@@ -159,7 +170,7 @@ def clinicAdminDoctorWindow(email):
             messagebox.showinfo("Info", f"Doctor {doctorName}'s access is already approved.")
         else:
             
-            doctorCursor.execute('UPDATE doctors SET IsApproved=? WHERE DoctorID=?', (1, doctorID))
+            doctorCursor.execute('UPDATE doctors SET IsApproved=?, IsOffline=? WHERE DoctorID=?', (1,1, doctorID))
             doctorConn.commit()
             doctorConn.close()
             insertTreeview()
@@ -187,7 +198,7 @@ def clinicAdminDoctorWindow(email):
             messagebox.showinfo("Info", f"Doctor {doctorName}'s access is already rejected.")
         else:
             
-            doctorCursor.execute('UPDATE doctors SET IsApproved=? WHERE DoctorID=?', (2, doctorID))
+            doctorCursor.execute('UPDATE doctors SET IsApproved=?, IsOffline=? WHERE DoctorID=?', (2, 0, doctorID))
             doctorConn.commit()
             doctorConn.close()
             insertTreeview()
@@ -217,6 +228,14 @@ def clinicAdminDoctorWindow(email):
                 searchTerm = '1'
             elif searchTerm == 'Rejected':
                 searchTerm = '2'
+        elif searchOption == 'Availability':
+            searchOption = "IsOffline"
+
+            if searchTerm == 'Online':
+                searchTerm = '1'
+            elif searchTerm == 'Offline':
+                searchTerm = '0'
+
 
 
         if searchTerm == "":
@@ -342,7 +361,7 @@ def clinicAdminDoctorWindow(email):
     # Search Box Dropdown Menu 
     searchOptions = [
         'Search By Option', 'Doctor Email', 'Specialization', 
-        "Experience", "Approval Status",
+        "Availability", "Approval Status",
     ]
     searchByDropdown = ctk.CTkComboBox(
         whiteFrame, fg_color="#ffffff", text_color="#000000", width=252, height=50, 

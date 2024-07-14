@@ -238,7 +238,7 @@ def signInWindow():
         logInLabel2.pack(side='left', fill='x', expand=False, padx=(0, 0), pady=(10, 40))
 
     # Validating user's email and password for increased security
-    def validateCredentials(email, password, nric):
+    def validateCredentials(email, password, nric, yearsOfExp=None):
         if "@" not in email:
             messagebox.showerror('Error', 'Enter a valid email address.')
             return False
@@ -348,6 +348,10 @@ def signInWindow():
             if validateCredentials(email, password, nric) is False:
                 return
             
+            if not yearsOfExp.isdigit() or int(yearsOfExp) > 70:
+                messagebox.showerror('Error', "Years Of Experience must contain only numbers and cannot be too high. Please try again.")
+                return 
+            
             if clinicName == 'Select Your Clinic':
                 messagebox.showerror('Error', 'Please select your Clinic.')
                 return
@@ -364,8 +368,8 @@ def signInWindow():
                 hashedPassword = bcrypt.hashpw(encodedPassword, bcrypt.gensalt())
                 print(hashedPassword)
                 doctorCursor.execute(
-                    'INSERT INTO doctors (FirstName, LastName, Email, Password, NRIC, Role, ClinicName, Specialization, YearsOfExperience, IsApproved, NumberOfAppointments, IsOffline) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', 
-                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, doctorSpecialization, yearsOfExp, 0, 0, 0]
+                    'INSERT INTO doctors (FirstName, LastName, Email, Password, NRIC, Role, ClinicName, Specialization, YearsOfExperience, IsApproved, NumberOfAppointments) VALUES (?,?,?,?,?,?,?,?,?,?,?)', 
+                    [firstName, lastName, email, hashedPassword, nric, role, clinicName, doctorSpecialization, yearsOfExp, 0, 0]
                 )
                 doctorConn.commit()
 

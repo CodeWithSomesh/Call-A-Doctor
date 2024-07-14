@@ -175,6 +175,41 @@ def doctorDashboardWindow(email):
             appointmentCursor.execute(f'SELECT * FROM appointments WHERE {searchOption}=? AND DoctorName=? AND ClinicName=? AND IsConfirmed=?', (searchTerm, doctorName, clinicName, 1))
             result = appointmentCursor.fetchall()
             insertTreeview(result)
+    
+    def changeOnlineStatus():
+       # Connecting to Doctors DB
+        doctorConn = sqlite3.connect('doctors.db')
+        doctorCursor = doctorConn.cursor()
+        doctorCursor.execute('SELECT * FROM doctors WHERE Email=?', [email])
+        result = doctorCursor.fetchone() 
+        doctorID = result[0]
+        onlineStatus = result[12]
+
+        
+        # If the Status is Offline, make it Online
+        if onlineStatus == 0:
+            doctorCursor.execute('UPDATE doctors SET IsOffline=? WHERE DoctorID=?', (1, doctorID))
+            doctorConn.commit()
+            doctorConn.close()
+            goOfflineButton.configure(text=" Go Offline ", fg_color="#E00000", hover_color="#AE0000", image=onlineIcon)
+            messagebox.showinfo('Success', f'You have made yourself online and available, now you will be able to receive new appointments!')
+
+        
+
+        # If the Status is Online, make it Offline
+        if onlineStatus == 1:
+            msg = messagebox.askokcancel('Warning', "You are about to go offline. When you go offline, you will not receive any new appointments.\nAre you sure you want to proceed?")
+
+            if msg:
+                goOfflineButton.configure(text=" Go Online ", fg_color="#1BC5DC", hover_color="#1695A7", image=onlineIcon)
+                messagebox.showinfo('Success', f'You have made yourself offline successfully. Note that when you are offline, you will not receive any new appointments.')
+
+                doctorCursor.execute('UPDATE doctors SET IsOffline=? WHERE DoctorID=?', (0, doctorID))
+                doctorConn.commit()
+                doctorConn.close()
+
+            
+
 
     def topLevel():
 
@@ -540,11 +575,13 @@ def doctorDashboardWindow(email):
     )
     cancelSearchButton.place(x=510, y=225)
 
-    def goOffline():
-        msg = messagebox.askokcancel('Warning', "You are about to go offline. When you go offline, you will not receive any new appointments.\nAre you sure you want to proceed?")
-
-        if msg:
-            goOfflineButton.configure(text=" Go Online ", fg_color="#1BC5DC", hover_color="#1695A7", image=onlineIcon)
+     # Connecting to Doctors DB
+    doctorConn = sqlite3.connect('doctors.db')
+    doctorCursor = doctorConn.cursor()
+    doctorCursor.execute('SELECT * FROM doctors WHERE Email=?', [email])
+    result = doctorCursor.fetchone() 
+    doctorID = result[0]
+    onlineStatus = result[12]    
             
 
     # Go Offline Button with Icon {Need to update before Viva}
@@ -553,11 +590,17 @@ def doctorDashboardWindow(email):
     offlineIcon = ctk.CTkImage(light_image=Image.open(offlineIconPath), size=(33,33),)
     onlineIcon = ctk.CTkImage(light_image=Image.open(onlineIconPath), size=(33,33),)
     goOfflineButton = ctk.CTkButton(
-        whiteFrame, text=" Go Offline ", width=200, height=50, 
-        font=("Inter", 22, "bold",), fg_color="#E00000", hover_color="#AE0000", image=offlineIcon,
-        command=goOffline # anchor=ctk.W 
+        whiteFrame, width=200, height=50, 
+        font=("Inter", 22, "bold",), 
+        command=changeOnlineStatus # anchor=ctk.W 
     )
     goOfflineButton.place(x=571, y=225)
+
+    if onlineStatus == 0:
+        goOfflineButton.configure(text=" Go Online ", fg_color="#1BC5DC", hover_color="#1695A7", image=onlineIcon)
+    else:
+        goOfflineButton.configure(text=" Go Offline ", fg_color="#E00000", hover_color="#AE0000", image=onlineIcon)
+                           
 
 
     # Generate Prescriptions Button with Icon

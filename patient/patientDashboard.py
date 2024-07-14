@@ -310,7 +310,7 @@ def patientDashboardWindow(email):
         # Connecting to Doctor DB
         doctorConn = sqlite3.connect('doctors.db')
         doctorCursor = doctorConn.cursor()
-        doctorCursor.execute('SELECT Specialization FROM doctors WHERE IsApproved=?', (1,))
+        doctorCursor.execute('SELECT Specialization FROM doctors WHERE IsApproved=? AND IsOffline=?', (1,1))
         doctors = doctorCursor.fetchall()
 
         
@@ -720,7 +720,7 @@ def patientDashboardWindow(email):
         # Connecting to Doctor DB
         doctorConn = sqlite3.connect('doctors.db')
         doctorCursor = doctorConn.cursor()
-        doctorCursor.execute('SELECT Specialization FROM doctors WHERE IsApproved=?', (1,))
+        doctorCursor.execute('SELECT Specialization FROM doctors WHERE IsApproved=? AND IsOffline=?', (1,1))
         doctors = doctorCursor.fetchall()
 
         # Making sure the available Specializations are all unique 

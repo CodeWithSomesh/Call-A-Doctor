@@ -294,7 +294,7 @@ def clinicAdminDashboardWindow(email):
         doctorCursor = doctorConn.cursor()
 
         # Getting Doctors who are approved and under the selected specialization
-        doctorCursor.execute('SELECT FirstName, LastName FROM doctors WHERE IsApproved=? AND Specialization=?', (1, doctorType))
+        doctorCursor.execute('SELECT FirstName, LastName FROM doctors WHERE IsApproved=? AND Specialization=? AND IsOffline=?', (1, doctorType, 1))
         doctors = doctorCursor.fetchall()
 
         # Combine FirstName and LastName to create full names
