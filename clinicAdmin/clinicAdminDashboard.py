@@ -67,10 +67,18 @@ def clinicAdminDashboardWindow(email):
     def insertTreeview(array=None):
         global count
 
+        # Connecting to Clinic Admins DB
+        clinicAdminConn = sqlite3.connect('clinicAdmins.db')
+        clinicAdminCursor = clinicAdminConn.cursor()
+        clinicAdminCursor.execute('SELECT * FROM clinicAdmins WHERE Email=?', [email])
+        result = clinicAdminCursor.fetchone()
+        clinicAdminID = result[0] # Getting Clinic Admin's ID
+        clinicName = result[7] # Getting Clinic Name
+
         # Connecting to Appointments DB
         appointmentConn = sqlite3.connect('appointments.db')
         appointmentCursor = appointmentConn.cursor()
-        appointmentCursor.execute('SELECT * FROM appointments')
+        appointmentCursor.execute('SELECT * FROM appointments WHERE ClinicName=?', [clinicName])
         appointments = appointmentCursor.fetchall()
         table.delete(*table.get_children())
 

@@ -73,13 +73,14 @@ def clinicAdminDoctorWindow(email):
         clinicAdminCursor.execute('SELECT * FROM clinicAdmins WHERE Email=?', [email])
         result = clinicAdminCursor.fetchone()
         clinicAdminID = result[0] # Getting Clinic Admin's ID
+        clinicName = result[7] # Getting Clinic Name
         numOfDoctors = result[11] # Getting Clinic's number of doctors 
         numOfApprovedDoctors = result[12] # Getting Clinic's number of APPROVED doctors
 
         # Connecting to Doctor DB
         doctorConn = sqlite3.connect('doctors.db')
         doctorCursor = doctorConn.cursor()
-        doctorCursor.execute('SELECT * FROM doctors')
+        doctorCursor.execute('SELECT * FROM doctors WHERE ClinicName=?', [clinicName])
         doctors = doctorCursor.fetchall()
         table.delete(*table.get_children())
 
